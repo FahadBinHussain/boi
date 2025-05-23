@@ -1,0 +1,79 @@
+'use client';
+
+import { useState } from 'react';
+import { books, categories } from '@/lib/books';
+import BookGrid from '@/components/ui/BookGrid';
+import CategoryFilter from '@/components/ui/CategoryFilter';
+import { FiSearch } from 'react-icons/fi';
+
+export default function BooksPage() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+
+  // Function to toggle a category selection
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategories(prev => 
+      prev.includes(category)
+        ? prev.filter(c => c !== category)
+        : [...prev, category]
+    );
+  };
+
+  // Filter books based on search query
+  const filteredBooks = books.filter(book => {
+    const matchesSearch = searchQuery === '' || 
+      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      book.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      book.description.toLowerCase().includes(searchQuery.toLowerCase());
+
+    return matchesSearch;
+  });
+
+  return (
+    <div className="bg-gray-50 min-h-screen py-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-10">
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">Browse Books</h1>
+          <p className="text-lg text-gray-600">
+            Discover and download free books from our extensive collection
+          </p>
+        </div>
+
+        {/* Search Bar */}
+        <div className="mb-8 max-w-3xl">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search books by title, author or description..."
+              className="w-full px-5 py-3 pr-12 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500">
+              <FiSearch size={20} />
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Sidebar with Categories */}
+          <div className="lg:col-span-1">
+            <CategoryFilter 
+              categories={categories}
+              selectedCategories={selectedCategories}
+              onCategoryChange={handleCategoryChange}
+            />
+          </div>
+
+          {/* Main Content - Book Grid */}
+          <div className="lg:col-span-3">
+            <BookGrid 
+              books={filteredBooks} 
+              selectedCategories={selectedCategories} 
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+} 
