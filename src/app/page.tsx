@@ -9,6 +9,7 @@ import AuthCTA from '@/components/auth/AuthCTA';
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import ApplyBackground from '@/components/ui/ApplyBackground';
 
 // Register GSAP plugins
 if (typeof window !== 'undefined') {
@@ -432,7 +433,9 @@ export default function Home() {
 
   return (
     <>
-      {/* Page Overlay for Animation */}
+      <ApplyBackground />
+      
+      {/* Page loading overlay */}
       <div 
         ref={pageOverlayRef} 
         className="fixed inset-0 bg-indigo-600 z-50 flex items-center justify-center"
@@ -440,7 +443,7 @@ export default function Home() {
         <div className="text-white text-3xl font-bold">বই</div>
       </div>
       
-      {/* Main Content */}
+      {/* Main content */}
       <div ref={pageWrapperRef} className="flex flex-col min-h-screen">
         {/* Hero Section */}
         <HeroSection />
