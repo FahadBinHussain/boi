@@ -11,10 +11,10 @@ const Footer = () => {
           {/* About */}
           <div>
             <h3 className="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">
-              About BookVault
+              About বই
             </h3>
             <p className="text-gray-600 text-sm leading-relaxed">
-              BookVault is a digital library offering free access to books across various genres and categories.
+              বই is a digital library offering free access to books across various genres and categories.
               Our mission is to promote reading and make knowledge accessible to everyone.
             </p>
           </div>
@@ -113,13 +113,13 @@ const Footer = () => {
               <a href="#" className="text-gray-500 hover:text-indigo-600 transition-colors">
                 <FiTwitter size={20} />
               </a>
-              <a href="mailto:contact@bookvault.com" className="text-gray-500 hover:text-indigo-600 transition-colors">
+              <a href="mailto:contact@boi.com" className="text-gray-500 hover:text-indigo-600 transition-colors">
                 <FiMail size={20} />
               </a>
             </div>
             <p className="text-sm text-gray-600">
               Questions or suggestions? 
-              <a href="mailto:contact@bookvault.com" className="text-indigo-600 hover:text-indigo-800 ml-1">
+              <a href="mailto:contact@boi.com" className="text-indigo-600 hover:text-indigo-800 ml-1">
                 Reach out to us
               </a>
             </p>
@@ -128,7 +128,7 @@ const Footer = () => {
 
         <div className="border-t border-gray-200 mt-8 pt-8 flex flex-col items-center">
           <p className="text-sm text-gray-500 mb-2">
-            &copy; {currentYear} BookVault. All rights reserved.
+            &copy; {currentYear} বই. All rights reserved.
           </p>
           <p className="flex items-center text-xs text-gray-400">
             Made with <FiHeart className="mx-1 text-red-500" /> for book lovers worldwide

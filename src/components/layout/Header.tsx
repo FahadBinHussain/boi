@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { FiMenu, FiX, FiBook, FiSearch } from 'react-icons/fi';
+import LoginButton from '../auth/LoginButton';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -21,7 +22,7 @@ const Header = () => {
             >
               <FiBook size={24} />
             </motion.div>
-            <span className="font-bold text-xl text-gray-900">BookVault</span>
+            <span className="font-bold text-xl text-gray-900">বই</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -40,7 +41,7 @@ const Header = () => {
             </Link>
           </nav>
 
-          {/* Search & Mobile Menu Button */}
+          {/* Search, Login & Mobile Menu Button */}
           <div className="flex items-center space-x-4">
             <button 
               onClick={() => setIsSearchOpen(!isSearchOpen)}
@@ -49,6 +50,8 @@ const Header = () => {
             >
               <FiSearch size={20} />
             </button>
+            
+            <LoginButton />
             
             <button
               className="md:hidden p-2 rounded-full hover:bg-gray-100 transition-colors"
@@ -117,6 +120,13 @@ const Header = () => {
               >
                 About
               </Link>
+              
+              {/* Mobile Sign In Button - separated for better mobile UX */}
+              <div className="px-4 py-2 border-t border-gray-200 mt-2 pt-2">
+                <div onClick={() => setIsMenuOpen(false)}>
+                  <LoginButton />
+                </div>
+              </div>
             </div>
           </motion.div>
         )}

@@ -10,7 +10,7 @@ export default function AboutPage() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-100 rounded-full text-indigo-600 mb-4">
             <FiBook size={28} />
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">About BookVault</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">About বই</h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
             A digital library offering free access to books across various genres and categories.
           </p>
@@ -21,7 +21,7 @@ export default function AboutPage() {
           <div className="p-8 md:p-12">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Our Mission</h2>
             <p className="text-gray-700 mb-6 leading-relaxed">
-              BookVault was created with a simple mission: to promote reading and make knowledge accessible to everyone around the world. We believe that books are one of humanity's greatest treasures, and access to them should not be limited by financial constraints.
+              বই was created with a simple mission: to promote reading and make knowledge accessible to everyone around the world. We believe that books are one of humanity's greatest treasures, and access to them should not be limited by financial constraints.
             </p>
             <p className="text-gray-700 mb-6 leading-relaxed">
               Our platform offers a collection of books that are either in the public domain or have been made available for free distribution by their authors and publishers. We strive to maintain a diverse collection covering various genres, topics, and interests.
@@ -57,7 +57,7 @@ export default function AboutPage() {
 
             <h2 className="text-2xl font-bold text-gray-900 mt-10 mb-6">Copyright and Fair Use</h2>
             <p className="text-gray-700 mb-6 leading-relaxed">
-              BookVault respects intellectual property rights and complies with copyright laws. The books available on our platform are either:
+              বই respects intellectual property rights and complies with copyright laws. The books available on our platform are either:
             </p>
             <ul className="list-disc pl-6 mb-6 text-gray-700 space-y-2">
               <li>In the public domain (copyright has expired)</li>

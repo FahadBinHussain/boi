@@ -1,8 +1,9 @@
 import { books, categories } from '@/lib/books';
 import HeroSection from '@/components/ui/HeroSection';
 import BookGrid from '@/components/ui/BookGrid';
-import { FiBookOpen, FiDownload, FiUsers } from 'react-icons/fi';
+import { FiBookOpen, FiDownload, FiUsers, FiLogIn } from 'react-icons/fi';
 import Link from 'next/link';
+import AuthCTA from '@/components/auth/AuthCTA';
 
 export default function Home() {
   // Featured books - just take the first 3 for the homepage
@@ -17,7 +18,7 @@ export default function Home() {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Why BookVault?</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Why বই?</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               We provide a simple, fast, and user-friendly platform to discover and download free books.
             </p>
@@ -117,23 +118,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-indigo-600">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-white mb-6">
-            Ready to start your reading journey?
-          </h2>
-          <p className="text-indigo-100 text-lg mb-8 max-w-2xl mx-auto">
-            Join thousands of readers who discover new books every day on BookVault.
-          </p>
-          <Link 
-            href="/books" 
-            className="inline-block px-8 py-4 bg-white text-indigo-600 font-bold rounded-lg hover:bg-gray-100 transition-colors"
-          >
-            Start Browsing
-          </Link>
-        </div>
-      </section>
+      {/* CTA Section with Authentication */}
+      <AuthCTA />
     </div>
   );
 }

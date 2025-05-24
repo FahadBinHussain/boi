@@ -2,9 +2,13 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { FiSearch, FiBook } from 'react-icons/fi';
+import { FiSearch, FiBook, FiLogIn } from 'react-icons/fi';
+import { useSession } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 
 const HeroSection = () => {
+  const { data: session } = useSession();
+
   return (
     <div className="bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 py-16 sm:py-24">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -45,6 +49,22 @@ const HeroSection = () => {
                 </motion.button>
               </Link>
             </div>
+            
+            {/* Sign In Call to Action - Only shown when user is not logged in */}
+            {!session && (
+              <div className="mt-6">
+                <p className="text-gray-600 mb-2">Want to save books and get personalized recommendations?</p>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => signIn('google')}
+                  className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+                >
+                  <FiLogIn size={18} />
+                  Sign in with Google
+                </motion.button>
+              </div>
+            )}
           </motion.div>
 
           <motion.div
