@@ -14,7 +14,7 @@
   }
 }
 
-/* Moving styling from HTML to body to avoid hydration issues */
+/* Direct styling without classes to avoid hydration issues */
 html {
   background: transparent;
 }

@@ -5,6 +5,7 @@ import Header from "@/components/layout/Header";
 import DisclaimerBanner from "@/components/layout/DisclaimerBanner";
 import Footer from "@/components/layout/Footer";
 import { Providers } from "./providers";
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +28,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <Script id="prevent-hydration-mismatch" strategy="beforeInteractive">
+          {`
+            (function() {
+              // Ensure consistent rendering by removing any classes that might cause hydration mismatches
+              if (typeof window !== 'undefined') {
+                document.documentElement.className = '';
+              }
+            })();
+          `}
+        </Script>
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
