@@ -22,121 +22,138 @@ const HeroSection = () => {
   const bookCardsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Create a master timeline for better sequence control
+    const masterTl = gsap.timeline({
+      defaults: { ease: "power3.out" },
+      onComplete: () => console.log("All hero animations complete")
+    });
+    
     // Main heading animation
     const heading = headingRef.current;
-    if (heading) {
-      gsap.fromTo(
-        heading,
-        { 
-          opacity: 0, 
-          y: 50 
-        },
-        { 
-          opacity: 1, 
-          y: 0, 
-          duration: 1, 
-          ease: 'power3.out' 
-        }
-      );
-    }
-
-    // Paragraph animation with staggered text
     const paragraph = paragraphRef.current;
-    if (paragraph && typeof window !== 'undefined') {
-      gsap.fromTo(
-        paragraph,
-        { 
-          opacity: 0, 
-          y: 20 
-        },
-        { 
-          opacity: 1, 
-          y: 0, 
-          duration: 1.2,
-          delay: 0.3,
-          ease: 'power2.out' 
-        }
-      );
-    }
-
-    // Buttons animation
     const buttons = buttonsRef.current;
-    if (buttons) {
-      gsap.fromTo(
-        buttons.querySelectorAll('a'),
-        { 
-          opacity: 0, 
-          y: 20
-        },
+    const bookCards = bookCardsRef.current;
+    
+    if (heading && paragraph && buttons && typeof window !== 'undefined') {
+      // Create a staggered text reveal animation
+      const headingText = heading.innerHTML;
+      heading.innerHTML = '';
+      heading.style.opacity = '1';
+      
+      // Create spans for each character for more granular animation
+      const chars = headingText.split('');
+      chars.forEach(char => {
+        const span = document.createElement('span');
+        span.innerText = char === ' ' ? '\u00A0' : char; // Use non-breaking space for spaces
+        span.style.display = 'inline-block';
+        span.style.opacity = '0';
+        heading.appendChild(span);
+      });
+      
+      // Add heading animation to timeline
+      masterTl.to(heading.querySelectorAll('span'), {
+        opacity: 1,
+        y: 0, 
+        stagger: 0.03,
+        duration: 0.4,
+        ease: "power2.out",
+        transformOrigin: "50% 50%",
+        rotationY: 0
+      }, 0)
+      
+      // Add paragraph animation
+      .fromTo(paragraph, 
+        { opacity: 0, y: 20 }, 
+        { opacity: 1, y: 0, duration: 1 }, 
+        0.5 // Start 0.5 seconds after the heading animation starts
+      )
+      
+      // Add buttons animation with bounce effect
+      .fromTo(buttons.querySelectorAll('a'), 
+        { opacity: 0, y: 20 }, 
         { 
           opacity: 1, 
           y: 0, 
-          duration: 0.8,
-          delay: 0.6,
           stagger: 0.15, 
-          ease: 'back.out(1.7)' 
-        }
+          duration: 0.7,
+          ease: "back.out(1.7)" 
+        }, 
+        0.7 // Start 0.7 seconds after the heading animation starts
       );
-    }
-
-    // Book cards animation
-    const bookCards = bookCardsRef.current;
-    if (bookCards && window.innerWidth >= 768) {
-      const cards = bookCards.querySelectorAll('div[class*="absolute"]');
       
-      gsap.fromTo(
-        cards,
-        { 
-          opacity: 0, 
-          scale: 0.8,
-          rotation: (i: number) => [-10, 5, 12][i] // Different starting rotation for each card
-        },
-        { 
-          opacity: 1, 
-          scale: 1,
-          rotation: (i: number) => [-8, 5, 12][i], // Final rotation for each card
-          duration: 1.2,
-          delay: 0.4,
-          stagger: 0.2,
-          ease: 'elastic.out(1, 0.5)' 
-        }
-      );
-
-      // Add hover effect for book cards
-      cards.forEach((card: Element, index: number) => {
-        card.addEventListener('mouseenter', () => {
-          gsap.to(card, { 
-            y: -10, 
-            scale: 1.05, 
-            rotation: ([-6, 7, 10])[index],
-            duration: 0.3, 
-            ease: 'power2.out', 
-            zIndex: 10 
-          });
-        });
+      // Book cards animation with 3D effect
+      if (bookCards && window.innerWidth >= 768) {
+        const cards = bookCards.querySelectorAll('div[class*="absolute"]');
         
-        card.addEventListener('mouseleave', () => {
-          gsap.to(card, { 
-            y: 0, 
-            scale: 1, 
-            rotation: ([-8, 5, 12])[index],
-            duration: 0.5, 
-            ease: 'power2.out',
-            zIndex: 1 
+        // Add cards animation to the master timeline
+        masterTl.fromTo(cards, 
+          { 
+            opacity: 0, 
+            scale: 0.8,
+            rotationY: 25,
+            z: -100,
+            transformPerspective: 600,
+            transformOrigin: "center center",
+            rotation: (i) => [-10, 5, 12][i] 
+          }, 
+          { 
+            opacity: 1, 
+            scale: 1,
+            rotationY: 0,
+            z: 0,
+            rotation: (i) => [-8, 5, 12][i],
+            stagger: 0.2,
+            duration: 1,
+            ease: "elastic.out(1, 0.5)" 
+          }, 
+          0.9 // Start 0.9 seconds after the heading animation starts
+        );
+        
+        // Add hover effect for book cards with 3D perspective
+        cards.forEach((card, index) => {
+          card.addEventListener('mouseenter', () => {
+            gsap.to(card, { 
+              y: -15, 
+              scale: 1.05, 
+              rotationY: 5,
+              rotation: ([-6, 7, 10])[index],
+              boxShadow: '0 20px 25px -5px rgba(0,0,0,0.2), 0 10px 10px -5px rgba(0,0,0,0.1)',
+              duration: 0.3, 
+              ease: 'power2.out', 
+              zIndex: 10 
+            });
+          });
+          
+          card.addEventListener('mouseleave', () => {
+            gsap.to(card, { 
+              y: 0, 
+              scale: 1, 
+              rotationY: 0,
+              rotation: ([-8, 5, 12])[index],
+              boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)',
+              duration: 0.5, 
+              ease: 'power2.out',
+              zIndex: 1 
+            });
           });
         });
-      });
+      }
     }
-
-    // Optional: Create a subtle background animation
+    
+    // Create a background animation with gradient movement
     gsap.to('.hero-gradient', {
       backgroundPosition: '100% 50%',
-      duration: 10,
+      duration: 15,
       repeat: -1,
       yoyo: true,
       ease: 'sine.inOut'
     });
-
+    
+    // Clean up function
+    return () => {
+      masterTl.kill();
+      gsap.killTweensOf('.hero-gradient');
+    };
   }, []);
 
   return (

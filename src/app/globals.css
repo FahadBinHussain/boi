@@ -19,3 +19,77 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Animation utilities */
+.reveal-text {
+  clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+  transition: clip-path 1s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.reveal-text.revealed {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+}
+
+/* For smooth parallax effects */
+.parallax-container {
+  perspective: 1000px;
+  overflow: hidden;
+}
+
+.parallax-element {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* For staggered animation containers */
+.stagger-container > * {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.stagger-container > *.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Smooth transitions for hover states */
+.feature-box {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+/* Add gradient animation for hero */
+.hero-gradient {
+  background: linear-gradient(120deg, #4f46e5, #7c3aed, #3b82f6);
+  background-size: 300% 300%;
+  animation: gradientAnimation 15s ease infinite;
+}
+
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* For smooth page transitions */
+.page-transition-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #4f46e5;
+  z-index: 9999;
+  transform: translateY(0);
+  transition: transform 0.7s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.page-transition-overlay.hidden {
+  transform: translateY(-100%);
+}
