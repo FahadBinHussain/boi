@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
+import DisclaimerBanner from "@/components/layout/DisclaimerBanner";
 import Footer from "@/components/layout/Footer";
 import { Providers } from "./providers";
 
@@ -32,6 +33,7 @@ export default function RootLayout({
       >
         <Providers>
           <Header />
+          <DisclaimerBanner />
           <main className="flex-grow">
             {children}
           </main>
