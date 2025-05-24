@@ -14,3 +14,4 @@ Google OAuth 2.0
 @auth/prisma-adapter 2.9.1
 ESLint 9
 npm
+gsap
