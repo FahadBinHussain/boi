@@ -43,18 +43,27 @@ export default function Home() {
     // Feature boxes animation
     if (featureBoxesRef.current) {
       const boxes = featureBoxesRef.current.querySelectorAll('.feature-box');
-      gsap.from(boxes, {
-        opacity: 0,
-        y: 50,
-        scale: 0.9,
-        stagger: 0.15,
-        duration: 0.8,
-        ease: "back.out(1.2)",
-        scrollTrigger: {
-          trigger: featureBoxesRef.current,
-          start: "top 75%",
+      gsap.fromTo(
+        boxes,
+        { 
+          opacity: 0,
+          y: 50,
+          scale: 0.9,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          stagger: 0.15,
+          duration: 0.8,
+          ease: "back.out(1.2)",
+          clearProps: "all",
+          scrollTrigger: {
+            trigger: featureBoxesRef.current,
+            start: "top 75%",
+          }
         }
-      });
+      );
       
       // Add hover animations to feature boxes
       boxes.forEach((box: Element) => {
@@ -64,6 +73,7 @@ export default function Home() {
             scale: 1.03,
             boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.05)',
             duration: 0.2,
+            overwrite: true,
           });
         });
         
@@ -73,6 +83,7 @@ export default function Home() {
             scale: 1,
             boxShadow: '0 0 0 0 rgba(0,0,0,0)',
             duration: 0.3,
+            overwrite: true,
           });
         });
       });
@@ -167,11 +178,11 @@ export default function Home() {
           </div>
 
           <div 
-            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+            className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10"
             ref={featureBoxesRef}
           >
             {/* Feature 1 */}
-            <div className="feature-box bg-gray-50 p-6 rounded-lg text-center transform transition-all duration-300">
+            <div className="feature-box bg-gray-50 p-6 rounded-lg text-center transform transition-all duration-300 relative z-10">
               <div className="w-16 h-16 mx-auto bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 mb-4">
                 <FiBookOpen size={28} />
               </div>
@@ -182,7 +193,7 @@ export default function Home() {
             </div>
 
             {/* Feature 2 */}
-            <div className="feature-box bg-gray-50 p-6 rounded-lg text-center transform transition-all duration-300">
+            <div className="feature-box bg-gray-50 p-6 rounded-lg text-center transform transition-all duration-300 relative z-10">
               <div className="w-16 h-16 mx-auto bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 mb-4">
                 <FiDownload size={28} />
               </div>
@@ -193,7 +204,7 @@ export default function Home() {
             </div>
 
             {/* Feature 3 */}
-            <div className="feature-box bg-gray-50 p-6 rounded-lg text-center transform transition-all duration-300">
+            <div className="feature-box bg-gray-50 p-6 rounded-lg text-center transform transition-all duration-300 relative z-10">
               <div className="w-16 h-16 mx-auto bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 mb-4">
                 <FiUsers size={28} />
               </div>
