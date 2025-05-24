@@ -35,23 +35,57 @@ const HeroSection = () => {
     const bookCards = bookCardsRef.current;
     
     if (heading && paragraph && buttons && typeof window !== 'undefined') {
-      // Create a staggered text reveal animation
-      const headingText = heading.innerHTML;
-      heading.innerHTML = '';
+      // Instead of manipulating innerHTML directly, let's handle the text parts separately
+      const mainText = "Discover and Download";
+      const highlightedText = "Free Books";
+      
+      // Set up the HTML structure properly
+      heading.innerHTML = ''; // Clear the heading
       heading.style.opacity = '1';
       
-      // Create spans for each character for more granular animation
-      const chars = headingText.split('');
-      chars.forEach(char => {
-        const span = document.createElement('span');
-        span.innerText = char === ' ' ? '\u00A0' : char; // Use non-breaking space for spaces
-        span.style.display = 'inline-block';
-        span.style.opacity = '0';
-        heading.appendChild(span);
+      // Create container for the main text part
+      const mainTextContainer = document.createElement('span');
+      
+      // Create spans for each character in the main text
+      mainText.split('').forEach(char => {
+        const charSpan = document.createElement('span');
+        charSpan.innerText = char === ' ' ? '\u00A0' : char; // Use non-breaking space for spaces
+        charSpan.style.display = 'inline-block';
+        charSpan.style.opacity = '0';
+        mainTextContainer.appendChild(charSpan);
       });
       
+      // Add the main text container
+      heading.appendChild(mainTextContainer);
+      
+      // Add a space after the main text
+      const spaceSpan = document.createElement('span');
+      spaceSpan.innerHTML = '\u00A0';
+      spaceSpan.style.display = 'inline-block';
+      spaceSpan.style.opacity = '0';
+      heading.appendChild(spaceSpan);
+      
+      // Create the styled span for highlighted text
+      const highlightedSpan = document.createElement('span');
+      highlightedSpan.className = 'text-indigo-600';
+      
+      // Create spans for each character in the highlighted text
+      highlightedText.split('').forEach(char => {
+        const charSpan = document.createElement('span');
+        charSpan.innerText = char === ' ' ? '\u00A0' : char;
+        charSpan.style.display = 'inline-block';
+        charSpan.style.opacity = '0';
+        highlightedSpan.appendChild(charSpan);
+      });
+      
+      // Add the highlighted span to the heading
+      heading.appendChild(highlightedSpan);
+      
+      // Animate all characters with staggered effect
+      const allCharSpans = heading.querySelectorAll('span > span');
+      
       // Add heading animation to timeline
-      masterTl.to(heading.querySelectorAll('span'), {
+      masterTl.to(allCharSpans, {
         opacity: 1,
         y: 0, 
         stagger: 0.03,
