@@ -9,7 +9,6 @@ import AuthCTA from '@/components/auth/AuthCTA';
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import ApplyBackground from '@/components/ui/ApplyBackground';
 
 // Register GSAP plugins
 if (typeof window !== 'undefined') {
@@ -433,8 +432,6 @@ export default function Home() {
 
   return (
     <>
-      <ApplyBackground />
-      
       {/* Page loading overlay */}
       <div 
         ref={pageOverlayRef} 

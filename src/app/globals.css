@@ -14,8 +14,8 @@
   }
 }
 
-/* HTML background class for animation contexts */
-html.bgnone {
+/* Moving styling from HTML to body to avoid hydration issues */
+html {
   background: transparent;
 }
 
