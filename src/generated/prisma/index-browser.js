@@ -157,6 +157,16 @@ exports.Prisma.VerificationTokenScalarFieldEnum = {
   expires: 'expires'
 };
 
+exports.Prisma.AdminApiKeyScalarFieldEnum = {
+  id: 'id',
+  adminId: 'adminId',
+  serviceName: 'serviceName',
+  encryptedApiKey: 'encryptedApiKey',
+  iv: 'iv',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.BookScalarFieldEnum = {
   id: 'id',
   title: 'title',
@@ -191,6 +201,7 @@ exports.Prisma.ModelName = {
   Session: 'Session',
   User: 'User',
   VerificationToken: 'VerificationToken',
+  AdminApiKey: 'AdminApiKey',
   Book: 'Book'
 };
 
