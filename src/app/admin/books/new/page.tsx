@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { FiPlus, FiX, FiArrowLeft, FiSave, FiImage, FiLink, FiCalendar, FiUsers, FiBook, FiLayers } from "react-icons/fi";
@@ -17,6 +17,13 @@ interface HostUrl {
   url: string;
 }
 
+// Add an interface for series thumbnails
+interface SeriesThumbnail {
+  bookNumber: number;
+  url: string;
+  preview: string;
+}
+
 export default function AddNewBook() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -29,23 +36,25 @@ export default function AddNewBook() {
     publicationDate?: string;
     seriesStart?: string;
     seriesEnd?: string;
+    seriesThumbnails?: string; // For general series thumbnail errors
   }>({});
 
   // Form state for single book
   const [bookName, setBookName] = useState("");
   const [authors, setAuthors] = useState<Author[]>([{ id: crypto.randomUUID(), name: "" }]);
-  const [thumbnailUrl, setThumbnailUrl] = useState("");
+  const [thumbnailUrl, setThumbnailUrl] = useState(""); // Used for single book mode
   const [hostUrls, setHostUrls] = useState<HostUrl[]>([
     { id: crypto.randomUUID(), label: "Default", url: "" }
   ]);
   const [publicationDate, setPublicationDate] = useState("");
-  const [thumbnailPreview, setThumbnailPreview] = useState("");
+  const [thumbnailPreview, setThumbnailPreview] = useState(""); // Used for single book mode
   
   // Additional form state for series
   const [seriesBaseName, setSeriesBaseName] = useState("");
   const [seriesStart, setSeriesStart] = useState(1);
   const [seriesEnd, setSeriesEnd] = useState(10);
   const [numberingSystem, setNumberingSystem] = useState<"western" | "bengali">("western");
+  const [seriesThumbnails, setSeriesThumbnails] = useState<SeriesThumbnail[]>([]); // For series mode
 
   // Number conversion functions
   const convertToBengaliNumeral = (num: number): string => {
@@ -57,14 +66,44 @@ export default function AddNewBook() {
     return numberingSystem === "bengali" ? convertToBengaliNumeral(num) : num.toString();
   };
 
-  // Update thumbnail preview when URL changes
+  // Update thumbnail preview when URL changes (single book mode)
   useEffect(() => {
-    if (thumbnailUrl && thumbnailUrl.trim() !== "") {
+    if (!isSeries && thumbnailUrl && thumbnailUrl.trim() !== "") {
       setThumbnailPreview(thumbnailUrl);
-    } else {
+    } else if (!isSeries) {
       setThumbnailPreview("");
     }
-  }, [thumbnailUrl]);
+  }, [thumbnailUrl, isSeries]);
+
+  // Initialize or update seriesThumbnails when series range or mode changes
+  useEffect(() => {
+    if (isSeries) {
+      const newThumbnails: SeriesThumbnail[] = [];
+      const currentTotalBooks = Math.max(0, seriesEnd - seriesStart + 1);
+      for (let i = 0; i < currentTotalBooks; i++) {
+        const bookNumber = seriesStart + i;
+        // Try to preserve existing URL if book number matches
+        const existingThumbnail = seriesThumbnails.find(st => st.bookNumber === bookNumber);
+        newThumbnails.push({
+          bookNumber: bookNumber,
+          url: existingThumbnail?.url || "",
+          preview: existingThumbnail?.preview || "",
+        });
+      }
+      setSeriesThumbnails(newThumbnails);
+    } else {
+      setSeriesThumbnails([]); // Clear when not in series mode
+    }
+  }, [isSeries, seriesStart, seriesEnd]);
+  
+  // Update individual series thumbnail preview
+  const updateSeriesThumbnailPreview = (index: number, url: string) => {
+    setSeriesThumbnails(prev => 
+      prev.map((thumbnail, i) => 
+        i === index ? { ...thumbnail, url, preview: url.trim() !== "" ? url : "" } : thumbnail
+      )
+    );
+  };
 
   // GSAP animations
   useEffect(() => {
@@ -88,6 +127,11 @@ export default function AddNewBook() {
         ".series-fields",
         { height: 0, opacity: 0 },
         { height: "auto", opacity: 1, duration: 0.5, ease: "power2.out" }
+      );
+      gsap.fromTo(
+        ".series-thumbnail-section",
+        { height: 0, opacity: 0 },
+        { height: "auto", opacity: 1, duration: 0.5, ease: "power2.out", delay: 0.1 }
       );
     }
   }, [isSeries]);
@@ -136,7 +180,7 @@ export default function AddNewBook() {
     if (!seriesBaseName) return preview;
     
     const maxDisplay = 5; // Show at most 5 items in preview
-    const total = seriesEnd - seriesStart + 1;
+    const total = getTotalBooksInSeries();
     
     // Show first few items
     for (let i = seriesStart; i < seriesStart + Math.min(3, total); i++) {
@@ -144,21 +188,23 @@ export default function AddNewBook() {
     }
     
     // If more than maxDisplay items, show ellipsis
-    if (total > maxDisplay) {
+    if (total > maxDisplay && total > 3) { // ensure ellipsis is only added if there are actually more items
       preview.push("...");
     }
     
-    // Show last item if there are more than 3 items
+    // Show last item if there are more than 3 items and it's different from the already added ones
     if (total > 3) {
-      preview.push(`${seriesBaseName} ${getFormattedSeriesNumber(seriesEnd)}`);
+       if (preview.length < maxDisplay || !preview.includes(`${seriesBaseName} ${getFormattedSeriesNumber(seriesEnd)}`)){
+         preview.push(`${seriesBaseName} ${getFormattedSeriesNumber(seriesEnd)}`);
+       }
     }
     
-    return preview;
+    return preview.slice(0, maxDisplay); // Ensure we don't exceed maxDisplay
   };
   
   // Get count of total books in series
   const getTotalBooksInSeries = (): number => {
-    return seriesEnd - seriesStart + 1;
+    return Math.max(0, seriesEnd - seriesStart + 1);
   };
 
   // Validate form
@@ -166,17 +212,23 @@ export default function AddNewBook() {
     const errors: {
       bookName?: string;
       authors?: string;
-      thumbnailUrl?: string;
+      thumbnailUrl?: string; // For single book thumbnail error
       hostUrls?: string;
       publicationDate?: string;
       seriesStart?: string;
       seriesEnd?: string;
+      seriesThumbnails?: string; // For general series thumbnail errors
     } = {};
+
+    const urlPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/;
 
     if (!isSeries) {
       // Single book validation
       if (!bookName.trim()) {
         errors.bookName = "Book name is required";
+      }
+      if (thumbnailUrl && !urlPattern.test(thumbnailUrl)) { // Validate single thumbnail URL
+        errors.thumbnailUrl = "Please enter a valid URL for the thumbnail";
       }
     } else {
       // Series validation
@@ -184,13 +236,27 @@ export default function AddNewBook() {
         errors.bookName = "Series base name is required";
       }
       
+      if (seriesStart <= 0) {
+        errors.seriesStart = "Start number must be greater than 0.";
+      }
       if (seriesStart > seriesEnd) {
         errors.seriesStart = "Start number must be less than or equal to end number";
       }
       
-      if (seriesEnd - seriesStart > 999) {
+      if (seriesEnd - seriesStart + 1 > 1000) { // Max 1000 books
         errors.seriesEnd = "Series is too large. Please create series with at most 1000 books at once.";
       }
+
+      // Validate series thumbnails
+      const invalidThumbnails = seriesThumbnails.some(thumb => thumb.url.trim() !== "" && !urlPattern.test(thumb.url));
+      if (invalidThumbnails) {
+        errors.seriesThumbnails = "One or more thumbnail URLs are invalid. Please check each one.";
+      }
+      // Example: Make all series thumbnails required
+      // const hasEmptySeriesThumbnail = seriesThumbnails.some(thumb => !thumb.url.trim());
+      // if (hasEmptySeriesThumbnail && getTotalBooksInSeries() > 0) {
+      //   errors.seriesThumbnails = "A thumbnail URL is required for each book in the series.";
+      // }
     }
 
     const hasEmptyAuthor = authors.some(author => !author.name.trim());
@@ -198,20 +264,14 @@ export default function AddNewBook() {
       errors.authors = "All author fields must be filled";
     }
 
-    const urlPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
-    
-    if (thumbnailUrl && !urlPattern.test(thumbnailUrl)) {
-      errors.thumbnailUrl = "Please enter a valid URL";
-    }
-
     const hasEmptyHostUrl = hostUrls.some(host => !host.url.trim() || !host.label.trim());
     if (hasEmptyHostUrl) {
       errors.hostUrls = "All host URL fields must be filled";
     }
 
-    const hasInvalidUrl = hostUrls.some(host => host.url && !urlPattern.test(host.url));
+    const hasInvalidUrl = hostUrls.some(host => host.url.trim() !== "" && !urlPattern.test(host.url));
     if (hasInvalidUrl) {
-      errors.hostUrls = "Please enter valid URLs";
+      errors.hostUrls = "Please enter valid URLs for all host entries";
     }
 
     if (!publicationDate) {
@@ -238,7 +298,7 @@ export default function AddNewBook() {
         const bookData = {
           name: bookName,
           authors: authors.map(author => author.name),
-          thumbnailUrl,
+          thumbnailUrl, // Single thumbnail
           hostUrls: hostUrls.map(host => ({ label: host.label, url: host.url })),
           publicationDate
         };
@@ -250,30 +310,31 @@ export default function AddNewBook() {
           baseName: seriesBaseName,
           startNumber: seriesStart,
           endNumber: seriesEnd,
-          totalBooks: seriesEnd - seriesStart + 1,
+          totalBooks: getTotalBooksInSeries(),
           authors: authors.map(author => author.name),
-          thumbnailUrl,
           hostUrls: hostUrls.map(host => ({ label: host.label, url: host.url })),
           publicationDate,
-          numberingSystem
+          numberingSystem,
+          thumbnails: seriesThumbnails.map(st => ({ bookNumber: st.bookNumber, url: st.url })) // Pass structured thumbnails
         };
         
         console.log("Series data to be submitted:", seriesData);
         
-        // Here you would process each book in the series
-        // Example of how you would create the series:
         const books = [];
-        for (let i = seriesStart; i <= seriesEnd; i++) {
-          const formattedNumber = getFormattedSeriesNumber(i);
+        for (let i = 0; i < getTotalBooksInSeries(); i++) {
+          const currentBookNumber = seriesStart + i;
+          const formattedNumber = getFormattedSeriesNumber(currentBookNumber);
+          const bookThumbnail = seriesThumbnails.find(st => st.bookNumber === currentBookNumber)?.url || "";
+
           const book = {
             name: `${seriesBaseName} ${formattedNumber}`,
             authors: authors.map(author => author.name),
-            thumbnailUrl,
+            thumbnailUrl: bookThumbnail, // Assign individual thumbnail
             hostUrls: hostUrls.map(host => ({ label: host.label, url: host.url })),
             publicationDate,
             seriesInfo: {
               seriesName: seriesBaseName,
-              numberInSeries: i
+              numberInSeries: currentBookNumber
             }
           };
           books.push(book);
@@ -376,9 +437,9 @@ export default function AddNewBook() {
             )}
           </div>
 
-          {/* Series Configuration - only shown when in series mode */}
+          {/* Series Configuration - only shown when in series mode */}          
           {isSeries && (
-            <div className="series-fields space-y-4 rounded-md bg-gray-50 p-4">
+            <div className="series-fields space-y-4 overflow-hidden rounded-md bg-gray-50 p-4">
               <h3 className="text-base font-medium text-gray-900">Series Configuration</h3>
               
               {/* Numbering System Selection */}
@@ -441,7 +502,7 @@ export default function AddNewBook() {
                   <input
                     type="number"
                     id="seriesEnd"
-                    min={seriesStart}
+                    min={seriesStart} // Ensure end is not less than start
                     className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
                       formErrors.seriesEnd ? "border-red-500" : ""
                     }`}
@@ -455,7 +516,7 @@ export default function AddNewBook() {
               </div>
               
               {/* Series Preview */}
-              {seriesBaseName && (
+              {seriesBaseName && getTotalBooksInSeries() > 0 && (
                 <div className="rounded-md bg-gray-100 p-3">
                   <p className="mb-2 text-sm font-medium text-gray-700">Series Preview:</p>
                   <div className="space-y-1 text-sm">
@@ -518,45 +579,96 @@ export default function AddNewBook() {
             )}
           </div>
 
-          {/* Thumbnail URL */}
-          <div className="form-field">
-            <label htmlFor="thumbnailUrl" className="mb-1 block text-sm font-medium text-gray-700">
-              <div className="flex items-center">
-                <FiImage className="mr-2 h-4 w-4 text-gray-500" />
-                Thumbnail URL
-                {isSeries && <span className="ml-1 text-xs text-gray-500">(applied to all books in series)</span>}
-              </div>
-            </label>
-            <input
-              type="text"
-              id="thumbnailUrl"
-              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                formErrors.thumbnailUrl ? "border-red-500" : ""
-              }`}
-              placeholder="https://example.com/image.jpg"
-              value={thumbnailUrl}
-              onChange={(e) => setThumbnailUrl(e.target.value)}
-            />
-            {formErrors.thumbnailUrl && (
-              <p className="mt-1 text-sm text-red-500">{formErrors.thumbnailUrl}</p>
-            )}
-            
-            {thumbnailPreview && (
-              <div className="mt-2 flex items-center">
-                <div className="h-16 w-12 overflow-hidden rounded border border-gray-200">
-                  <img 
-                    src={thumbnailPreview} 
-                    alt="Thumbnail preview" 
-                    className="h-full w-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src = "https://via.placeholder.com/120x160?text=Error"; 
-                    }}
-                  />
+          {/* Thumbnail URL - Conditional Rendering */}
+          {!isSeries ? (
+            // Single Book Thumbnail Input
+            <div className="form-field">
+              <label htmlFor="thumbnailUrl" className="mb-1 block text-sm font-medium text-gray-700">
+                <div className="flex items-center">
+                  <FiImage className="mr-2 h-4 w-4 text-gray-500" />
+                  Thumbnail URL
                 </div>
-                <span className="ml-2 text-xs text-gray-500">Thumbnail preview</span>
-              </div>
-            )}
-          </div>
+              </label>
+              <input
+                type="text"
+                id="thumbnailUrl"
+                className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                  formErrors.thumbnailUrl ? "border-red-500" : ""
+                }`}
+                placeholder="https://example.com/image.jpg"
+                value={thumbnailUrl}
+                onChange={(e) => setThumbnailUrl(e.target.value)}
+              />
+              {formErrors.thumbnailUrl && (
+                <p className="mt-1 text-sm text-red-500">{formErrors.thumbnailUrl}</p>
+              )}
+              
+              {thumbnailPreview && (
+                <div className="mt-2 flex items-center">
+                  <div className="h-16 w-12 overflow-hidden rounded border border-gray-200">
+                    <img 
+                      src={thumbnailPreview} 
+                      alt="Thumbnail preview" 
+                      className="h-full w-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = "https://via.placeholder.com/120x160?text=Error"; 
+                      }}
+                    />
+                  </div>
+                  <span className="ml-2 text-xs text-gray-500">Thumbnail preview</span>
+                </div>
+              )}
+            </div>
+          ) : (
+            // Series Thumbnails Input
+            <div className="form-field series-thumbnail-section space-y-4 overflow-hidden rounded-md bg-gray-50 p-4">
+              <h3 className="text-base font-medium text-gray-900">
+                Series Thumbnails ({getTotalBooksInSeries()} {getTotalBooksInSeries() === 1 ? "book" : "books"})
+              </h3>
+              {getTotalBooksInSeries() > 0 ? (
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {seriesThumbnails.map((thumbnail, index) => (
+                    <div key={thumbnail.bookNumber} className="form-field space-y-1">
+                       <label htmlFor={`seriesThumbnail-${thumbnail.bookNumber}`} className="block text-xs font-medium text-gray-600">
+                        {`Thumbnail for: ${seriesBaseName || "Book"} ${getFormattedSeriesNumber(thumbnail.bookNumber)}`}
+                      </label>
+                      <input
+                        type="text"
+                        id={`seriesThumbnail-${thumbnail.bookNumber}`}
+                        className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                          formErrors.seriesThumbnails && thumbnail.url.trim() !== "" && !/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/.test(thumbnail.url) ? "border-red-500" : ""
+                        }`}
+                        placeholder={`URL for ${seriesBaseName || "Book"} ${getFormattedSeriesNumber(thumbnail.bookNumber)}`}
+                        value={thumbnail.url}
+                        onChange={(e) => updateSeriesThumbnailPreview(index, e.target.value)}
+                      />
+                      {thumbnail.preview && (
+                        <div className="mt-1 flex items-center">
+                          <div className="h-16 w-12 overflow-hidden rounded border border-gray-200">
+                            <img 
+                              src={thumbnail.preview} 
+                              alt={`Preview for book ${thumbnail.bookNumber}`}
+                              className="h-full w-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.src = "https://via.placeholder.com/120x160?text=No Preview"; 
+                              }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500">
+                  Adjust the series range (Start and End Number) to add thumbnails. Minimum 1 book required.
+                </p>
+              )}
+              {formErrors.seriesThumbnails && (
+                <p className="mt-1 text-sm text-red-500">{formErrors.seriesThumbnails}</p>
+              )}
+            </div>
+          )}
 
           {/* Host URLs */}
           <div className="form-field">
@@ -660,7 +772,7 @@ export default function AddNewBook() {
               }`}
             >
               <FiSave className="mr-2 h-4 w-4" />
-              {isSubmitting ? "Saving..." : isSeries ? `Save Series (${getTotalBooksInSeries()} books)` : "Save Book"}
+              {isSubmitting ? "Saving..." : isSeries ? `Save Series (${getTotalBooksInSeries()} ${getTotalBooksInSeries() === 1 ? "book" : "books"})` : "Save Book"}
             </button>
           </div>
         </form>
