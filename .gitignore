@@ -16,13 +16,19 @@
 # next.js
 /.next/
 /out/
+/next-env.d.ts
+.next-cache/
+*.tsbuildinfo
 
 # production
 /build
+/dist
 
 # misc
 .DS_Store
 *.pem
+Thumbs.db
+.cache/
 
 # debug
 npm-debug.log*
@@ -30,8 +36,14 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files - IMPORTANT: never commit sensitive environment variables
+.env
+.env.*
+.env.local
+.env.development
+.env.test
+.env.production
+!.env.example
 
 # vercel
 .vercel
@@ -39,3 +51,24 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Prisma
+/prisma/migrations/
+/prisma/*.db
+/prisma/generated/
+/src/generated/
+
+# IDE / editors
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+logs
+*.log
+
+# OS generated
+.DS_Store*
+ehthumbs.db
