@@ -1,99 +1,320 @@
 "use client";
 
-import { useAdmin } from "@/lib/hooks/useAdmin";
-import { useState } from "react";
-import { signOut } from "next-auth/react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
+import { FiBook, FiUsers, FiTrendingUp, FiDownload, FiPlusCircle, FiAlertCircle } from "react-icons/fi";
+import gsap from "gsap";
+
+// Mock data for demo purposes
+const recentBooks = [
+  { id: 1, title: "The Art of Programming", author: "John Doe", downloads: 1203, status: "active" },
+  { id: 2, title: "Data Structures Explained", author: "Jane Smith", downloads: 845, status: "active" },
+  { id: 3, title: "Machine Learning Basics", author: "Robert Johnson", downloads: 567, status: "pending" },
+  { id: 4, title: "Web Development Guide", author: "Emily Williams", downloads: 421, status: "active" },
+];
+
+const recentUsers = [
+  { id: 1, name: "Alex Johnson", email: "alex@example.com", joined: "2023-05-15", downloads: 28 },
+  { id: 2, name: "Sarah Miller", email: "sarah@example.com", joined: "2023-05-18", downloads: 12 },
+  { id: 3, name: "David Clark", email: "david@example.com", joined: "2023-05-22", downloads: 5 },
+];
+
+// Stat card component
+function StatCard({ title, value, icon, color }: { title: string; value: string; icon: React.ReactNode; color: string }) {
+  return (
+    <div className={`dashboard-card rounded-lg bg-white p-6 shadow-md transition-all duration-300 hover:shadow-lg hover:translate-y-[-2px]`}>
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium text-gray-500">{title}</p>
+          <p className="mt-2 text-3xl font-bold text-gray-900">{value}</p>
+        </div>
+        <div className={`rounded-full p-3 ${color}`}>
+          {icon}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function AdminDashboard() {
-  const { isAdmin, isLoading, user } = useAdmin();
-  const [activeTab, setActiveTab] = useState<"books" | "users">("books");
-
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-indigo-500"></div>
-        <span className="ml-2">Loading...</span>
-      </div>
+  const chartRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    // Animate the dashboard cards
+    gsap.fromTo(
+      ".dashboard-card",
+      { 
+        y: 30, 
+        opacity: 0 
+      },
+      { 
+        y: 0, 
+        opacity: 1, 
+        stagger: 0.1,
+        duration: 0.7,
+        ease: "power2.out"
+      }
     );
-  }
-
-  if (!isAdmin) {
-    return null; // This will be redirected by the useAdmin hook
-  }
+    
+    // Animate the tables
+    gsap.fromTo(
+      ".dashboard-table",
+      { 
+        opacity: 0,
+        y: 20
+      },
+      { 
+        opacity: 1,
+        y: 0,
+        duration: 0.7,
+        delay: 0.4,
+        ease: "power2.out"
+      }
+    );
+    
+    // Simple chart animation with GSAP
+    if (chartRef.current) {
+      const bars = chartRef.current.querySelectorAll(".chart-bar");
+      gsap.fromTo(
+        bars,
+        { height: 0 },
+        { 
+          height: "100%", 
+          duration: 1.5,
+          ease: "elastic.out(1, 0.3)",
+          stagger: 0.1,
+          delay: 0.5
+        }
+      );
+    }
+  }, []);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="text-gray-600">
-            Welcome back, {user?.name || "Admin"}
-          </p>
+    <div>
+      <div className="mb-8 flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
+        <div className="flex space-x-2">
+          <Link 
+            href="/admin/books/new" 
+            className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            <FiPlusCircle className="mr-2 h-4 w-4" />
+            Add Book
+          </Link>
         </div>
-        <button
-          onClick={() => signOut({ callbackUrl: "/" })}
-          className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
-        >
-          Sign Out
-        </button>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="border-b border-gray-200 mb-8">
-        <nav className="-mb-px flex space-x-8">
-          <button
-            className={`${
-              activeTab === "books"
-                ? "border-indigo-500 text-indigo-600"
-                : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
-            } whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium`}
-            onClick={() => setActiveTab("books")}
-          >
-            Books
-          </button>
-          <button
-            className={`${
-              activeTab === "users"
-                ? "border-indigo-500 text-indigo-600"
-                : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
-            } whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium`}
-            onClick={() => setActiveTab("users")}
-          >
-            Users
-          </button>
-        </nav>
+      {/* Stats Grid */}
+      <div className="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard 
+          title="Total Books" 
+          value="1,284" 
+          icon={<FiBook className="h-6 w-6 text-white" />} 
+          color="bg-blue-500"
+        />
+        <StatCard 
+          title="Total Users" 
+          value="5,624" 
+          icon={<FiUsers className="h-6 w-6 text-white" />} 
+          color="bg-green-500"
+        />
+        <StatCard 
+          title="Downloads Today" 
+          value="842" 
+          icon={<FiDownload className="h-6 w-6 text-white" />} 
+          color="bg-purple-500"
+        />
+        <StatCard 
+          title="Growth Rate" 
+          value="+12.5%" 
+          icon={<FiTrendingUp className="h-6 w-6 text-white" />} 
+          color="bg-orange-500"
+        />
       </div>
 
-      {/* Tab Content */}
-      <div className="bg-white shadow rounded-lg">
-        {activeTab === "books" && (
-          <div className="p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-medium text-gray-900">Books</h2>
-              <Link
-                href="/admin/books/new"
-                className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
-              >
-                Add Book
-              </Link>
-            </div>
-            <div className="mt-6">
-              <p className="text-gray-500 italic">Book management features will be displayed here</p>
-              {/* Book table would go here */}
+      {/* Charts Section */}
+      <div className="mb-8 grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <div className="dashboard-card rounded-lg bg-white p-6 shadow-md">
+          <h2 className="mb-4 text-lg font-medium text-gray-900">Downloads Overview</h2>
+          <div className="h-64" ref={chartRef}>
+            <div className="flex h-full items-end space-x-6 px-2">
+              <div className="flex h-full flex-1 flex-col items-center justify-end">
+                <div className="chart-bar w-full rounded-t bg-blue-500" style={{ height: "65%" }}></div>
+                <div className="mt-2 text-xs text-gray-500">Mon</div>
+              </div>
+              <div className="flex h-full flex-1 flex-col items-center justify-end">
+                <div className="chart-bar w-full rounded-t bg-blue-500" style={{ height: "40%" }}></div>
+                <div className="mt-2 text-xs text-gray-500">Tue</div>
+              </div>
+              <div className="flex h-full flex-1 flex-col items-center justify-end">
+                <div className="chart-bar w-full rounded-t bg-blue-500" style={{ height: "85%" }}></div>
+                <div className="mt-2 text-xs text-gray-500">Wed</div>
+              </div>
+              <div className="flex h-full flex-1 flex-col items-center justify-end">
+                <div className="chart-bar w-full rounded-t bg-blue-500" style={{ height: "55%" }}></div>
+                <div className="mt-2 text-xs text-gray-500">Thu</div>
+              </div>
+              <div className="flex h-full flex-1 flex-col items-center justify-end">
+                <div className="chart-bar w-full rounded-t bg-blue-500" style={{ height: "75%" }}></div>
+                <div className="mt-2 text-xs text-gray-500">Fri</div>
+              </div>
+              <div className="flex h-full flex-1 flex-col items-center justify-end">
+                <div className="chart-bar w-full rounded-t bg-blue-500" style={{ height: "30%" }}></div>
+                <div className="mt-2 text-xs text-gray-500">Sat</div>
+              </div>
+              <div className="flex h-full flex-1 flex-col items-center justify-end">
+                <div className="chart-bar w-full rounded-t bg-blue-500" style={{ height: "45%" }}></div>
+                <div className="mt-2 text-xs text-gray-500">Sun</div>
+              </div>
             </div>
           </div>
-        )}
+        </div>
 
-        {activeTab === "users" && (
-          <div className="p-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Users</h2>
-            <div className="mt-6">
-              <p className="text-gray-500 italic">User management features will be displayed here</p>
-              {/* User table would go here */}
+        <div className="dashboard-card rounded-lg bg-white p-6 shadow-md">
+          <h2 className="mb-4 text-lg font-medium text-gray-900">User Activity</h2>
+          <div className="flex h-64 items-center justify-center">
+            <div className="relative h-48 w-48">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-gray-800">78%</div>
+                  <div className="text-sm text-gray-500">Active Users</div>
+                </div>
+              </div>
+              <svg className="h-full w-full" viewBox="0 0 100 100">
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="40"
+                  fill="none"
+                  stroke="#E5E7EB"
+                  strokeWidth="10"
+                />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="40"
+                  fill="none"
+                  stroke="#4F46E5"
+                  strokeWidth="10"
+                  strokeDasharray="251.2"
+                  strokeDashoffset="55.264"
+                  transform="rotate(-90 50 50)"
+                />
+              </svg>
             </div>
           </div>
-        )}
+        </div>
+      </div>
+
+      {/* Tables Section */}
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        {/* Recent Books Table */}
+        <div className="dashboard-table rounded-lg bg-white shadow-md">
+          <div className="border-b border-gray-200 px-6 py-4">
+            <h2 className="text-lg font-medium text-gray-900">Recent Books</h2>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Title</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Author</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Downloads</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 bg-white">
+                {recentBooks.map((book) => (
+                  <tr key={book.id} className="transition-colors hover:bg-gray-50">
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <div className="text-sm font-medium text-gray-900">{book.title}</div>
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <div className="text-sm text-gray-500">{book.author}</div>
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <div className="text-sm text-gray-500">{book.downloads}</div>
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
+                        book.status === "active" 
+                          ? "bg-green-100 text-green-800" 
+                          : "bg-yellow-100 text-yellow-800"
+                      }`}>
+                        {book.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="border-t border-gray-200 px-6 py-4">
+            <Link href="/admin/books" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+              View all books
+            </Link>
+          </div>
+        </div>
+
+        {/* Recent Users Table */}
+        <div className="dashboard-table rounded-lg bg-white shadow-md">
+          <div className="border-b border-gray-200 px-6 py-4">
+            <h2 className="text-lg font-medium text-gray-900">Recent Users</h2>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Email</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Joined</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Downloads</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 bg-white">
+                {recentUsers.map((user) => (
+                  <tr key={user.id} className="transition-colors hover:bg-gray-50">
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <div className="text-sm font-medium text-gray-900">{user.name}</div>
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <div className="text-sm text-gray-500">{user.email}</div>
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <div className="text-sm text-gray-500">{new Date(user.joined).toLocaleDateString()}</div>
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <div className="text-sm text-gray-500">{user.downloads}</div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="border-t border-gray-200 px-6 py-4">
+            <Link href="/admin/users" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+              View all users
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* System Alerts */}
+      <div className="mt-8 rounded-lg bg-yellow-50 p-4">
+        <div className="flex">
+          <div className="flex-shrink-0">
+            <FiAlertCircle className="h-5 w-5 text-yellow-400" aria-hidden="true" />
+          </div>
+          <div className="ml-3">
+            <h3 className="text-sm font-medium text-yellow-800">System Notice</h3>
+            <div className="mt-2 text-sm text-yellow-700">
+              <p>
+                Scheduled maintenance planned for June 15, 2023, from 2:00 AM to 4:00 AM UTC. 
+                The system may experience brief downtime during this period.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
