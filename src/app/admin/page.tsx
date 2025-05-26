@@ -5,15 +5,27 @@ import Link from "next/link";
 import { FiBook, FiUsers, FiTrendingUp, FiDownload, FiPlusCircle, FiAlertCircle } from "react-icons/fi";
 import gsap from "gsap";
 
-// Mock data for demo purposes
-const recentBooks = [
-  { id: 1, title: "The Art of Programming", author: "John Doe", downloads: 1203, status: "active" },
-  { id: 2, title: "Data Structures Explained", author: "Jane Smith", downloads: 845, status: "active" },
-  { id: 3, title: "Machine Learning Basics", author: "Robert Johnson", downloads: 567, status: "pending" },
-  { id: 4, title: "Web Development Guide", author: "Emily Williams", downloads: 421, status: "active" },
-];
+// Define types for our data
+interface Book {
+  id: number;
+  title: string;
+  author: string;
+  downloads: number;
+  status: string;
+}
 
-const recentUsers = [
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  joined: string;
+  downloads: number;
+}
+
+// Empty arrays instead of mock data
+const recentBooks: Book[] = [];
+
+const recentUsers: User[] = [
   { id: 1, name: "Alex Johnson", email: "alex@example.com", joined: "2023-05-15", downloads: 28 },
   { id: 2, name: "Sarah Miller", email: "sarah@example.com", joined: "2023-05-18", downloads: 12 },
   { id: 3, name: "David Clark", email: "david@example.com", joined: "2023-05-22", downloads: 5 },
@@ -108,7 +120,7 @@ export default function AdminDashboard() {
       <div className="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard 
           title="Total Books" 
-          value="1,284" 
+          value="0" 
           icon={<FiBook className="h-6 w-6 text-white" />} 
           color="bg-blue-500"
         />
@@ -214,40 +226,57 @@ export default function AdminDashboard() {
             <h2 className="text-lg font-medium text-gray-900">Recent Books</h2>
           </div>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Title</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Author</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Downloads</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 bg-white">
-                {recentBooks.map((book) => (
-                  <tr key={book.id} className="transition-colors hover:bg-gray-50">
-                    <td className="whitespace-nowrap px-6 py-4">
-                      <div className="text-sm font-medium text-gray-900">{book.title}</div>
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4">
-                      <div className="text-sm text-gray-500">{book.author}</div>
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4">
-                      <div className="text-sm text-gray-500">{book.downloads}</div>
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4">
-                      <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
-                        book.status === "active" 
-                          ? "bg-green-100 text-green-800" 
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}>
-                        {book.status}
-                      </span>
-                    </td>
+            {recentBooks.length > 0 ? (
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Title</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Author</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Downloads</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-gray-200 bg-white">
+                  {recentBooks.map((book) => (
+                    <tr key={book.id} className="transition-colors hover:bg-gray-50">
+                      <td className="whitespace-nowrap px-6 py-4">
+                        <div className="text-sm font-medium text-gray-900">{book.title}</div>
+                      </td>
+                      <td className="whitespace-nowrap px-6 py-4">
+                        <div className="text-sm text-gray-500">{book.author}</div>
+                      </td>
+                      <td className="whitespace-nowrap px-6 py-4">
+                        <div className="text-sm text-gray-500">{book.downloads}</div>
+                      </td>
+                      <td className="whitespace-nowrap px-6 py-4">
+                        <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
+                          book.status === "active" 
+                            ? "bg-green-100 text-green-800" 
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}>
+                          {book.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="py-12 text-center">
+                <FiBook className="mx-auto h-12 w-12 text-gray-300" />
+                <h3 className="mt-2 text-sm font-medium text-gray-900">No books yet</h3>
+                <p className="mt-1 text-sm text-gray-500">Get started by adding your first book.</p>
+                <div className="mt-6">
+                  <Link
+                    href="/admin/books/new"
+                    className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700"
+                  >
+                    <FiPlusCircle className="-ml-0.5 mr-1.5 h-4 w-4" aria-hidden="true" />
+                    Add Book
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
           <div className="border-t border-gray-200 px-6 py-4">
             <Link href="/admin/books" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
