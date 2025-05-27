@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { FiPlus, FiX, FiArrowLeft, FiSave, FiImage, FiCalendar, FiUsers, FiBook, FiLayers, FiFileText, FiCheckCircle } from "react-icons/fi";
 import gsap from "gsap";
+import { useUserSettings } from "@/hooks/useUserSettings";
+import { useNotification } from "@/contexts/NotificationContext";
 
 interface Author {
   id: string;
@@ -51,6 +53,8 @@ interface ApprovedBook {
 
 export default function AddNewBook() {
   const router = useRouter();
+  const { settings, isLoading: isSettingsLoading, syncStatus, lastSyncMessage } = useUserSettings();
+  const { showNotification } = useNotification();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSeries, setIsSeries] = useState(false);
   const [formErrors, setFormErrors] = useState<{
@@ -73,7 +77,7 @@ export default function AddNewBook() {
   const [thumbnailPreview, setThumbnailPreview] = useState(""); // Used for single book mode
   const [bookPdfFile, setBookPdfFile] = useState<File | null>(null); // For single book PDF
   
-  // Add a state for single book year-only toggle - set default to true
+  // Use user's preferred date format from settings or default to year-only
   const [isYearOnly, setIsYearOnly] = useState(true);
 
   // Additional form state for series
@@ -86,6 +90,24 @@ export default function AddNewBook() {
 
   // Add state for approved books
   const [approvedBooks, setApprovedBooks] = useState<ApprovedBook[]>([]);
+
+  // Load user settings when component mounts
+  useEffect(() => {
+    if (!isSettingsLoading && settings) {
+      // Apply the user's publication date format preference
+      setIsYearOnly(settings.preferYearOnlyDateFormat ?? true);
+      
+      // No need to show notification for initial settings load
+    }
+  }, [settings, isSettingsLoading]);
+  
+  // Monitor sync status for notifications
+  useEffect(() => {
+    // Only show important notifications (error states)
+    if (syncStatus === 'error') {
+      showNotification('error', lastSyncMessage || 'Failed to synchronize settings');
+    }
+  }, [syncStatus, lastSyncMessage, showNotification]);
 
   // Number conversion functions
   const convertToBengaliNumeral = (num: number): string => {
@@ -192,6 +214,8 @@ export default function AddNewBook() {
             publicationDate: `${year}-01-01` // Default to January 1st of the year
           };
         }
+        
+        // No need to show notification for each toggle
       }
       return updated;
     });
@@ -304,7 +328,7 @@ export default function AddNewBook() {
     return Math.max(0, seriesEnd - seriesStart + 1);
   };
 
-  // Update handleYearToggle for single book to properly toggle state
+  // Update handleYearToggle to just handle the format conversion but not save to settings
   const handleYearToggle = () => {
     const newIsYearOnly = !isYearOnly;
     
@@ -317,7 +341,11 @@ export default function AddNewBook() {
       // Convert year to full date
       setPublicationDate(`${publicationDate}-01-01`);
     }
+    
+    // Update local state only
     setIsYearOnly(newIsYearOnly);
+    
+    // No notification needed for this UI interaction
   };
 
   // Validate form including checking publication date based on format

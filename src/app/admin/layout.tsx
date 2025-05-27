@@ -1,6 +1,7 @@
 "use client";
 
 import { useAdmin } from "@/lib/hooks/useAdmin";
+import { useUserSettings } from "@/hooks/useUserSettings";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -14,7 +15,8 @@ import {
   FiMenu, 
   FiX,
   FiBarChart2,
-  FiDatabase
+  FiDatabase,
+  FiRefreshCw
 } from "react-icons/fi";
 import gsap from "gsap";
 
@@ -24,6 +26,7 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const { isAdmin, isLoading, user } = useAdmin();
+  const { syncStatus } = useUserSettings();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const pathname = usePathname();
   
@@ -71,6 +74,13 @@ export default function AdminLayout({
     return null; // This will be redirected by the useAdmin hook
   }
 
+  const navItems = [
+    { name: "Dashboard", href: "/admin", icon: <FiHome className="h-5 w-5" /> },
+    { name: "Books", href: "/admin/books", icon: <FiBook className="h-5 w-5" /> },
+    { name: "Users", href: "/admin/users", icon: <FiUsers className="h-5 w-5" /> },
+    { name: "Settings", href: "/admin/settings", icon: <FiSettings className="h-5 w-5" /> },
+  ];
+
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Mobile sidebar toggle */}
@@ -95,6 +105,11 @@ export default function AdminLayout({
             <Link href="/admin" className="flex items-center">
               <span className="text-2xl font-bold text-white">BookAdmin</span>
             </Link>
+            {syncStatus === 'syncing' && (
+              <div className="ml-2 flex items-center text-indigo-300">
+                <FiRefreshCw className="h-4 w-4 animate-spin" />
+              </div>
+            )}
           </div>
 
           {/* User info */}
@@ -112,61 +127,21 @@ export default function AdminLayout({
 
           {/* Sidebar navigation */}
           <nav className="flex-1 space-y-1 px-2 py-4">
-            <Link
-              href="/admin"
-              className={`sidebar-item group mb-1 flex items-center rounded-md px-2 py-2 text-sm font-medium ${
-                pathname === "/admin"
-                  ? "bg-indigo-800 text-white"
-                  : "text-indigo-100 hover:bg-indigo-800 hover:text-white"
-              }`}
-            >
-              <FiBarChart2 className="mr-3 h-5 w-5" aria-hidden="true" />
-              Dashboard
-            </Link>
-            <Link
-              href="/admin/books"
-              className={`sidebar-item group mb-1 flex items-center rounded-md px-2 py-2 text-sm font-medium ${
-                pathname === "/admin/books"
-                  ? "bg-indigo-800 text-white"
-                  : "text-indigo-100 hover:bg-indigo-800 hover:text-white"
-              }`}
-            >
-              <FiBook className="mr-3 h-5 w-5" aria-hidden="true" />
-              Books
-            </Link>
-            <Link
-              href="/admin/users"
-              className={`sidebar-item group mb-1 flex items-center rounded-md px-2 py-2 text-sm font-medium ${
-                pathname === "/admin/users"
-                  ? "bg-indigo-800 text-white"
-                  : "text-indigo-100 hover:bg-indigo-800 hover:text-white"
-              }`}
-            >
-              <FiUsers className="mr-3 h-5 w-5" aria-hidden="true" />
-              Users
-            </Link>
-            <Link
-              href="/admin/categories"
-              className={`sidebar-item group mb-1 flex items-center rounded-md px-2 py-2 text-sm font-medium ${
-                pathname === "/admin/categories"
-                  ? "bg-indigo-800 text-white"
-                  : "text-indigo-100 hover:bg-indigo-800 hover:text-white"
-              }`}
-            >
-              <FiDatabase className="mr-3 h-5 w-5" aria-hidden="true" />
-              Categories
-            </Link>
-            <Link
-              href="/admin/settings"
-              className={`sidebar-item group mb-1 flex items-center rounded-md px-2 py-2 text-sm font-medium ${
-                pathname === "/admin/settings"
-                  ? "bg-indigo-800 text-white"
-                  : "text-indigo-100 hover:bg-indigo-800 hover:text-white"
-              }`}
-            >
-              <FiSettings className="mr-3 h-5 w-5" aria-hidden="true" />
-              Settings
-            </Link>
+            {navItems.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`sidebar-item group mb-1 flex items-center rounded-md px-2 py-2 text-sm font-medium ${
+                  pathname === item.href || 
+                  (item.href !== "/admin" && pathname?.startsWith(item.href))
+                    ? "bg-indigo-800 text-white"
+                    : "text-indigo-100 hover:bg-indigo-800 hover:text-white"
+                }`}
+              >
+                <span className="mr-3 text-gray-300">{item.icon}</span>
+                {item.name}
+              </Link>
+            ))}
           </nav>
 
           {/* Logout button */}

@@ -1,244 +1,218 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { FiKey, FiSave, FiAlertTriangle, FiCheckCircle, FiXCircle } from 'react-icons/fi';
-import gsap from 'gsap';
+import { useState, useEffect, useRef } from "react";
+import { FiSave, FiSettings, FiCalendar, FiLock, FiCheck, FiLoader, FiRefreshCw } from "react-icons/fi";
+import { useUserSettings } from "@/hooks/useUserSettings";
+import { useNotification } from "@/contexts/NotificationContext";
 
-// const LOCAL_STORAGE_KEY_FILES_VC = 'filesVcApiKey'; // No longer using localStorage directly for saving
+export default function AdminSettings() {
+  const { settings, updateSettings, saveChanges, isLoading, syncStatus, lastSyncMessage } = useUserSettings();
+  const { showNotification } = useNotification();
+  const [isSaving, setIsSaving] = useState(false);
+  const notificationShownRef = useRef<boolean>(false);
+  
+  // Local state for form controls
+  const [preferYearOnlyDateFormat, setPreferYearOnlyDateFormat] = useState(true);
+  const [filesVcApiKey, setFilesVcApiKey] = useState("");
+  const [isApiKeyModified, setIsApiKeyModified] = useState(false);
 
-export default function SettingsPage() {
-  const [filesVcApiKey, setFilesVcApiKey] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
-  const [isFilesVcKeySet, setIsFilesVcKeySet] = useState<boolean | null>(null); // null = unknown, true = set, false = not set
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  // Check if API key is set on mount
+  // Load settings when component mounts
   useEffect(() => {
-    const checkApiKeyStatus = async () => {
-      setIsLoading(true);
-      setErrorMessage(null);
-      try {
-        console.log("Checking API key status...");
-        const response = await fetch(`/api/admin/settings/api-keys?serviceName=files_vc`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          // Include credentials to ensure cookies are sent for authentication
-          credentials: 'include'
-        });
-        
-        console.log("API response status:", response.status);
-        
-        if (response.ok) {
-          const data = await response.json();
-          console.log("API response data:", data);
-          setIsFilesVcKeySet(data.isSet);
-        } else {
-          let errorData;
-          try {
-            errorData = await response.json();
-            console.error("API error response:", errorData);
-          } catch (e) {
-            console.error("Could not parse error response as JSON");
-            errorData = { 
-              error: `HTTP Error: ${response.status} ${response.statusText}`,
-              details: "The server returned an error response that could not be parsed as JSON"
-            };
-          }
-          
-          // Improved error message that includes both the main error and details if available
-          const errorMsg = errorData?.error || `HTTP Error: ${response.status} ${response.statusText}`;
-          const errorDetails = errorData?.details ? ` - ${errorData.details}` : '';
-          
-          setErrorMessage(`${errorMsg}${errorDetails}`);
-          console.error("Failed to check API key status:", errorMsg, errorDetails);
-          setIsFilesVcKeySet(false); // Assume not set on error
-        }
-      } catch (error) {
-        const errorDetail = error instanceof Error ? error.message : String(error);
-        setErrorMessage(`Error checking API key status: ${errorDetail}`);
-        console.error("Error checking API key status:", error);
-        setIsFilesVcKeySet(false); // Assume not set on error
-      } finally {
-        setIsLoading(false);
+    if (!isLoading && settings) {
+      setPreferYearOnlyDateFormat(settings.preferYearOnlyDateFormat ?? true);
+      
+      // If API key exists in settings, show masked version
+      if (settings.filesVcApiKey) {
+        setFilesVcApiKey("••••••••••••••••");
       }
-    };
-    checkApiKeyStatus();
-  }, []);
+    }
+  }, [isLoading, settings]);
 
-  // GSAP Animations
+  // Show notifications when sync status changes, but only once per sync operation
   useEffect(() => {
-    if (!isLoading) { // Run animations only after loading is complete
-      gsap.fromTo(
-        '.settings-card',
-        { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.5, ease: 'power2.out', stagger: 0.1 }
-      );
+    if (syncStatus === 'success' && !notificationShownRef.current) {
+      notificationShownRef.current = true;
+      showNotification('success', lastSyncMessage || 'Settings synchronized successfully');
+      setTimeout(() => {
+        notificationShownRef.current = false;
+      }, 5000); // Don't show another success notification for 5 seconds
+    } else if (syncStatus === 'error') {
+      notificationShownRef.current = true;
+      showNotification('error', lastSyncMessage || 'Failed to synchronize settings');
+      setTimeout(() => {
+        notificationShownRef.current = false;
+      }, 5000);
     }
-  }, [isLoading]);
+  }, [syncStatus, lastSyncMessage, showNotification]);
 
-  const handleSaveFilesVcApiKey = async () => {
-    if (!filesVcApiKey.trim()) {
-      alert("API Key cannot be empty."); // Basic validation
-      return;
-    }
-    setSaveStatus('saving');
-    setErrorMessage(null);
+  const handleApiKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFilesVcApiKey(e.target.value);
+    setIsApiKeyModified(true);
+  };
+
+  const handleSaveSettings = async () => {
+    setIsSaving(true);
+    
     try {
-      const response = await fetch('/api/admin/settings/api-keys', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', // Include credentials for authentication
-        body: JSON.stringify({ 
-          serviceName: 'files_vc', 
-          apiKey: filesVcApiKey 
-        }),
-      });
-
-      let responseData;
-      try {
-        responseData = await response.json();
-      } catch (e: unknown) {
-        const errorMsg = e instanceof Error ? e.message : String(e);
-        throw new Error(`Failed to parse response: ${errorMsg}. The server may have returned a non-JSON response.`);
+      const updatedSettings: Record<string, any> = {
+        preferYearOnlyDateFormat,
+      };
+      
+      // Only update API key if it was modified
+      if (isApiKeyModified && filesVcApiKey) {
+        updatedSettings.filesVcApiKey = filesVcApiKey;
       }
-
-      if (response.ok) {
-        console.log("API key saved successfully:", responseData);
-        setSaveStatus('success');
-        setIsFilesVcKeySet(true); // Assume key is now set
-        setTimeout(() => setSaveStatus('idle'), 2000);
-      } else {
-        // Improved error message handling with more details
-        const errorMsg = responseData?.error || response.statusText || 'Unknown error';
-        const errorDetails = responseData?.details ? ` - ${responseData.details}` : '';
-        
-        setErrorMessage(`${errorMsg}${errorDetails}`);
-        console.error("Error saving Files.vc API key:", errorMsg, errorDetails);
-        setSaveStatus('error');
-        setTimeout(() => setSaveStatus('idle'), 3000);
-      }
+      
+      // First just update local state
+      await updateSettings(updatedSettings);
+      
+      // Then explicitly save to server
+      await saveChanges();
+      
+      setIsApiKeyModified(false);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-      setErrorMessage(errorMessage);
-      console.error("Error saving Files.vc API key:", error);
-      setSaveStatus('error');
-      setTimeout(() => setSaveStatus('idle'), 3000);
+      console.error("Failed to save settings:", error);
+      // The error notification will be shown by the useEffect watching syncStatus
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  if (isLoading && isFilesVcKeySet === null) { // Show loading only during initial check
-    return (
-      <div className="flex h-full items-center justify-center">
-        <p className="text-gray-500">Loading settings status...</p>
-        {/* You could add a spinner here */}
-      </div>
-    );
-  }
+  // Get sync status indicator
+  const getSyncStatusIndicator = () => {
+    switch (syncStatus) {
+      case 'syncing':
+        return (
+          <div className="flex items-center text-blue-600 animate-pulse">
+            <FiRefreshCw className="mr-1 h-4 w-4 animate-spin" />
+            <span>Syncing...</span>
+          </div>
+        );
+      case 'success':
+        return (
+          <div className="flex items-center text-green-600">
+            <FiCheck className="mr-1 h-4 w-4" />
+            <span>Synced</span>
+          </div>
+        );
+      case 'error':
+        return (
+          <div className="flex items-center text-red-600">
+            <FiLoader className="mr-1 h-4 w-4" />
+            <span>Sync failed</span>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
-    <div className="space-y-8">
-      <h1 className="text-3xl font-bold text-gray-900 settings-card">Admin Settings</h1>
-
-      {/* Security Warning Banner - Remains important */}
-      <div className="settings-card rounded-md bg-red-50 p-4">
-        <div className="flex">
-          <div className="flex-shrink-0">
-            <FiAlertTriangle className="h-5 w-5 text-red-400" aria-hidden="true" />
-          </div>
-          <div className="ml-3">
-            <h3 className="text-sm font-medium text-red-800">Security Notice: API Key Management</h3>
-            <div className="mt-2 text-sm text-red-700">
-              <p>
-                This system is designed to store API keys encrypted in a backend database (e.g., Neon).
-                Ensure your backend API route for saving keys (`/api/admin/settings/api-keys`) implements proper authentication and secure database storage.
-              </p>
-            </div>
-          </div>
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-8 flex items-center justify-between">
+        <div className="flex items-center">
+          <FiSettings className="mr-3 h-6 w-6 text-gray-700" />
+          <h1 className="text-2xl font-bold text-gray-900">Admin Settings</h1>
         </div>
+        {getSyncStatusIndicator()}
       </div>
-
-      {/* Error message display - Enhanced with more details and troubleshooting instructions */}
-      {errorMessage && (
-        <div className="settings-card rounded-md bg-red-50 p-4">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <FiXCircle className="h-5 w-5 text-red-400" aria-hidden="true" />
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Error</h3>
-              <div className="mt-2 text-sm text-red-700">
-                <p>{errorMessage}</p>
-                <p className="mt-2">
-                  Please make sure you are logged in as an admin user and that your database is properly set up.
+      
+      {isLoading ? (
+        <div className="rounded-md bg-gray-50 p-4 text-gray-600">Loading settings...</div>
+      ) : (
+        <div className="space-y-8">
+          {/* Publication Date Format */}
+          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <h2 className="mb-4 flex items-center text-lg font-medium text-gray-900">
+              <FiCalendar className="mr-2 h-5 w-5 text-gray-700" />
+              Publication Date Format
+            </h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="flex items-center justify-between text-sm font-medium text-gray-700">
+                  <span>Default Publication Date Format</span>
+                  <div 
+                    className="relative inline-block h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    onClick={() => {
+                      const newValue = !preferYearOnlyDateFormat;
+                      setPreferYearOnlyDateFormat(newValue);
+                      
+                      // Just update local state, don't auto-save
+                      updateSettings({ preferYearOnlyDateFormat: newValue });
+                    }}
+                  >
+                    <span
+                      className={`${
+                        preferYearOnlyDateFormat ? "translate-x-5" : "translate-x-0"
+                      } pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
+                    />
+                  </div>
+                </label>
+                <p className="mt-1 text-sm text-gray-500">
+                  {preferYearOnlyDateFormat ? "Year Only (YYYY)" : "Full Date (YYYY-MM-DD)"}
                 </p>
-                <div className="mt-3 text-xs bg-red-100 p-2 rounded">
-                  <p className="font-medium">Troubleshooting:</p>
-                  <ul className="list-disc list-inside mt-1">
-                    <li>Check that your API_ENCRYPTION_KEY is set in the .env.local file (64-character hex)</li>
-                    <li>Verify your database connection is working (check DATABASE_URL)</li>
-                    <li>Ensure you have the ADMIN role in the database</li>
-                    <li>Check server logs for more details</li>
-                  </ul>
-                </div>
+                <p className="mt-1 text-xs text-gray-400">
+                  This setting affects how publication dates are displayed and entered in book forms.
+                </p>
               </div>
             </div>
           </div>
-        </div>
-      )}
-
-      <div className="settings-card rounded-lg bg-white p-6 shadow-md">
-        <h2 className="mb-6 text-xl font-semibold text-gray-800">File Host API Keys</h2>
-        
-        <div className="space-y-6">
-          {/* Files.vc API Key Setting */}
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-                <label htmlFor="filesVcApiKey" className="flex items-center text-sm font-medium text-gray-700">
-                <FiKey className="mr-2 h-4 w-4 text-gray-500" />
-                Files.vc API Key
+          
+          {/* Files.vc API Key */}
+          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <h2 className="mb-4 flex items-center text-lg font-medium text-gray-900">
+              <FiLock className="mr-2 h-5 w-5 text-gray-700" />
+              Files.vc Integration
+            </h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="apiKey" className="mb-1 block text-sm font-medium text-gray-700">
+                  API Key
                 </label>
-                {isFilesVcKeySet !== null && (
-                    <span className={`flex items-center text-xs font-medium px-2 py-0.5 rounded-full ${isFilesVcKeySet ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}> 
-                        {isFilesVcKeySet ? <FiCheckCircle className="mr-1 h-3 w-3"/> : <FiAlertTriangle className="mr-1 h-3 w-3"/>}
-                        {isFilesVcKeySet ? 'Key is Set' : 'Key Not Set'}
-                    </span>
-                )}
+                <input
+                  type="password"
+                  id="apiKey"
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  placeholder={isApiKeyModified ? "Enter new API key" : "Enter API key or leave unchanged"}
+                  value={filesVcApiKey}
+                  onChange={handleApiKeyChange}
+                />
+                <p className="mt-1 text-xs text-gray-400">
+                  {!isApiKeyModified && settings?.filesVcApiKey 
+                    ? "API key is saved and encrypted. Leave blank to keep the existing key." 
+                    : "Your API key will be stored securely and encrypted."}
+                </p>
+              </div>
             </div>
-            <p className="mb-2 text-xs text-gray-500">
-              Enter your Files.vc API key. This key will be encrypted and stored securely.
-            </p>
-            <div className="flex items-center space-x-3">
-              <input
-                type="password" 
-                id="filesVcApiKey"
-                className="mt-1 block w-full flex-grow rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                placeholder={isFilesVcKeySet ? "Key is set (Enter new key to update)" : "Enter your Files.vc API Key"}
-                value={filesVcApiKey}
-                onChange={(e) => setFilesVcApiKey(e.target.value)}
-              />
-              <button
-                type="button"
-                onClick={handleSaveFilesVcApiKey}
-                disabled={saveStatus === 'saving'}
-                className={`inline-flex items-center justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2
-                  ${saveStatus === 'saving' ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500'}
-                  ${saveStatus === 'success' ? 'bg-green-500 hover:bg-green-600' : ''}
-                  ${saveStatus === 'error' ? 'bg-red-500 hover:bg-red-600' : ''}`}
-              >
-                <FiSave className="mr-2 h-4 w-4" />
-                {saveStatus === 'saving' ? 'Saving...' : saveStatus === 'success' ? 'Saved!' : saveStatus === 'error' ? 'Error!' : (isFilesVcKeySet ? 'Update Key' : 'Save Key')}
-              </button>
-            </div>
-            {saveStatus === 'success' && <p className="mt-1 text-sm text-green-600">Files.vc API Key action processed successfully.</p>}
-            {saveStatus === 'error' && <p className="mt-1 text-sm text-red-600">Failed to process API Key. See error message above for details.</p>}
+          </div>
+          
+          {/* Save Button and Status */}
+          <div className="flex items-center justify-end">
+            <button
+              type="button"
+              onClick={handleSaveSettings}
+              disabled={isSaving || syncStatus === 'syncing'}
+              className={`inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+                (isSaving || syncStatus === 'syncing') ? "cursor-not-allowed opacity-75" : ""
+              }`}
+            >
+              {(isSaving || syncStatus === 'syncing') ? (
+                <>
+                  <FiRefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  Syncing...
+                </>
+              ) : (
+                <>
+                  <FiSave className="mr-2 h-4 w-4" />
+                  Save Settings
+                </>
+              )}
+            </button>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

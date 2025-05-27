@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
@@ -14,22 +8,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// NextAuth.js Models
 model Account {
   id                String  @id @default(cuid())
   userId            String
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -50,8 +42,9 @@ model User {
   image         String?
   role          UserRole      @default(USER)
   accounts      Account[]
+  apiKeys       AdminApiKey[]
   sessions      Session[]
-  apiKeys       AdminApiKey[] // Relation to API keys
+  settings      UserSettings?
 }
 
 model VerificationToken {
@@ -62,35 +55,45 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// User Roles
-enum UserRole {
-  USER
-  ADMIN
+model UserSettings {
+  id                       String   @id @default(cuid())
+  userId                   String   @unique
+  preferYearOnlyDateFormat Boolean  @default(true)
+  encryptedFilesVcApiKey   String?
+  apiKeyIv                 String?
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+  user                     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
-// API Keys storage model for secure API key management
 model AdminApiKey {
   id              String   @id @default(cuid())
   adminId         String
-  admin           User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
-  serviceName     String // The service this key is for (e.g., "files_vc")
-  encryptedApiKey String // The encrypted API key
-  iv              String // Initialization Vector for AES-256-GCM encryption
+  serviceName     String
+  encryptedApiKey String
+  iv              String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  admin           User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
 
-  @@unique([adminId, serviceName]) // An admin can only have one key per service
+  @@unique([adminId, serviceName])
   @@index([adminId])
   @@index([serviceName])
 }
 
-// Add your custom models below
 model Book {
   id          String   @id @default(cuid())
   title       String
   author      String
   imageUrl    String?
-  description String?  @db.Text
+  description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+enum UserRole {
+  USER
+  ADMIN
 }
