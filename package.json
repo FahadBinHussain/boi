@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "setup": "node scripts/check-env.js",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "update-scrapers": "git submodule update --remote --recursive"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.9.1",
