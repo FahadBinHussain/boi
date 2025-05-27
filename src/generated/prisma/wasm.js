@@ -163,17 +163,6 @@ exports.Prisma.UserSettingsScalarFieldEnum = {
   preferYearOnlyDateFormat: 'preferYearOnlyDateFormat',
   encryptedFilesVcApiKey: 'encryptedFilesVcApiKey',
   apiKeyIv: 'apiKeyIv',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.AdminApiKeyScalarFieldEnum = {
-  id: 'id',
-  adminId: 'adminId',
-  serviceName: 'serviceName',
-  encryptedApiKey: 'encryptedApiKey',
-  iv: 'iv',
-  createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
 
@@ -183,7 +172,6 @@ exports.Prisma.BookScalarFieldEnum = {
   author: 'author',
   imageUrl: 'imageUrl',
   description: 'description',
-  createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
 
@@ -212,7 +200,6 @@ exports.Prisma.ModelName = {
   User: 'User',
   VerificationToken: 'VerificationToken',
   UserSettings: 'UserSettings',
-  AdminApiKey: 'AdminApiKey',
   Book: 'Book'
 };
 
