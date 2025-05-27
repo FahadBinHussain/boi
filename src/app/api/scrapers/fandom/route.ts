@@ -9,6 +9,24 @@ const execAsync = promisify(exec);
 // Assumes scraper.js is the entry point and is in the root of the Fandom-Scraper submodule
 const scraperScriptPath = path.resolve(process.cwd(), 'src/lib/scrapers/Fandom-Scraper/scraper.js');
 
+// Define interfaces for the expected data structure
+interface FandomScraperOutput {
+  title: string;
+  plot_summary?: string;
+  author?: string;
+  publication_date?: string;
+  cover_image_url?: string;
+  [key: string]: any; // Allow additional properties
+}
+
+interface ScrapedBookData {
+  title: string;
+  imageUrl?: string;
+  summary?: string;
+  publicationDate?: string;
+  authors?: string[];
+}
+
 export async function POST(request: NextRequest) {
   console.log('Fandom scraper API endpoint hit');
   try {
@@ -34,21 +52,44 @@ export async function POST(request: NextRequest) {
     }
 
     // Execute the scraper script
-    // You'll need to adapt this command based on how your scraper.js is meant to be run
-    // e.g., if it takes the URL as a command-line argument
     const { stdout, stderr } = await execAsync(`node ${scraperScriptPath} "${fandomUrl}"`);
 
     if (stderr) {
-      console.error('Error during scraping:', stderr);
-      return NextResponse.json({ error: 'Scraping process error', details: stderr }, { status: 500 });
+      console.error('Error output from scraper:', stderr);
+      // Only return error if stderr indicates a true error (note that many tools output non-error information to stderr)
+      if (stderr.includes('Error') || stderr.includes('exception') || stderr.includes('failed')) {
+        return NextResponse.json({ error: 'Scraping process error', details: stderr }, { status: 500 });
+      }
     }
 
-    // Assuming the scraper.js outputs JSON to stdout
-    const scrapedData = JSON.parse(stdout);
-    console.log('Scraping successful, data:', scrapedData);
+    // Ensure we have output before trying to parse it
+    if (!stdout || stdout.trim() === '') {
+      return NextResponse.json({ error: 'Empty response from scraper' }, { status: 500 });
+    }
 
-    return NextResponse.json(scrapedData, { status: 200 });
-
+    try {
+      // Parse the JSON output from the scraper
+      const scrapedData: FandomScraperOutput = JSON.parse(stdout);
+      
+      // Map the Fandom scraper output to our expected format
+      const bookData: ScrapedBookData = {
+        title: scrapedData.title || 'Untitled Book',
+        imageUrl: scrapedData.cover_image_url,
+        summary: scrapedData.plot_summary,
+        publicationDate: scrapedData.publication_date,
+        authors: scrapedData.author ? [scrapedData.author] : undefined
+      };
+      
+      return NextResponse.json(bookData, { status: 200 });
+    } catch (parseError) {
+      console.error('Failed to parse scraper output:', parseError);
+      console.error('Raw stdout:', stdout);
+      return NextResponse.json({ 
+        error: 'Failed to parse scraped data (not valid JSON). Check scraper output.',
+        details: String(parseError),
+        stdout: stdout  // Include the raw output for debugging
+      }, { status: 500 });
+    }
   } catch (error) {
     console.error('Error in Fandom scraper API:', error);
     let errorMessage = 'Failed to scrape Fandom URL.';
