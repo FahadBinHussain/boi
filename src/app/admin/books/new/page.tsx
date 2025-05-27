@@ -665,20 +665,21 @@ The PDF will be uploaded again during the final form submission.`);
         </div>
       </div>
 
-      <div className="mb-4 rounded-md bg-green-50 p-4">
-        <div className="flex">
-          <div className="flex-shrink-0">
-            <FiCheckCircle className="h-5 w-5 text-green-400" aria-hidden="true" />
-          </div>
-          <div className="ml-3">
-            <h3 className="text-sm font-medium text-green-800">Files.vc Integration Active</h3>
-            <div className="mt-2 text-sm text-green-700">
-              <p>
-                Files.vc API key is configured. PDF files will be uploaded to Files.vc.
-              </p>
-            </div>
-          </div>
-        </div>
+      {/* Replace the existing Files.vc integration status box with a simpler indicator */}
+      <div className="mb-4 flex items-center">
+        <span className="text-sm font-medium mr-2">Files.vc:</span>
+        {/* Dynamic indicator based on whether the API key exists in settings */}
+        {settings?.filesVcApiKey ? (
+          <span className="inline-flex items-center">
+            <span className="h-3 w-3 rounded-full bg-green-500 mr-1" aria-hidden="true"></span>
+            <span className="text-sm text-green-700">Active</span>
+          </span>
+        ) : (
+          <span className="inline-flex items-center">
+            <span className="h-3 w-3 rounded-full bg-red-500 mr-1" aria-hidden="true"></span>
+            <span className="text-sm text-red-700">Not configured</span>
+          </span>
+        )}
       </div>
 
       <div className="form-card rounded-lg bg-white p-6 shadow-md">
