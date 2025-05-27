@@ -811,341 +811,344 @@ The PDF will be uploaded again during the final form submission.`);
 
           {/* Series Configuration - only shown when in series mode */}          
           {isSeries && (
-            <div className="series-fields space-y-6 overflow-hidden rounded-lg border border-gray-100 bg-white p-6 shadow-sm">
-              <div className="border-b border-gray-100 pb-4">
-                <h3 className="text-lg font-medium text-gray-900">Series Configuration</h3>
-                <p className="mt-1 text-sm text-gray-500">Configure how your book series will be created and named.</p>
-              </div>
-              
-              {/* Series Naming Mode */}
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Naming Style</label>
-                  <p className="text-xs text-gray-500 mt-1">Choose whether all books in the series share the same name pattern or have individual names.</p>
-                  <div className="mt-3 flex items-center justify-between rounded-md bg-gray-50 p-4">
-                    <span className="text-sm text-gray-700">Use consistent series name</span>
-                    <div className="relative inline-block h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                      onClick={() => setUseDifferentNames(!useDifferentNames)}
-                    >
-                      <span
-                        className={`${
-                          useDifferentNames ? "translate-x-5" : "translate-x-0"
-                        } pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
-                      />
+            <div className="space-y-8">
+              {/* Step 1: Basic Series Configuration */}
+              <div className="series-fields rounded-lg border border-gray-100 bg-white p-6 shadow-sm">
+                <div className="border-b border-gray-100 pb-4 mb-6">
+                  <div className="flex items-center">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 mr-3">
+                      <span className="font-medium">1</span>
                     </div>
-                    <span className="text-sm text-gray-700">Use different names</span>
+                    <h3 className="text-lg font-medium text-gray-900">Series Information</h3>
                   </div>
+                  <p className="mt-1 text-sm text-gray-500 ml-11">Define the basic information about your book series</p>
                 </div>
                 
                 {/* Series Range */}
-                <div className="pt-2">
-                  <label className="block text-sm font-medium text-gray-700">Series Range</label>
-                  <p className="text-xs text-gray-500 mt-1">Define the starting and ending numbers for your book series.</p>
-                  <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div className="group">
-                      <label htmlFor="seriesStart" className="block text-sm font-medium text-gray-700">
-                        Start Number
-                      </label>
-                      <div className="mt-1 relative rounded-md">
-                        <input
-                          type="number"
-                          id="seriesStart"
-                          min="1"
-                          className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                            formErrors.seriesStart ? "border-red-500" : ""
-                          }`}
-                          value={seriesStart}
-                          onChange={(e) => setSeriesStart(parseInt(e.target.value) || 1)}
-                        />
-                        {formErrors.seriesStart && (
-                          <p className="mt-1 text-sm text-red-500">{formErrors.seriesStart}</p>
-                        )}
-                      </div>
-                    </div>
-                    <div>
-                      <label htmlFor="seriesEnd" className="block text-sm font-medium text-gray-700">
-                        End Number
-                      </label>
-                      <div className="mt-1 relative rounded-md">
-                        <input
-                          type="number"
-                          id="seriesEnd"
-                          min={seriesStart} // Ensure end is not less than start
-                          className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                            formErrors.seriesEnd ? "border-red-500" : ""
-                          }`}
-                          value={seriesEnd}
-                          onChange={(e) => setSeriesEnd(parseInt(e.target.value) || seriesStart)}
-                        />
-                        {formErrors.seriesEnd && (
-                          <p className="mt-1 text-sm text-red-500">{formErrors.seriesEnd}</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Series Preview */}
-              {((!useDifferentNames && seriesBaseName) || useDifferentNames) && getTotalBooksInSeries() > 0 && (
-                <div className="mt-4 rounded-lg bg-indigo-50 p-4 border border-indigo-100">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                      <svg className="h-5 w-5 text-indigo-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <div className="ml-3">
-                      <h3 className="text-sm font-medium text-indigo-800">Series Preview</h3>
-                      <div className="mt-2 space-y-1 text-sm">
-                        {generateSeriesPreview().map((title, index) => (
-                          <div key={index} className="text-indigo-700">{title}</div>
-                        ))}
-                      </div>
-                      <div className="mt-2 flex items-center gap-1">
-                        <span className="font-semibold text-indigo-800">{getTotalBooksInSeries()}</span>
-                        <span className="text-xs text-indigo-700">{getTotalBooksInSeries() === 1 ? "book" : "books"} will be created</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Authors */}
-          <div className="form-field">
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              <div className="flex items-center">
-                <FiUsers className="mr-2 h-4 w-4 text-gray-500" />
-                Authors <span className="text-red-500">*</span>
-              </div>
-            </label>
-            <div className="space-y-3">
-              {authors.map((author, index) => (
-                <div key={author.id} className="flex items-center space-x-2">
-                  <input
-                    type="text"
-                    className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                      formErrors.authors ? "border-red-500" : ""
-                    }`}
-                    placeholder={`Author ${index + 1}`}
-                    value={author.name}
-                    onChange={(e) => updateAuthor(author.id, e.target.value)}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeAuthor(author.id)}
-                    disabled={authors.length === 1}
-                    className={`inline-flex items-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 ${
-                      authors.length === 1 ? "cursor-not-allowed opacity-50" : ""
-                    }`}
-                  >
-                    <FiX className="h-5 w-5" />
-                    <span className="sr-only">Remove author</span>
-                  </button>
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={addAuthor}
-                className="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
-              >
-                <FiPlus className="mr-2 h-4 w-4" />
-                Add Another Author
-              </button>
-            </div>
-            {formErrors.authors && (
-              <p className="mt-1 text-sm text-red-500">{formErrors.authors}</p>
-            )}
-          </div>
-
-          {/* Combined Series Books Section - replaces separate thumbnails and PDFs sections */}
-          {isSeries && (
-            <div className="form-field space-y-4 overflow-hidden rounded-md bg-gray-50 p-4">
-              <h3 className="text-base font-medium text-gray-900">
-                Series Books ({getTotalBooksInSeries()} {getTotalBooksInSeries() === 1 ? "book" : "books"})
-              </h3>
-              {getTotalBooksInSeries() > 0 ? (
                 <div className="space-y-6">
-                  {Array.from({ length: getTotalBooksInSeries() }, (_, i) => {
-                    const bookNumber = seriesStart + i;
-                    const thumbnailIndex = seriesThumbnails.findIndex(t => t.bookNumber === bookNumber);
-                    const pdfIndex = seriesBookPdfs.findIndex(p => p.bookNumber === bookNumber);
-                    const isApproved = approvedBooks.find(book => book.bookNumber === bookNumber)?.isApproved || false;
-                    
-                    return (
-                      <div 
-                        key={bookNumber} 
-                        className={`rounded-md border p-4 ${isApproved ? 'border-green-500 bg-green-50' : 'border-gray-200'}`}
-                      >
-                        <div className="mb-2 flex items-center justify-between">
-                          <h4 className="text-sm font-medium text-gray-900">
-                            {useDifferentNames 
-                              ? `Book ${getFormattedSeriesNumber(bookNumber)}`
-                              : `${seriesBaseName || "Book"} ${getFormattedSeriesNumber(bookNumber)}`
-                            }
-                          </h4>
-                          <span className={`flex items-center text-xs font-medium px-2 py-0.5 rounded-full ${isApproved ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                            {isApproved ? <FiCheckCircle className="mr-1 h-3 w-3"/> : <FiFileText className="mr-1 h-3 w-3"/>}
-                            {isApproved ? 'Approved' : 'Pending'}
-                          </span>
-                        </div>
-
-                        {/* Add custom book name field when in different names mode */}
-                        {useDifferentNames && (
-                          <div className="mb-4">
-                            <label htmlFor={`bookName-${bookNumber}`} className="block text-xs font-medium text-gray-600">
-                              Book Name <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                              type="text"
-                              id={`bookName-${bookNumber}`}
-                              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                                formErrors.seriesBookNames && thumbnailIndex !== -1 && !seriesThumbnails[thumbnailIndex].customName?.trim() ? "border-red-500" : ""
-                              }`}
-                              placeholder={`Enter name for book ${getFormattedSeriesNumber(bookNumber)}`}
-                              value={thumbnailIndex !== -1 ? seriesThumbnails[thumbnailIndex].customName || "" : ""}
-                              onChange={(e) => updateSeriesBookName(thumbnailIndex, e.target.value)}
-                            />
-                          </div>
-                        )}
-                        
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                          {/* Thumbnail Input */}
-                          <div className="space-y-2">
-                            <label htmlFor={`seriesThumbnail-${bookNumber}`} className="block text-xs font-medium text-gray-600">
-                              Thumbnail URL
-                            </label>
-                            <input
-                              type="text"
-                              id={`seriesThumbnail-${bookNumber}`}
-                              className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                                formErrors.seriesThumbnails && thumbnailIndex !== -1 && seriesThumbnails[thumbnailIndex].url.trim() !== "" && 
-                                !/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/.test(seriesThumbnails[thumbnailIndex].url) ? "border-red-500" : ""
-                              }`}
-                              placeholder="https://example.com/thumbnail.jpg"
-                              value={thumbnailIndex !== -1 ? seriesThumbnails[thumbnailIndex].url : ""}
-                              onChange={(e) => updateSeriesThumbnailPreview(thumbnailIndex, e.target.value)}
-                            />
-                            
-                            {thumbnailIndex !== -1 && seriesThumbnails[thumbnailIndex].preview && (
-                              <div className="mt-1 flex items-center">
-                                <div className="h-16 w-12 overflow-hidden rounded border border-gray-200">
-                                  <img 
-                                    src={seriesThumbnails[thumbnailIndex].preview} 
-                                    alt={`Preview for book ${bookNumber}`}
-                                    className="h-full w-full object-cover"
-                                    onError={(e) => {
-                                      e.currentTarget.src = "https://via.placeholder.com/120x160?text=No Preview"; 
-                                    }}
-                                  />
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                          
-                          {/* PDF Input */}
-                          <div className="space-y-2">
-                            <label htmlFor={`seriesPdf-${bookNumber}`} className="block text-xs font-medium text-gray-600">
-                              PDF File <span className="text-xs text-gray-500">(Will be uploaded to Files.vc)</span>
-                            </label>
-                            <input
-                              type="file"
-                              id={`seriesPdf-${bookNumber}`}
-                              accept=".pdf"
-                              onChange={(e) => handleSeriesBookPdfChange(pdfIndex, e)}
-                              className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-indigo-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-indigo-700 hover:file:bg-indigo-100"
-                            />
-                            {pdfIndex !== -1 && seriesBookPdfs[pdfIndex].file && (
-                              <p className="mt-1 text-xs text-gray-600">
-                                Selected: {seriesBookPdfs[pdfIndex].file.name} ({(seriesBookPdfs[pdfIndex].file.size / 1024 / 1024).toFixed(2)} MB)
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                        
-                        {/* Book Summary for this specific book */}
-                        <div className="mt-4">
-                          <label htmlFor={`summary-${bookNumber}`} className="block text-xs font-medium text-gray-600">
-                            Book Summary
-                          </label>
-                          <textarea
-                            id={`summary-${bookNumber}`}
-                            rows={3}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                            placeholder="Enter a brief summary of the book..."
-                            value={thumbnailIndex !== -1 ? seriesThumbnails[thumbnailIndex].summary || "" : ""}
-                            onChange={(e) => updateSeriesBookSummary(thumbnailIndex, e.target.value)}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Series Range</label>
+                    <p className="text-xs text-gray-500 mt-1">Define the starting and ending numbers for your book series</p>
+                    <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div className="group">
+                        <label htmlFor="seriesStart" className="block text-sm font-medium text-gray-700">
+                          Start Number
+                        </label>
+                        <div className="mt-1 relative rounded-md">
+                          <input
+                            type="number"
+                            id="seriesStart"
+                            min="1"
+                            className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                              formErrors.seriesStart ? "border-red-500" : ""
+                            }`}
+                            value={seriesStart}
+                            onChange={(e) => setSeriesStart(parseInt(e.target.value) || 1)}
                           />
-                        </div>
-                        
-                        {/* Publication Date for this specific book */}
-                        <div className="mt-4">
-                          <label htmlFor={`publicationDate-${bookNumber}`} className="flex items-center justify-between text-xs font-medium text-gray-600">
-                            <span>Publication Date <span className="text-red-500">*</span></span>
-                            <div className="flex items-center">
-                              <span className="mr-2 text-xs">
-                                {thumbnailIndex !== -1 && seriesThumbnails[thumbnailIndex]?.isYearOnly 
-                                  ? "Year only" 
-                                  : "Full date"}
-                              </span>
-                              <button 
-                                type="button"
-                                onClick={() => thumbnailIndex !== -1 && toggleSeriesBookYearOnly(thumbnailIndex)}
-                                className="text-xs text-indigo-600 hover:text-indigo-800"
-                              >
-                                Toggle format
-                              </button>
-                            </div>
-                          </label>
-                          {thumbnailIndex !== -1 && seriesThumbnails[thumbnailIndex]?.isYearOnly ? (
-                            <input
-                              type="text"
-                              id={`publicationDate-${bookNumber}`}
-                              placeholder="YYYY"
-                              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                              value={thumbnailIndex !== -1 ? seriesThumbnails[thumbnailIndex].publicationDate || "" : ""}
-                              onChange={(e) => updateSeriesBookPublicationDate(thumbnailIndex, e.target.value)}
-                              pattern="\d{4}"
-                            />
-                          ) : (
-                            <input
-                              type="date"
-                              id={`publicationDate-${bookNumber}`}
-                              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                              value={thumbnailIndex !== -1 ? seriesThumbnails[thumbnailIndex].publicationDate || "" : ""}
-                              onChange={(e) => updateSeriesBookPublicationDate(thumbnailIndex, e.target.value)}
-                            />
+                          {formErrors.seriesStart && (
+                            <p className="mt-1 text-sm text-red-500">{formErrors.seriesStart}</p>
                           )}
                         </div>
-                        
-                        {/* Approve Button */}
-                        <div className="mt-4 flex justify-end">
-                          <button
-                            type="button"
-                            onClick={() => handleApproveBook(bookNumber)}
-                            className={`inline-flex items-center rounded-md px-3 py-2 text-sm font-medium ${
-                              isApproved 
-                                ? 'bg-green-100 text-green-700 hover:bg-green-200' 
-                                : 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200'
+                      </div>
+                      <div>
+                        <label htmlFor="seriesEnd" className="block text-sm font-medium text-gray-700">
+                          End Number
+                        </label>
+                        <div className="mt-1 relative rounded-md">
+                          <input
+                            type="number"
+                            id="seriesEnd"
+                            min={seriesStart} // Ensure end is not less than start
+                            className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                              formErrors.seriesEnd ? "border-red-500" : ""
                             }`}
-                          >
-                            <FiCheckCircle className="mr-2 h-4 w-4" />
-                            {isApproved ? 'Approved' : 'Approve Book'}
-                          </button>
+                            value={seriesEnd}
+                            onChange={(e) => setSeriesEnd(parseInt(e.target.value) || seriesStart)}
+                          />
+                          {formErrors.seriesEnd && (
+                            <p className="mt-1 text-sm text-red-500">{formErrors.seriesEnd}</p>
+                          )}
                         </div>
                       </div>
-                    );
-                  })}
+                    </div>
+                  </div>
+                  
+                  {/* Series Naming Mode */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Naming Style</label>
+                    <p className="text-xs text-gray-500 mt-1">Choose how to name books in your series</p>
+                    <div className="mt-3 flex flex-col gap-4">
+                      {/* Option 1: Use same name for all books */}
+                      <div className={`flex items-start p-4 border rounded-md ${!useDifferentNames ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'}`}>
+                        <input
+                          type="radio"
+                          id="consistent-names"
+                          checked={!useDifferentNames}
+                          onChange={() => setUseDifferentNames(false)}
+                          className="h-4 w-4 mt-1 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                        />
+                        <div className="ml-3">
+                          <label htmlFor="consistent-names" className="font-medium text-gray-800 cursor-pointer">Use consistent series name</label>
+                          <p className="text-sm text-gray-600 mt-1">All books will follow the same naming pattern with different numbers</p>
+                        </div>
+                      </div>
+                      
+                      {/* Option 2: Use different names for each book */}
+                      <div className={`flex items-start p-4 border rounded-md ${useDifferentNames ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'}`}>
+                        <input
+                          type="radio"
+                          id="different-names"
+                          checked={useDifferentNames}
+                          onChange={() => setUseDifferentNames(true)}
+                          className="h-4 w-4 mt-1 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                        />
+                        <div className="ml-3">
+                          <label htmlFor="different-names" className="font-medium text-gray-800 cursor-pointer">Use different names for each book</label>
+                          <p className="text-sm text-gray-600 mt-1">Each book in the series will have its own unique name</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              ) : (
-                <p className="text-sm text-gray-500">
-                  Adjust the series range to add books. Minimum 1 book required.
-                </p>
-              )}
-              {formErrors.seriesBookNames && (
-                <p className="mt-1 text-sm text-red-500">{formErrors.seriesBookNames}</p>
+                
+                {/* Series Preview */}
+                {getTotalBooksInSeries() > 0 && (
+                  <div className="mt-6 rounded-lg bg-indigo-50 p-4 border border-indigo-100">
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0 pt-0.5">
+                        <svg className="h-5 w-5 text-indigo-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="ml-3">
+                        <h3 className="text-sm font-medium text-indigo-800">Series Preview</h3>
+                        <div className="mt-2 space-y-1 text-sm">
+                          {generateSeriesPreview().map((title, index) => (
+                            <div key={index} className="text-indigo-700">{title}</div>
+                          ))}
+                        </div>
+                        <div className="mt-2">
+                          <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+                            {getTotalBooksInSeries()} {getTotalBooksInSeries() === 1 ? "book" : "books"} will be created
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Step 2: Book Details */}
+              {getTotalBooksInSeries() > 0 && (
+                <div className="series-fields rounded-lg border border-gray-100 bg-white p-6 shadow-sm">
+                  <div className="border-b border-gray-100 pb-4 mb-6">
+                    <div className="flex items-center">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 mr-3">
+                        <span className="font-medium">2</span>
+                      </div>
+                      <h3 className="text-lg font-medium text-gray-900">Books Details</h3>
+                    </div>
+                    <p className="mt-1 text-sm text-gray-500 ml-11">Configure details for each book in the series</p>
+                  </div>
+
+                  {/* Book Tabs Interface */}
+                  <div className="mt-4">
+                    <div className="mb-4 border-b border-gray-200">
+                      <ul className="flex flex-wrap -mb-px text-sm font-medium text-center" role="tablist">
+                        {Array.from({ length: getTotalBooksInSeries() }, (_, i) => {
+                          const bookNumber = seriesStart + i;
+                          return (
+                            <li className="mr-2" key={bookNumber} role="presentation">
+                              <button
+                                type="button"
+                                className={`inline-block p-3 rounded-t-lg ${
+                                  i === 0 ? 'border-b-2 border-indigo-600 text-indigo-600' : 'border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300'
+                                }`}
+                                role="tab"
+                              >
+                                Book {bookNumber}
+                              </button>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+
+                    {/* Individual Book Forms - For simplicity, just showing the first book by default */}
+                    {Array.from({ length: getTotalBooksInSeries() }, (_, i) => {
+                      const bookNumber = seriesStart + i;
+                      const thumbnailIndex = seriesThumbnails.findIndex(t => t.bookNumber === bookNumber);
+                      const pdfIndex = seriesBookPdfs.findIndex(p => p.bookNumber === bookNumber);
+                      const isApproved = approvedBooks.find(book => book.bookNumber === bookNumber)?.isApproved || false;
+                      
+                      // For simplicity, we'll only show the first book form
+                      if (i !== 0) return null;
+                      
+                      return (
+                        <div key={bookNumber} className="p-4 bg-gray-50 rounded-md">
+                          <div className="flex flex-col md:flex-row md:gap-8">
+                            <div className="mb-6 md:mb-0 md:w-1/3">
+                              <h4 className="font-medium text-lg mb-2">
+                                {useDifferentNames 
+                                  ? `Book ${getFormattedSeriesNumber(bookNumber)}`
+                                  : `${seriesBaseName || "Book"} ${getFormattedSeriesNumber(bookNumber)}`
+                                }
+                              </h4>
+                              
+                              {/* Book Name Field (always shown, but required only when using different names) */}
+                              <div className="mb-4">
+                                <label className="block text-sm font-medium text-gray-600 mb-1">
+                                  Book Name {useDifferentNames && <span className="text-red-500">*</span>}
+                                </label>
+                                <input
+                                  type="text"
+                                  className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                                    formErrors.seriesBookNames && thumbnailIndex !== -1 && useDifferentNames && !seriesThumbnails[thumbnailIndex].customName?.trim() ? "border-red-500" : ""
+                                  }`}
+                                  placeholder="Enter name for this book"
+                                  value={thumbnailIndex !== -1 ? seriesThumbnails[thumbnailIndex].customName || "" : ""}
+                                  onChange={(e) => updateSeriesBookName(thumbnailIndex, e.target.value)}
+                                  required={useDifferentNames}
+                                />
+                              </div>
+                              
+                              {/* Thumbnail Input */}
+                              <div className="mb-4">
+                                <label className="block text-sm font-medium text-gray-600 mb-1">
+                                  Thumbnail URL
+                                </label>
+                                <input
+                                  type="text"
+                                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                  placeholder="https://example.com/thumbnail.jpg"
+                                  value={thumbnailIndex !== -1 ? seriesThumbnails[thumbnailIndex].url : ""}
+                                  onChange={(e) => updateSeriesThumbnailPreview(thumbnailIndex, e.target.value)}
+                                />
+                                
+                                {thumbnailIndex !== -1 && seriesThumbnails[thumbnailIndex].preview && (
+                                  <div className="mt-2">
+                                    <div className="h-24 w-18 overflow-hidden rounded border border-gray-200">
+                                      <img 
+                                        src={seriesThumbnails[thumbnailIndex].preview} 
+                                        alt={`Preview for book ${bookNumber}`}
+                                        className="h-full w-full object-cover"
+                                        onError={(e) => {
+                                          e.currentTarget.src = "https://via.placeholder.com/120x160?text=No Preview"; 
+                                        }}
+                                      />
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                              
+                              {/* PDF Input */}
+                              <div className="mb-4">
+                                <label className="block text-sm font-medium text-gray-600 mb-1">
+                                  PDF File
+                                </label>
+                                <input
+                                  type="file"
+                                  accept=".pdf"
+                                  onChange={(e) => handleSeriesBookPdfChange(pdfIndex, e)}
+                                  className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-indigo-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-indigo-700 hover:file:bg-indigo-100"
+                                />
+                                {pdfIndex !== -1 && seriesBookPdfs[pdfIndex].file && (
+                                  <p className="mt-1 text-xs text-gray-600">
+                                    Selected: {seriesBookPdfs[pdfIndex].file.name} ({(seriesBookPdfs[pdfIndex].file.size / 1024 / 1024).toFixed(2)} MB)
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                            
+                            <div className="md:w-2/3">
+                              {/* Book Summary */}
+                              <div className="mb-4">
+                                <label className="block text-sm font-medium text-gray-600 mb-1">
+                                  Book Summary
+                                </label>
+                                <textarea
+                                  rows={3}
+                                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                  placeholder="Enter a brief summary of the book..."
+                                  value={thumbnailIndex !== -1 ? seriesThumbnails[thumbnailIndex].summary || "" : ""}
+                                  onChange={(e) => updateSeriesBookSummary(thumbnailIndex, e.target.value)}
+                                />
+                              </div>
+                              
+                              {/* Publication Date */}
+                              <div className="mb-4">
+                                <div className="flex items-center justify-between mb-1">
+                                  <label className="block text-sm font-medium text-gray-600">
+                                    Publication Date <span className="text-red-500">*</span>
+                                  </label>
+                                  <div className="flex items-center space-x-3">
+                                    <div className="flex items-center">
+                                      <input
+                                        type="radio"
+                                        id={`year-only-${bookNumber}`}
+                                        checked={thumbnailIndex !== -1 && seriesThumbnails[thumbnailIndex]?.isYearOnly}
+                                        onChange={() => thumbnailIndex !== -1 && toggleSeriesBookYearOnly(thumbnailIndex)}
+                                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                                      />
+                                      <label htmlFor={`year-only-${bookNumber}`} className="ml-2 text-xs text-gray-700">Year only</label>
+                                    </div>
+                                    <div className="flex items-center">
+                                      <input
+                                        type="radio"
+                                        id={`full-date-${bookNumber}`}
+                                        checked={thumbnailIndex !== -1 && !seriesThumbnails[thumbnailIndex]?.isYearOnly}
+                                        onChange={() => thumbnailIndex !== -1 && !seriesThumbnails[thumbnailIndex]?.isYearOnly && toggleSeriesBookYearOnly(thumbnailIndex)}
+                                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                                      />
+                                      <label htmlFor={`full-date-${bookNumber}`} className="ml-2 text-xs text-gray-700">Full date</label>
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                {thumbnailIndex !== -1 && seriesThumbnails[thumbnailIndex]?.isYearOnly ? (
+                                  <input
+                                    type="text"
+                                    placeholder="YYYY"
+                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    value={thumbnailIndex !== -1 ? seriesThumbnails[thumbnailIndex].publicationDate || "" : ""}
+                                    onChange={(e) => updateSeriesBookPublicationDate(thumbnailIndex, e.target.value)}
+                                    pattern="\d{4}"
+                                  />
+                                ) : (
+                                  <input
+                                    type="date"
+                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    value={thumbnailIndex !== -1 ? seriesThumbnails[thumbnailIndex].publicationDate || "" : ""}
+                                    onChange={(e) => updateSeriesBookPublicationDate(thumbnailIndex, e.target.value)}
+                                  />
+                                )}
+                              </div>
+                              
+                              <div className="mt-4 flex justify-end">
+                                <button
+                                  type="button"
+                                  onClick={() => handleApproveBook(bookNumber)}
+                                  className={`inline-flex items-center rounded-md px-4 py-2 text-sm font-medium ${
+                                    isApproved 
+                                      ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+                                      : 'bg-indigo-100 text-indigo-800 hover:bg-indigo-200'
+                                  }`}
+                                >
+                                  <FiCheckCircle className="mr-2 h-4 w-4" />
+                                  {isApproved ? 'Approved' : 'Approve Book'}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="mt-4 text-center text-sm text-gray-500">
+                            <p>This is book {i + 1} of {getTotalBooksInSeries()}. Use the tabs above to edit other books.</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               )}
             </div>
           )}
