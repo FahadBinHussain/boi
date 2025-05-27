@@ -169,7 +169,6 @@ exports.Prisma.UserSettingsScalarFieldEnum = {
 exports.Prisma.BookScalarFieldEnum = {
   id: 'id',
   title: 'title',
-  author: 'author',
   imageUrl: 'imageUrl',
   description: 'description',
   summary: 'summary',
@@ -182,6 +181,13 @@ exports.Prisma.SeriesScalarFieldEnum = {
   id: 'id',
   name: 'name',
   description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.AuthorScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -212,7 +218,8 @@ exports.Prisma.ModelName = {
   VerificationToken: 'VerificationToken',
   UserSettings: 'UserSettings',
   Book: 'Book',
-  Series: 'Series'
+  Series: 'Series',
+  Author: 'Author'
 };
 
 /**

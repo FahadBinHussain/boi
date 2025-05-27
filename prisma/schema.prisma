@@ -67,22 +67,30 @@ model UserSettings {
 }
 
 model Book {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   title       String
-  author      String
   imageUrl    String?
   description String?
   summary     String?
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime  @updatedAt
   positionInSeries Int?
-  series      Series?  @relation(fields: [seriesId], references: [id])
+  series      Series?   @relation(fields: [seriesId], references: [id])
   seriesId    String?
+  authors     Author[]
 }
 
 model Series {
   id          String   @id @default(cuid())
   name        String
   description String?
+  books       Book[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Author {
+  id          String   @id @default(cuid())
+  name        String
   books       Book[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

@@ -69,7 +69,6 @@ model UserSettings {
 model Book {
   id               String   @id @default(cuid())
   title            String
-  author           String
   imageUrl         String?
   description      String?
   summary          String?
@@ -77,6 +76,7 @@ model Book {
   positionInSeries Int?
   series           Series?  @relation(fields: [seriesId], references: [id])
   seriesId         String?
+  authors          Author[]
 }
 
 model Series {
@@ -86,6 +86,14 @@ model Series {
   books       Book[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Author {
+  id        String   @id @default(cuid())
+  name      String
+  books     Book[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum UserRole {
