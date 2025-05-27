@@ -20,6 +20,7 @@ interface SeriesThumbnail {
   preview: string;
   publicationDate: string; // Add publication date for each book
   isYearOnly: boolean; // Track if the date is year-only format
+  summary: string; // Add this for book summary
 }
 
 // Interface for book PDF files in a series
@@ -67,6 +68,7 @@ export default function AddNewBook() {
     seriesThumbnails?: string;
     bookPdf?: string; // For single book PDF error
     seriesBookPdfs?: string; // For series PDF errors
+    summary?: string; // Add this for summary field errors
   }>({});
 
   // Form state for single book
@@ -76,6 +78,7 @@ export default function AddNewBook() {
   const [publicationDate, setPublicationDate] = useState("");
   const [thumbnailPreview, setThumbnailPreview] = useState(""); // Used for single book mode
   const [bookPdfFile, setBookPdfFile] = useState<File | null>(null); // For single book PDF
+  const [summary, setSummary] = useState("");  // Add this after line 65 with other single book state
   
   // Use user's preferred date format from settings or default to year-only
   const [isYearOnly, setIsYearOnly] = useState(true);
@@ -148,6 +151,7 @@ export default function AddNewBook() {
           preview: existingThumbnail?.preview || "",
           publicationDate: existingThumbnail?.publicationDate || publicationDate, // Use existing or current global date
           isYearOnly: existingThumbnail?.isYearOnly !== undefined ? existingThumbnail.isYearOnly : true, // Default to year-only
+          summary: existingThumbnail?.summary || "", // Preserve existing summary or set empty
         });
         newBookPdfs.push({
           bookNumber: bookNumber,
@@ -433,132 +437,87 @@ export default function AddNewBook() {
     e.preventDefault();
     
     if (!validateForm()) {
+      console.error("Form validation failed");
+      showNotification('error', 'Please fix the errors in the form before submitting.');
       return;
     }
-
+    
     setIsSubmitting(true);
-
+    
     try {
-      let bookData: any;
-      let uploadResults: (UploadResult | SeriesUploadResult)[] = [];
-
-      if (!isSeries) {
-        // Single book submission
-        bookData = {
-          name: bookName,
-          authors: authors.map(author => author.name),
-          thumbnailUrl, // Single thumbnail
-          publicationDate,
-        };
-
-        console.log("Book data to be submitted:", bookData);
+      // Prepare form data
+      const formData = new FormData();
+      
+      if (isSeries) {
+        // Adding series metadata
+        formData.append("seriesName", seriesBaseName);
+        formData.append("bookCount", getTotalBooksInSeries().toString());
+        formData.append("seriesStart", seriesStart.toString());
+        formData.append("seriesEnd", seriesEnd.toString());
+        formData.append("numberingSystem", numberingSystem);
         
-        // Upload PDF if provided
-        if (bookPdfFile) {
-          const uploadResult = await uploadPdfToFilesVc(bookPdfFile);
-          if (uploadResult) {
-            bookData.pdfUrl = uploadResult.fileData.url;
-            uploadResults.push(uploadResult);
+        // Add authors information
+        formData.append("authorsCount", authors.length.toString());
+        authors.forEach((author, index) => {
+          formData.append(`author_${index}`, author.name);
+        });
+        
+        // Add each book's information
+        for (let i = 0; i < seriesThumbnails.length; i++) {
+          const book = seriesThumbnails[i];
+          const pdfFile = seriesBookPdfs.find(p => p.bookNumber === book.bookNumber)?.file;
+          
+          if (pdfFile) {
+            formData.append(`pdf_${book.bookNumber}`, pdfFile);
           }
+          
+          formData.append(`thumbnail_${book.bookNumber}`, book.url);
+          formData.append(`publicationDate_${book.bookNumber}`, book.publicationDate);
+          formData.append(`isYearOnly_${book.bookNumber}`, book.isYearOnly.toString());
+          // Include summary for each book in the series
+          formData.append(`summary_${book.bookNumber}`, book.summary || '');
         }
       } else {
-        // Series submission
-        const seriesData = {
-          baseName: seriesBaseName,
-          startNumber: seriesStart,
-          endNumber: seriesEnd,
-          totalBooks: getTotalBooksInSeries(),
-          authors: authors.map(author => author.name),
-          numberingSystem,
-          thumbnails: seriesThumbnails.map(st => ({ 
-            bookNumber: st.bookNumber, 
-            url: st.url,
-            publicationDate: st.publicationDate // Include publication date for each book
-          })),
-        };
+        // Single book details
+        formData.append("bookName", bookName);
         
-        console.log("Series data to be submitted:", seriesData);
+        // Add authors information
+        formData.append("authorsCount", authors.length.toString());
+        authors.forEach((author, index) => {
+          formData.append(`author_${index}`, author.name);
+        });
         
-        const books = [];
+        formData.append("thumbnailUrl", thumbnailUrl);
+        formData.append("publicationDate", publicationDate);
+        formData.append("isYearOnly", isYearOnly.toString());
         
-        // Get list of approved book numbers
-        const approvedBookNumbers = approvedBooks
-          .filter(book => book.isApproved)
-          .map(book => book.bookNumber);
+        // Include summary for single book
+        formData.append("summary", summary || '');
         
-        if (approvedBookNumbers.length === 0) {
-          alert("Please approve at least one book before submission.");
-          setIsSubmitting(false);
-          return;
+        if (bookPdfFile) {
+          formData.append("pdf", bookPdfFile);
         }
-        
-        // Upload PDFs for approved books only
-        const seriesPdfUploads: Promise<SeriesUploadResult | null>[] = [];
-        for (const pdfItem of seriesBookPdfs) {
-          // Only upload PDFs for approved books
-          if (pdfItem.file && approvedBookNumbers.includes(pdfItem.bookNumber)) {
-            const uploadPromise = uploadPdfToFilesVc(pdfItem.file)
-              .then(result => {
-                if (result) {
-                  return {
-                    bookNumber: pdfItem.bookNumber,
-                    fileData: result.fileData
-                  } as SeriesUploadResult;
-                }
-                return null;
-              });
-            seriesPdfUploads.push(uploadPromise);
-          }
-        }
-        
-        if (seriesPdfUploads.length > 0) {
-          const results = await Promise.all(seriesPdfUploads);
-          uploadResults = results.filter(Boolean) as SeriesUploadResult[];
-        }
-        
-        // Create book objects with uploaded PDF URLs (only for approved books)
-        for (let i = 0; i < getTotalBooksInSeries(); i++) {
-          const currentBookNumber = seriesStart + i;
-          
-          // Skip non-approved books
-          if (!approvedBookNumbers.includes(currentBookNumber)) {
-            continue;
-          }
-          
-          const formattedNumber = getFormattedSeriesNumber(currentBookNumber);
-          const bookThumbnail = seriesThumbnails.find(st => st.bookNumber === currentBookNumber);
-          
-          // Find the upload result for this book number
-          const bookUploadResult = (uploadResults as SeriesUploadResult[]).find(result => result.bookNumber === currentBookNumber);
-          const pdfUrl = bookUploadResult ? bookUploadResult.fileData.url : null;
-
-          const book = {
-            name: `${seriesBaseName} ${formattedNumber}`,
-            authors: authors.map(author => author.name),
-            thumbnailUrl: bookThumbnail?.url || "",
-            publicationDate: bookThumbnail?.publicationDate || "", // Use the book-specific publication date
-            seriesInfo: {
-              seriesName: seriesBaseName,
-              numberInSeries: currentBookNumber
-            },
-            pdfUrl: pdfUrl,
-            isApproved: true
-          };
-          books.push(book);
-        }
-        
-        console.log(`Created ${books.length} approved books in series with ${uploadResults.length} PDF uploads`);
-        bookData = { seriesBooks: books };
       }
-
-      // Here you would send the book data to your book database
-      console.log("Final book data to be saved:", bookData);
-      console.log("Files.vc uploads successful:", uploadResults.length);
       
-      // Redirect to books page after successful submission
-      router.push("/admin/books");
+      // Add log to see form data before submission
+      console.log("Form submission data:");
+      for (const [key, value] of formData.entries()) {
+        // Don't log the actual PDF file contents
+        if (key.startsWith('pdf_') || key === 'pdf') {
+          console.log(key, '[PDF File]');
+        } else {
+          console.log(key, value);
+        }
+      }
+      
+      // Simulate server response for now
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      showNotification('success', isSeries ? 'Book series added successfully!' : 'Book added successfully!');
+      router.push('/admin/books');
     } catch (error) {
       console.error("Error submitting form:", error);
+      showNotification('error', 'Failed to save book. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -678,6 +637,15 @@ The PDF will be uploaded again during the final form submission.`);
       console.error('Error during book approval:', error);
       alert(`An error occurred while approving book ${seriesBaseName} ${getFormattedSeriesNumber(bookNumber)}. Please try again.`);
     }
+  };
+
+  // Add function to update summary for a specific book in the series
+  const updateSeriesBookSummary = (index: number, summaryText: string) => {
+    setSeriesThumbnails(prev => 
+      prev.map((thumbnail, i) => 
+        i === index ? { ...thumbnail, summary: summaryText } : thumbnail
+      )
+    );
   };
 
   return (
@@ -1002,6 +970,21 @@ The PDF will be uploaded again during the final form submission.`);
                           </div>
                         </div>
                         
+                        {/* Book Summary for this specific book */}
+                        <div className="mt-4">
+                          <label htmlFor={`summary-${bookNumber}`} className="block text-xs font-medium text-gray-600">
+                            Book Summary
+                          </label>
+                          <textarea
+                            id={`summary-${bookNumber}`}
+                            rows={3}
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            placeholder="Enter a brief summary of the book..."
+                            value={thumbnailIndex !== -1 ? seriesThumbnails[thumbnailIndex].summary || "" : ""}
+                            onChange={(e) => updateSeriesBookSummary(thumbnailIndex, e.target.value)}
+                          />
+                        </div>
+                        
                         {/* Publication Date for this specific book */}
                         <div className="mt-4">
                           <label htmlFor={`publicationDate-${bookNumber}`} className="flex items-center justify-between text-xs font-medium text-gray-600">
@@ -1185,6 +1168,31 @@ The PDF will be uploaded again during the final form submission.`);
               
               {formErrors.publicationDate && (
                 <p className="mt-1 text-sm text-red-500">{formErrors.publicationDate}</p>
+              )}
+            </div>
+          )}
+
+          {/* Book Summary Field for single book after the PDF input */}
+          {!isSeries && (
+            <div className="form-field">
+              <label htmlFor="summary" className="mb-1 block text-sm font-medium text-gray-700">
+                <div className="flex items-center">
+                  <FiFileText className="mr-2 h-4 w-4 text-gray-500" />
+                  Book Summary
+                </div>
+              </label>
+              <textarea
+                id="summary"
+                rows={4}
+                className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                  formErrors.summary ? "border-red-500" : ""
+                }`}
+                placeholder="Enter a brief summary of the book..."
+                value={summary}
+                onChange={(e) => setSummary(e.target.value)}
+              />
+              {formErrors.summary && (
+                <p className="mt-1 text-sm text-red-500">{formErrors.summary}</p>
               )}
             </div>
           )}

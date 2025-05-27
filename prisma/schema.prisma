@@ -72,6 +72,7 @@ model Book {
   author      String
   imageUrl    String?
   description String?
+  summary     String?
   updatedAt   DateTime @updatedAt
 }
 
