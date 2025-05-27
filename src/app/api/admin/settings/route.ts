@@ -85,10 +85,13 @@ async function getUserId(request: NextRequest): Promise<string | null> {
 
 // GET handler for fetching user settings
 export async function GET(request: NextRequest) {
+  console.log('====== SETTINGS GET REQUEST STARTED ======');
   try {
     const userId = await getUserId(request);
+    console.log('GET settings: User ID from session:', userId);
     
     if (!userId) {
+      console.log('GET settings: No user ID found, returning 401');
       return NextResponse.json(
         { error: 'Unauthorized: No user found in session' }, 
         { status: 401 }
@@ -96,15 +99,39 @@ export async function GET(request: NextRequest) {
     }
 
     // Try to find user settings in the database
+    console.log('GET settings: Looking up settings for user ID:', userId);
     const userSettings = await prisma.userSettings.findUnique({
       where: { userId }
     });
+    console.log('GET settings: Database lookup result:', userSettings ? 'Found settings' : 'No settings found');
     
-    // If no settings exist, return default values
+    // If no settings exist, create default settings
     if (!userSettings) {
-      return NextResponse.json({
-        preferYearOnlyDateFormat: true
-      }, { status: 200 });
+      console.log('GET settings: No settings found, creating defaults');
+      try {
+        // Create default settings
+        const defaultSettings = await prisma.userSettings.create({
+          data: {
+            userId,
+            preferYearOnlyDateFormat: true
+          }
+        });
+        
+        console.log(`GET settings: Created default settings for user ${userId}`, defaultSettings);
+        
+        // Return the newly created settings
+        console.log('GET settings: Returning newly created settings');
+        return NextResponse.json({
+          preferYearOnlyDateFormat: defaultSettings.preferYearOnlyDateFormat
+        }, { status: 200 });
+      } catch (error) {
+        console.error('GET settings: Error creating default user settings:', error);
+        // Still return default settings even if creation fails
+        console.log('GET settings: Returning fallback default settings after error');
+        return NextResponse.json({
+          preferYearOnlyDateFormat: true
+        }, { status: 200 });
+      }
     }
     
     // Format the response
@@ -114,13 +141,16 @@ export async function GET(request: NextRequest) {
       filesVcApiKey: userSettings.encryptedFilesVcApiKey ? true : undefined
     };
     
+    console.log('GET settings: Returning existing settings from database');
     return NextResponse.json(response, { status: 200 });
   } catch (error) {
-    console.error('Error fetching user settings:', error);
+    console.error('GET settings: Error fetching user settings:', error);
     return NextResponse.json(
       { error: 'Failed to fetch user settings' }, 
       { status: 500 }
     );
+  } finally {
+    console.log('====== SETTINGS GET REQUEST COMPLETED ======');
   }
 }
 

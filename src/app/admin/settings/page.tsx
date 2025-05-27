@@ -30,17 +30,24 @@ export default function AdminSettings() {
 
   // Show notifications when sync status changes, but only once per sync operation
   useEffect(() => {
+    console.log('Settings page: syncStatus changed to:', syncStatus, 'with message:', lastSyncMessage);
+    console.log('Settings page: notificationShown flag is:', notificationShownRef.current);
+    
     if (syncStatus === 'success' && !notificationShownRef.current) {
       notificationShownRef.current = true;
+      console.log('Settings page: Showing success notification with message:', lastSyncMessage);
       showNotification('success', lastSyncMessage || 'Settings synchronized successfully');
       setTimeout(() => {
         notificationShownRef.current = false;
+        console.log('Settings page: Reset notification flag after timeout');
       }, 5000); // Don't show another success notification for 5 seconds
     } else if (syncStatus === 'error') {
       notificationShownRef.current = true;
+      console.log('Settings page: Showing error notification with message:', lastSyncMessage);
       showNotification('error', lastSyncMessage || 'Failed to synchronize settings');
       setTimeout(() => {
         notificationShownRef.current = false;
+        console.log('Settings page: Reset notification flag after timeout');
       }, 5000);
     }
   }, [syncStatus, lastSyncMessage, showNotification]);

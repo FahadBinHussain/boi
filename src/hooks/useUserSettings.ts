@@ -38,20 +38,30 @@ export const useUserSettings = (): UseUserSettingsReturn => {
   // Load settings from API when the hook mounts
   useEffect(() => {
     const loadSettings = async () => {
+      console.log('==== useUserSettings: Starting to load settings ====');
       setIsLoading(true);
       setSyncStatus('syncing');
       setLastSyncMessage('Loading settings from database...');
       
       try {
+        console.log('useUserSettings: Fetching settings from API');
         // Fetch settings from API
-        const response = await fetch('/api/admin/settings');
+        const response = await fetch('/api/admin/settings', {
+          cache: 'no-store', // Prevent caching
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        });
+        console.log('useUserSettings: API response status:', response.status);
         
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
+          console.log('useUserSettings: API error response:', errorData);
           
           // Handle authentication errors specifically
           if (response.status === 401) {
-            console.warn('Authentication issue - user not logged in or session expired');
+            console.warn('useUserSettings: Authentication issue - user not logged in or session expired');
             throw new Error(
               `Authentication required: ${errorData.error || 'You need to be logged in to access your settings'}`
             );
@@ -65,20 +75,28 @@ export const useUserSettings = (): UseUserSettingsReturn => {
         }
         
         const data = await response.json();
+        console.log('useUserSettings: API data received:', { 
+          hasData: !!data, 
+          preferYearOnlyDateFormat: data?.preferYearOnlyDateFormat,
+          hasApiKey: !!data?.filesVcApiKey
+        });
         
         // If API call succeeds but we still don't have settings, use defaults
         if (!data) {
+          console.log('useUserSettings: No data from API, using defaults');
           setSettings({
             preferYearOnlyDateFormat: true
           });
+          setSyncStatus('success');
+          setLastSyncMessage('Using default settings (no saved preferences found)');
         } else {
+          console.log('useUserSettings: Using data from API');
           setSettings(data);
+          setSyncStatus('success');
+          setLastSyncMessage('Settings loaded successfully');
         }
-        
-        setSyncStatus('success');
-        setLastSyncMessage('Settings loaded from database successfully');
       } catch (err) {
-        console.error('Error loading user settings:', err);
+        console.error('useUserSettings: Error loading settings:', err);
         setError(err instanceof Error ? err : new Error('Unknown error loading settings'));
         setSyncStatus('error');
         
@@ -92,8 +110,10 @@ export const useUserSettings = (): UseUserSettingsReturn => {
           }
         }
         setLastSyncMessage(`Failed to load settings: ${errorMessage}`);
+        console.log('useUserSettings: Error message set to:', errorMessage);
         
         // Fallback to defaults on error
+        console.log('useUserSettings: Falling back to defaults due to error');
         setSettings({
           preferYearOnlyDateFormat: true
         });
@@ -103,14 +123,16 @@ export const useUserSettings = (): UseUserSettingsReturn => {
           try {
             const savedSettings = localStorage.getItem('userSettings');
             if (savedSettings) {
+              console.log('useUserSettings: Found settings in localStorage');
               setSettings(JSON.parse(savedSettings));
               setLastSyncMessage('Settings loaded from browser storage (database unavailable)');
             }
           } catch (e) {
-            console.error('Fallback to localStorage failed:', e);
+            console.error('useUserSettings: Fallback to localStorage failed:', e);
           }
         }
       } finally {
+        console.log('useUserSettings: Finished loading settings, status =', syncStatus);
         setIsLoading(false);
         // Reset sync status after a short delay
         if (syncTimeoutRef.current) {
@@ -119,6 +141,7 @@ export const useUserSettings = (): UseUserSettingsReturn => {
         syncTimeoutRef.current = setTimeout(() => {
           setSyncStatus('idle');
         }, 3000);
+        console.log('==== useUserSettings: Settings load process complete ====');
       }
     };
 

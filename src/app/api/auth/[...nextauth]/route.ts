@@ -88,6 +88,31 @@ export const authOptions = {
         user: message.user?.email,
         provider: message.account?.provider 
       }); 
+      
+      // Create settings for existing users if they don't have them yet
+      if (message.user?.id) {
+        try {
+          // Check if settings exist
+          const existingSettings = await prisma.userSettings.findUnique({
+            where: { userId: message.user.id },
+            select: { userId: true }
+          });
+          
+          // If no settings exist, create them
+          if (!existingSettings) {
+            await prisma.userSettings.create({
+              data: {
+                userId: message.user.id,
+                preferYearOnlyDateFormat: true,
+                // Add other default settings here as needed
+              }
+            });
+            console.log(`⚙️ Default settings created for existing user ${message.user.email} during sign-in`);
+          }
+        } catch (error) {
+          console.error("❌ Failed to check/create settings on sign-in:", error);
+        }
+      }
     },
     async createUser(message: any) {
       console.log("👤 New user created:", { 
@@ -106,8 +131,18 @@ export const authOptions = {
             });
             console.log(`🔑 User ${message.user.email} set as admin (first user)`);
           }
+          
+          // Create default user settings for new user
+          await prisma.userSettings.create({
+            data: {
+              userId: message.user.id,
+              preferYearOnlyDateFormat: true,
+              // Add other default settings here as needed
+            }
+          });
+          console.log(`⚙️ Default settings created for new user ${message.user.email}`);
         } catch (error) {
-          console.error("❌ Failed to update user role:", error);
+          console.error("❌ Failed to update user role or create settings:", error);
         }
       }
     },
