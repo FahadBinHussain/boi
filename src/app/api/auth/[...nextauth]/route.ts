@@ -31,9 +31,10 @@ export const authOptions = {
   ],
   callbacks: {
     async session({ session, user }: any) {
-      // Add role to session user
+      // Add role and ID to session user
       console.log("Session callback with user:", { userId: user.id, email: user.email, role: user.role });
       if (session?.user) {
+        session.user.id = user.id;
         session.user.role = user.role;
       }
       return session;

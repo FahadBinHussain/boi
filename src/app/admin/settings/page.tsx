@@ -4,11 +4,14 @@ import { useState, useEffect, useRef } from "react";
 import { FiSave, FiSettings, FiCalendar, FiLock, FiCheck, FiLoader, FiRefreshCw } from "react-icons/fi";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import { useNotification } from "@/contexts/NotificationContext";
+import { useSession } from "next-auth/react";
 
 export default function AdminSettings() {
+  const { data: session } = useSession();
   const { settings, updateSettings, saveChanges, isLoading, syncStatus, lastSyncMessage } = useUserSettings();
   const { showNotification } = useNotification();
   const [isSaving, setIsSaving] = useState(false);
+  const [showDebug, setShowDebug] = useState(false);
   const notificationShownRef = useRef<boolean>(false);
   
   // Local state for form controls
@@ -122,6 +125,26 @@ export default function AdminSettings() {
           <h1 className="text-2xl font-bold text-gray-900">Admin Settings</h1>
         </div>
         {getSyncStatusIndicator()}
+      </div>
+      
+      {/* Debug section */}
+      <div className="mb-4">
+        <button 
+          onClick={() => setShowDebug(!showDebug)}
+          className="text-sm text-gray-500 underline"
+        >
+          {showDebug ? "Hide Debug Info" : "Show Debug Info"}
+        </button>
+        
+        {showDebug && (
+          <div className="mt-2 rounded-md bg-gray-100 p-3 text-xs font-mono">
+            <div><strong>Session User ID:</strong> {(session?.user as any)?.id || 'No ID'}</div>
+            <div><strong>Session Email:</strong> {session?.user?.email || 'No Email'}</div>
+            <div><strong>Session Role:</strong> {(session?.user as any)?.role || 'No Role'}</div>
+            <div><strong>Last Sync Status:</strong> {syncStatus || 'None'}</div>
+            <div><strong>Last Sync Message:</strong> {lastSyncMessage || 'None'}</div>
+          </div>
+        )}
       </div>
       
       {isLoading ? (

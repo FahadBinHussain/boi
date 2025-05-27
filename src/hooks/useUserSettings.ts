@@ -44,6 +44,18 @@ export const useUserSettings = (): UseUserSettingsReturn => {
       setLastSyncMessage('Loading settings from database...');
       
       try {
+        // Check session status first
+        console.log('useUserSettings: Checking session status');
+        const sessionResponse = await fetch('/api/auth/session', {
+          credentials: 'include'
+        });
+        const sessionData = await sessionResponse.json();
+        console.log('useUserSettings: Session data:', {
+          isLoggedIn: !!sessionData?.user,
+          userId: sessionData?.user?.id,
+          userEmail: sessionData?.user?.email
+        });
+        
         console.log('useUserSettings: Fetching settings from API');
         // Fetch settings from API
         const response = await fetch('/api/admin/settings', {
@@ -51,7 +63,9 @@ export const useUserSettings = (): UseUserSettingsReturn => {
           headers: {
             'Cache-Control': 'no-cache',
             'Pragma': 'no-cache'
-          }
+          },
+          // Ensure credentials are included
+          credentials: 'include'
         });
         console.log('useUserSettings: API response status:', response.status);
         
@@ -109,7 +123,7 @@ export const useUserSettings = (): UseUserSettingsReturn => {
             errorMessage = err.message;
           }
         }
-        setLastSyncMessage(`Failed to load settings: ${errorMessage}`);
+        setLastSyncMessage(`Failed to load settings from database: ${errorMessage}`);
         console.log('useUserSettings: Error message set to:', errorMessage);
         
         // Fallback to defaults on error
@@ -117,20 +131,6 @@ export const useUserSettings = (): UseUserSettingsReturn => {
         setSettings({
           preferYearOnlyDateFormat: true
         });
-        
-        // For development fallback to localStorage if API fails
-        if (process.env.NODE_ENV === 'development') {
-          try {
-            const savedSettings = localStorage.getItem('userSettings');
-            if (savedSettings) {
-              console.log('useUserSettings: Found settings in localStorage');
-              setSettings(JSON.parse(savedSettings));
-              setLastSyncMessage('Settings loaded from browser storage (database unavailable)');
-            }
-          } catch (e) {
-            console.error('useUserSettings: Fallback to localStorage failed:', e);
-          }
-        }
       } finally {
         console.log('useUserSettings: Finished loading settings, status =', syncStatus);
         setIsLoading(false);
@@ -198,18 +198,8 @@ export const useUserSettings = (): UseUserSettingsReturn => {
         } else if (response.status === 409) {
           errorMessage = 'Conflict with existing settings';
         } else if (response.status === 500) {
-          errorMessage = `Server error: ${responseData.error || 'Internal server error'}`;
-          // In development, attempt to diagnose database connection issues
-          if (process.env.NODE_ENV === 'development') {
-            console.error('Possible database connection issue or schema mismatch');
-            
-            // Save to localStorage as a fallback in development
-            localStorage.setItem('userSettings', JSON.stringify({
-              ...settings,
-              ...changesObj
-            }));
-            errorMessage += ' (Changes saved to local storage as fallback)';
-          }
+          errorMessage = `Database error: ${responseData.error || 'Unable to save settings to database'}`;
+          console.error('Database synchronization failed:', responseData);
         }
         
         throw new Error(`Failed to update settings: ${response.status} ${response.statusText} - ${errorMessage}`);
@@ -221,22 +211,14 @@ export const useUserSettings = (): UseUserSettingsReturn => {
       setPendingChanges(null);
       
       setSyncStatus('success');
-      setLastSyncMessage(responseData.message || 'Settings saved to database successfully');
-      
-      // For development, also save to localStorage as backup
-      if (process.env.NODE_ENV === 'development') {
-        localStorage.setItem('userSettings', JSON.stringify({
-          ...settings,
-          ...changesObj
-        }));
-      }
+      setLastSyncMessage(responseData.message || 'Settings saved successfully to database');
     } catch (err) {
       console.error('Error updating user settings:', err);
       setError(err instanceof Error ? err : new Error('Failed to update settings'));
       setSyncStatus('error');
       
       // Create a more user-friendly error message
-      let displayMessage = 'Failed to save settings';
+      let displayMessage = 'Failed to save settings to database';
       if (err instanceof Error) {
         displayMessage = err.message;
         
@@ -244,7 +226,7 @@ export const useUserSettings = (): UseUserSettingsReturn => {
         if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
           displayMessage = 'Network error: Please check your internet connection';
         } else if (err.message.includes('database')) {
-          displayMessage = 'Database error: Your settings could not be saved';
+          displayMessage = 'Database error: Your settings could not be saved to the database';
         }
       }
       

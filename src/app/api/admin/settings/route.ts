@@ -49,46 +49,45 @@ async function getUserId(request: NextRequest): Promise<string | null> {
       return session.user.id;
     }
     
-    // Second attempt: Instead of using cookies directly, use the request cookies
-    // This is more reliable in route handlers
-    const sessionCookie = request.cookies.get('next-auth.session-token')?.value;
-    
-    if (sessionCookie) {
-      console.log('Found session token in request cookies, but no user in session');
-      
-      // In a real app, you'd use the session token to look up the user
-      // For now, we'll just log that we found it
-    }
-    
-    // Fallback for development only
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Using development fallback user ID (no session found)');
-      // Use an existing user ID from your database instead of a made-up one
-      // Based on the logs, we can see a real user ID we can use
-      return 'cmb59u5yf0000udrgre8dq752';
-    }
-    
-    console.warn('No authenticated user found in session or cookies');
+    console.warn('No authenticated user found in session');
     return null;
   } catch (error) {
     console.error('Error getting user ID from session:', error);
-    
-    // Fallback for development only
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Using development fallback user ID after error');
-      return 'cmb59u5yf0000udrgre8dq752';
-    }
-    
     return null;
   }
+}
+
+// Get consistently formatted user ID
+function getConsistentUserId(rawUserId: string | null): string {
+  // Ensure the ID matches expected format
+  if (!rawUserId) return '';
+  
+  // Return the original ID for real users
+  return rawUserId;
 }
 
 // GET handler for fetching user settings
 export async function GET(request: NextRequest) {
   console.log('====== SETTINGS GET REQUEST STARTED ======');
   try {
-    const userId = await getUserId(request);
-    console.log('GET settings: User ID from session:', userId);
+    // First verify database connection
+    try {
+      console.log('GET settings: Verifying database connection');
+      // Simple query to check database connectivity
+      const testResult = await prisma.$queryRaw`SELECT 1 as result`;
+      console.log('GET settings: Database connection verified:', testResult);
+    } catch (dbError) {
+      console.error('GET settings: Database connection test failed:', 
+        dbError instanceof Error ? dbError.message : String(dbError)
+      );
+      return NextResponse.json({ 
+        error: 'Database connection failed - please check your database configuration' 
+      }, { status: 500 });
+    }
+    
+    const rawUserId = await getUserId(request);
+    const userId = getConsistentUserId(rawUserId);
+    console.log('GET settings: User ID from session:', rawUserId, 'formatted to:', userId);
     
     if (!userId) {
       console.log('GET settings: No user ID found, returning 401');
@@ -156,32 +155,51 @@ export async function GET(request: NextRequest) {
 
 // PUT handler for updating user settings
 export async function PUT(request: NextRequest) {
+  console.log('====== SETTINGS PUT REQUEST STARTED ======');
   try {
-    const userId = await getUserId(request);
+    // First verify database connection
+    try {
+      console.log('PUT settings: Verifying database connection');
+      // Simple query to check database connectivity
+      const testResult = await prisma.$queryRaw`SELECT 1 as result`;
+      console.log('PUT settings: Database connection verified:', testResult);
+    } catch (dbError) {
+      console.error('PUT settings: Database connection test failed:', 
+        dbError instanceof Error ? dbError.message : String(dbError)
+      );
+      return NextResponse.json({ 
+        error: 'Database connection failed - please check your database configuration' 
+      }, { status: 500 });
+    }
+    
+    const rawUserId = await getUserId(request);
+    const userId = getConsistentUserId(rawUserId);
+    console.log('PUT settings: User ID from session:', rawUserId, 'formatted to:', userId);
     
     if (!userId) {
+      console.log('PUT settings: No user ID found, returning 401');
       return NextResponse.json(
-        { error: 'Unauthorized: No user found in session' }, 
+        { error: 'Unauthorized: You must be logged in to update settings' }, 
         { status: 401 }
       );
     }
     
-    // Verify that the user exists in the database before proceeding
+    // Check if the user exists in the database
     const userExists = await prisma.user.findUnique({
       where: { id: userId },
       select: { id: true }
     });
     
     if (!userExists) {
-      console.error(`User with ID ${userId} does not exist in the database`);
+      console.log(`PUT settings: User ${userId} doesn't exist in database, returning 403`);
       return NextResponse.json(
-        { error: 'The user does not exist in the database' }, 
-        { status: 400 }
+        { error: 'Forbidden: Your user account does not have permissions to update settings' }, 
+        { status: 403 }
       );
     }
     
     const data = await request.json();
-    console.log('Received settings update data:', JSON.stringify(data, null, 2));
+    console.log('PUT settings: Received settings update data:', JSON.stringify(data, null, 2));
     
     // Prepare the data for upsert
     const updateData: any = {};
@@ -210,18 +228,86 @@ export async function PUT(request: NextRequest) {
     
     try {
       // Upsert the settings (create if not exists, update if exists)
-      const result = await prisma.userSettings.upsert({
-        where: { userId },
-        update: updateData,
-        create: {
-          userId,
-          ...updateData,
-          // Set defaults for any missing fields
-          preferYearOnlyDateFormat: 'preferYearOnlyDateFormat' in updateData 
-            ? updateData.preferYearOnlyDateFormat 
-            : true
+      // We'll use the upsert directly without the user verification since upsert will handle this safely
+      console.log('PUT settings: Attempting first upsert with userId:', userId);
+      let result;
+      try {
+        // First attempt at upserting settings
+        const logSafeData = { userId };
+        // Create a safe version of updateData for logging, without sensitive info
+        Object.keys(updateData).forEach(key => {
+          // @ts-ignore - This is just for logging
+          logSafeData[key] = key.includes('encrypted') ? '[REDACTED]' : updateData[key];
+        });
+        console.log('PUT settings: Starting upsert operation with data:', logSafeData);
+        
+        // First, check if the user exists to avoid foreign key constraint errors
+        const userExists = await prisma.user.findUnique({
+          where: { id: userId },
+          select: { id: true }
+        });
+        
+        if (!userExists) {
+          console.log(`PUT settings: User ${userId} doesn't exist, creating fallback user first`);
+          // Create a user record first
+          try {
+            console.log(`PUT settings: Creating fallback user with ID: ${userId}`);
+            await prisma.user.create({
+              data: {
+                id: userId,
+                email: `user-${userId.substring(0, 8)}@example.com`,
+                emailVerified: new Date(),
+              }
+            });
+            console.log('PUT settings: Successfully created fallback user');
+          } catch (userCreateError) {
+            console.error('PUT settings: Failed to create user:', userCreateError);
+            throw new Error(`Could not create user: ${
+              userCreateError instanceof Error ? userCreateError.message : String(userCreateError)
+            }`);
+          }
         }
-      });
+        
+        // Now proceed with the upsert
+        result = await prisma.userSettings.upsert({
+          where: { userId },
+          update: updateData,
+          create: {
+            userId,
+            ...updateData,
+            // Set defaults for any missing fields
+            preferYearOnlyDateFormat: 'preferYearOnlyDateFormat' in updateData 
+              ? updateData.preferYearOnlyDateFormat 
+              : true
+          }
+        });
+        console.log('PUT settings: Upsert succeeded, result:', { 
+          id: result.id, 
+          userId: result.userId,
+          hasPreferYearOnlyDateFormat: !!result.preferYearOnlyDateFormat,
+          hasApiKey: !!result.encryptedFilesVcApiKey
+        });
+      } catch (upsertError) {
+        // Log detailed error information
+        console.error('PUT settings: Upsert failed with error:', {
+          name: upsertError instanceof Error ? upsertError.name : 'unknown',
+          message: upsertError instanceof Error ? upsertError.message : String(upsertError),
+          code: upsertError instanceof PrismaClientKnownRequestError ? upsertError.code : 'unknown',
+          meta: upsertError instanceof PrismaClientKnownRequestError ? upsertError.meta : 'unknown',
+        });
+        
+        // If it's a Prisma error, provide more detailed information
+        if (upsertError instanceof PrismaClientKnownRequestError) {
+          if (upsertError.code === 'P2003') {
+            throw new Error(`Foreign key constraint failed. User with ID ${userId} might not exist in the database.`);
+          } else {
+            throw new Error(`Database error (${upsertError.code}): ${upsertError.message}`);
+          }
+        }
+        
+        // Otherwise, rethrow the original error
+        throw upsertError;
+      }
       
       console.log('Successfully updated settings for user:', userId);
       
@@ -232,7 +318,7 @@ export async function PUT(request: NextRequest) {
     } catch (error) {
       // Handle specific Prisma errors with proper type checking
       if (error instanceof PrismaClientKnownRequestError) {
-        console.error('Prisma DB error:', {
+        console.error('PUT settings: Prisma DB error:', {
           code: error.code,
           meta: error.meta,
           message: error.message
@@ -243,13 +329,6 @@ export async function PUT(request: NextRequest) {
           return NextResponse.json({ 
             error: 'A settings entry already exists for this user' 
           }, { status: 409 });
-        }
-        
-        // P2003 is a foreign key constraint failure
-        if (error.code === 'P2003') {
-          return NextResponse.json({ 
-            error: 'The referenced user does not exist in the database' 
-          }, { status: 400 });
         }
       }
       
@@ -269,5 +348,7 @@ export async function PUT(request: NextRequest) {
       { error: errorMessage }, 
       { status: 500 }
     );
+  } finally {
+    console.log('====== SETTINGS PUT REQUEST COMPLETED ======');
   }
 } 
