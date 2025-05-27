@@ -3,25 +3,29 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { FiPlus, FiX, FiArrowLeft, FiSave, FiImage, FiCalendar, FiUsers, FiBook, FiLayers, FiFileText, FiCheckCircle } from "react-icons/fi";
+import { FiPlus, FiX, FiArrowLeft, FiSave, FiImage, FiCalendar, FiUsers, FiBook, FiLayers, FiFileText, FiCheckCircle, FiBookmark, FiUpload, FiTrash2, FiLink, FiLoader, FiDownload } from "react-icons/fi";
 import gsap from "gsap";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import { useNotification } from "@/contexts/NotificationContext";
 
 interface Author {
-  id: string;
   name: string;
+  id?: string; // Make id optional since we're creating new authors
 }
 
 // Add an interface for series thumbnails
 interface SeriesThumbnail {
   bookNumber: number;
   url: string;
-  preview: string;
-  publicationDate: string; // Add publication date for each book
-  isYearOnly: boolean; // Track if the date is year-only format
-  summary: string; // Add this for book summary
-  customName?: string; // Add this for custom book name
+  publicationDate: string;
+  isYearOnly: boolean;
+  customName?: string;
+  summary?: string;
+  preview?: string;
+  metadataUrl?: string; // Add this field to store metadata URL for each book
+  isLoading: boolean; // Add this field to store loading state
+  errorMessage?: string; // Add this field to store error messages
+  successMessage?: string; // Add this field to store success messages
 }
 
 // Interface for book PDF files in a series
@@ -53,6 +57,20 @@ interface ApprovedBook {
   isApproved: boolean;
 }
 
+// Add interfaces for the scraped data
+interface ScrapedBookData {
+  title: string;
+  imageUrl?: string;
+  summary?: string;
+  publicationDate?: string;
+  authors?: string[];
+}
+
+interface ScrapedSeriesData {
+  seriesTitle: string;
+  books?: ScrapedBookData[];
+}
+
 export default function AddNewBook() {
   const router = useRouter();
   const { settings, isLoading: isSettingsLoading, syncStatus, lastSyncMessage } = useUserSettings();
@@ -72,6 +90,7 @@ export default function AddNewBook() {
     seriesBookPdfs?: string; // For series PDF errors
     summary?: string; // Add this for summary field errors
     seriesBookNames?: string; // Add this for custom book name errors
+    metadataUrl?: string;
   }>({});
 
   // Form state for single book
@@ -95,6 +114,15 @@ export default function AddNewBook() {
 
   // Add state for approved books
   const [approvedBooks, setApprovedBooks] = useState<ApprovedBook[]>([]);
+
+  // Add new state variables for metadata URL functionality
+  const [metadataUrl, setMetadataUrl] = useState("");
+  const [isScrapingMetadata, setIsScrapingMetadata] = useState(false);
+  const [scrapingError, setScrapingError] = useState<string | null>(null);
+  const [metadataSuccess, setMetadataSuccess] = useState<string | null>(null);
+
+  // Update the state to track the active book tab
+  const [activeBookTab, setActiveBookTab] = useState<number>(0);
 
   // Load user settings when component mounts
   useEffect(() => {
@@ -150,6 +178,10 @@ export default function AddNewBook() {
           isYearOnly: existingThumbnail?.isYearOnly !== undefined ? existingThumbnail.isYearOnly : true, // Default to year-only
           summary: existingThumbnail?.summary || "", // Preserve existing summary or set empty
           customName: existingThumbnail?.customName || "", // Preserve existing custom name or set empty
+          metadataUrl: existingThumbnail?.metadataUrl || "", // Preserve existing metadata URL
+          isLoading: false, // Add loading state
+          errorMessage: existingThumbnail?.errorMessage, // Add error message
+          successMessage: existingThumbnail?.successMessage, // Add success message
         });
         newBookPdfs.push({
           bookNumber: bookNumber,
@@ -709,6 +741,356 @@ The PDF will be uploaded again during the final form submission.`);
     );
   };
 
+  // Function to determine URL type
+  const detectUrlType = (url: string): string | null => {
+    try {
+      const urlObj = new URL(url);
+      const hostname = urlObj.hostname;
+      
+      if (hostname.includes('fandom.com') || hostname.endsWith('.fandom.com')) {
+        return 'fandom';
+      }
+      
+      // Add more URL type detections as you add more scrapers
+      // Example:
+      // if (hostname.includes('goodreads.com')) {
+      //   return 'goodreads';
+      // }
+      
+      return null; // Unknown URL type
+    } catch (error) {
+      // Not a valid URL
+      return null;
+    }
+  };
+
+  // Function to fetch metadata from the appropriate scraper
+  const fetchMetadata = async (url: string): Promise<void> => {
+    if (!url.trim()) {
+      setScrapingError("Please enter a URL");
+      return;
+    }
+    
+    const urlType = detectUrlType(url);
+    if (!urlType) {
+      setScrapingError("Unsupported URL type. Currently supports: Fandom");
+      return;
+    }
+    
+    setIsScrapingMetadata(true);
+    setScrapingError(null);
+    setMetadataSuccess(null);
+    
+    try {
+      // Call the appropriate scraper API endpoint based on URL type
+      let apiEndpoint = '';
+      
+      switch (urlType) {
+        case 'fandom':
+          apiEndpoint = '/api/scrapers/fandom';
+          break;
+        // Add cases for other scrapers when available
+      }
+      
+      const response = await fetch(apiEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ fandomUrl: url }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Failed to fetch metadata: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      
+      // Populate form fields with the scraped data
+      populateFormFields(data);
+      
+      // Set success message based on the data received
+      if ('seriesTitle' in data) {
+        setMetadataSuccess(`Series "${data.seriesTitle}" data imported successfully${data.books ? ` with ${data.books.length} books` : ''}!`);
+      } else {
+        setMetadataSuccess(`Book "${data.title}" data imported successfully!`);
+      }
+      
+      showNotification('success', 'Metadata successfully fetched and applied!');
+    } catch (error) {
+      console.error('Error fetching metadata:', error);
+      setScrapingError(error instanceof Error ? error.message : 'Failed to fetch metadata');
+      showNotification('error', 'Failed to fetch metadata. See error for details.');
+    } finally {
+      setIsScrapingMetadata(false);
+    }
+  };
+  
+  // Function to populate form fields with scraped data
+  const populateFormFields = (data: ScrapedSeriesData | ScrapedBookData) => {
+    // Populate different fields based on whether we're in series or single book mode
+    if (isSeries) {
+      // Check if it's series data
+      if ('seriesTitle' in data) {
+        // If it's a series, populate the series name
+        if (data.seriesTitle) {
+          setSeriesBaseName(data.seriesTitle);
+        }
+        
+        // If there are multiple books in the scraped data and we're in different names mode
+        if (data.books && Array.isArray(data.books)) {
+          // Update the series start and end if needed
+          if (data.books.length > 0) {
+            // Adjust series start and end to match the number of books
+            setSeriesStart(1); // Assuming books are 1-indexed
+            setSeriesEnd(data.books.length);
+            
+            // Update thumbnail information for each book
+            const newThumbnails: SeriesThumbnail[] = data.books.map((book, index) => {
+              const bookNumber = index + 1;
+              return {
+                bookNumber,
+                url: book.imageUrl || '',
+                customName: book.title || `${seriesBaseName} ${getFormattedSeriesNumber(bookNumber)}`,
+                publicationDate: book.publicationDate || '',
+                isYearOnly: true,
+                summary: book.summary || '',
+                preview: '',
+                metadataUrl: book.imageUrl || '',
+                isLoading: false,
+                errorMessage: undefined,
+                successMessage: undefined
+              };
+            });
+            
+            setSeriesThumbnails(newThumbnails);
+            
+            // If authors are available from the first book, apply to all books in the series
+            if (data.books[0]?.authors && data.books[0].authors.length > 0) {
+              const newAuthors = data.books[0].authors.map((authorName: string) => ({ name: authorName }));
+              setAuthors(newAuthors);
+            }
+          }
+        }
+      }
+    } else {
+      // Single book mode - check if it has title and not seriesTitle
+      if ('title' in data && !('seriesTitle' in data)) {
+        if (data.title) {
+          setBookName(data.title);
+        }
+        
+        if (data.imageUrl) {
+          setThumbnailUrl(data.imageUrl);
+        }
+        
+        if (data.summary) {
+          setSummary(data.summary);
+        }
+        
+        if (data.publicationDate) {
+          // Check if it's a full date or just a year
+          const yearOnlyMatch = /^\d{4}$/.test(data.publicationDate);
+          const fullDateMatch = /^\d{4}-\d{2}-\d{2}$/.test(data.publicationDate);
+          
+          if (yearOnlyMatch) {
+            setPublicationDate(data.publicationDate);
+            setIsYearOnly(true);
+          } else if (fullDateMatch) {
+            setPublicationDate(data.publicationDate);
+            setIsYearOnly(false);
+          }
+        }
+        
+        // If authors are available
+        if (data.authors && Array.isArray(data.authors) && data.authors.length > 0) {
+          const newAuthors = data.authors.map((authorName: string) => ({ name: authorName }));
+          setAuthors(newAuthors);
+        }
+      }
+    }
+  };
+  
+  // Metadata URL field handler
+  const handleMetadataUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMetadataUrl(e.target.value);
+    setScrapingError(null);
+    setMetadataSuccess(null);
+  };
+  
+  // Handle fetch metadata button click
+  const handleFetchMetadata = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    await fetchMetadata(metadataUrl);
+  };
+
+  // Add a function to update the metadata URL for a specific book in the series
+  const updateSeriesBookMetadataUrl = (index: number, url: string) => {
+    setSeriesThumbnails(prev => 
+      prev.map((thumbnail, i) => 
+        i === index ? { ...thumbnail, metadataUrl: url } : thumbnail
+      )
+    );
+  };
+
+  // Add a new implementation of fetchBookMetadata
+  const fetchBookMetadata = async (index: number, url: string): Promise<void> => {
+    if (!url.trim()) {
+      // Update the specific book's error state
+      setSeriesThumbnails(prev => {
+        const updated = [...prev];
+        if (index >= 0 && index < updated.length) {
+          updated[index] = { 
+            ...updated[index], 
+            errorMessage: "Please enter a URL",
+            successMessage: undefined
+          };
+        }
+        return updated;
+      });
+      showNotification('error', "Please enter a URL");
+      return;
+    }
+    
+    const urlType = detectUrlType(url);
+    if (!urlType) {
+      // Update the specific book's error state
+      setSeriesThumbnails(prev => {
+        const updated = [...prev];
+        if (index >= 0 && index < updated.length) {
+          updated[index] = { 
+            ...updated[index], 
+            errorMessage: "Unsupported URL type. Currently supports: Fandom",
+            successMessage: undefined
+          };
+        }
+        return updated;
+      });
+      showNotification('error', "Unsupported URL type. Currently supports: Fandom");
+      return;
+    }
+    
+    // Set loading state
+    setSeriesThumbnails(prev => {
+      const updated = [...prev];
+      if (index >= 0 && index < updated.length) {
+        updated[index] = {
+          ...updated[index],
+          isLoading: true,
+          errorMessage: undefined,
+          successMessage: undefined
+        };
+      }
+      return updated;
+    });
+    
+    try {
+      // Call the appropriate scraper API endpoint based on URL type
+      let apiEndpoint = '';
+      
+      switch (urlType) {
+        case 'fandom':
+          apiEndpoint = '/api/scrapers/fandom';
+          break;
+        // Add cases for other scrapers when available
+      }
+      
+      const response = await fetch(apiEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ fandomUrl: url }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Failed to fetch metadata: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      
+      // Update only this book's data
+      if ('title' in data) {
+        // Apply the changes to just this book
+        setSeriesThumbnails(prev => {
+          const updated = [...prev];
+          
+          if (index >= 0 && index < updated.length) {
+            // Update book details with scraped data
+            updated[index] = {
+              ...updated[index],
+              customName: data.title || updated[index].customName,
+              url: data.imageUrl || updated[index].url,
+              preview: data.imageUrl || updated[index].preview,
+              summary: data.summary || updated[index].summary,
+              publicationDate: data.publicationDate || updated[index].publicationDate,
+              successMessage: `"${data.title}" data imported successfully!`,
+              errorMessage: undefined,
+              isLoading: false
+            };
+          }
+          
+          return updated;
+        });
+
+        // If this is the first book and it has authors, update the global authors
+        if (index === 0 && data.authors && Array.isArray(data.authors) && data.authors.length > 0) {
+          const newAuthors = data.authors.map((authorName: string) => ({ name: authorName }));
+          setAuthors(newAuthors);
+        }
+
+        showNotification('success', `Book "${data.title}" data imported successfully!`);
+      } else if ('seriesTitle' in data && data.books && Array.isArray(data.books) && index < data.books.length) {
+        // If it returns series data, extract just this book's data based on index
+        const bookData = data.books[index];
+        if (bookData) {
+          setSeriesThumbnails(prev => {
+            const updated = [...prev];
+            
+            if (index >= 0 && index < updated.length) {
+              // Update book details with scraped data
+              updated[index] = {
+                ...updated[index],
+                customName: bookData.title || updated[index].customName,
+                url: bookData.imageUrl || updated[index].url,
+                preview: bookData.imageUrl || updated[index].preview,
+                summary: bookData.summary || updated[index].summary,
+                publicationDate: bookData.publicationDate || updated[index].publicationDate,
+                successMessage: `"${bookData.title}" data imported successfully!`,
+                errorMessage: undefined,
+                isLoading: false
+              };
+            }
+            
+            return updated;
+          });
+
+          showNotification('success', `Book "${bookData.title}" data imported successfully!`);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching metadata for book:', error);
+      
+      // Set error message for this book
+      setSeriesThumbnails(prev => {
+        const updated = [...prev];
+        if (index >= 0 && index < updated.length) {
+          updated[index] = { 
+            ...updated[index], 
+            isLoading: false,
+            errorMessage: error instanceof Error ? error.message : 'Failed to fetch metadata',
+            successMessage: undefined
+          };
+        }
+        return updated;
+      });
+      
+      showNotification('error', error instanceof Error ? error.message : 'Failed to fetch metadata');
+    }
+  };
+
   return (
     <div>
       <div className="mb-8 flex items-center justify-between">
@@ -954,15 +1336,19 @@ The PDF will be uploaded again during the final form submission.`);
                   {/* Book Tabs Interface */}
                   <div className="mt-4">
                     <div className="mb-4 border-b border-gray-200">
-                      <ul className="flex flex-wrap -mb-px text-sm font-medium text-center" role="tablist">
+                      <ul className="flex flex-wrap -mb-px text-sm font-medium text-center overflow-x-auto" role="tablist">
                         {Array.from({ length: getTotalBooksInSeries() }, (_, i) => {
                           const bookNumber = seriesStart + i;
+                          const isActive = i === activeBookTab;
                           return (
                             <li className="mr-2" key={bookNumber} role="presentation">
                               <button
                                 type="button"
-                                className={`inline-block p-3 rounded-t-lg ${
-                                  i === 0 ? 'border-b-2 border-indigo-600 text-indigo-600' : 'border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300'
+                                onClick={() => setActiveBookTab(i)}
+                                className={`inline-block p-3 rounded-t-lg border-b-2 ${
+                                  isActive 
+                                    ? 'border-indigo-600 text-indigo-600' 
+                                    : 'border-transparent hover:text-gray-600 hover:border-gray-300'
                                 }`}
                                 role="tab"
                               >
@@ -981,8 +1367,8 @@ The PDF will be uploaded again during the final form submission.`);
                       const pdfIndex = seriesBookPdfs.findIndex(p => p.bookNumber === bookNumber);
                       const isApproved = approvedBooks.find(book => book.bookNumber === bookNumber)?.isApproved || false;
                       
-                      // For simplicity, we'll only show the first book form
-                      if (i !== 0) return null;
+                      // Only show the active tab
+                      if (i !== activeBookTab) return null;
                       
                       return (
                         <div key={bookNumber} className="p-4 bg-gray-50 rounded-md">
@@ -1061,6 +1447,56 @@ The PDF will be uploaded again during the final form submission.`);
                             </div>
                             
                             <div className="md:w-2/3">
+                              {/* Metadata URL for this specific book */}
+                              <div className="mb-4">
+                                <label className="block text-sm font-medium text-gray-600 mb-1">
+                                  <div className="flex items-center">
+                                    <FiLink className="mr-2 h-4 w-4 text-gray-500" />
+                                    Book Metadata URL
+                                  </div>
+                                </label>
+                                <div className="flex rounded-md shadow-sm">
+                                  <input
+                                    type="text"
+                                    className="block w-full flex-1 rounded-none rounded-l-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    placeholder="Paste a Fandom URL for this specific book"
+                                    value={thumbnailIndex !== -1 ? seriesThumbnails[thumbnailIndex].metadataUrl || "" : ""}
+                                    onChange={(e) => updateSeriesBookMetadataUrl(thumbnailIndex, e.target.value)}
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => thumbnailIndex !== -1 && fetchBookMetadata(thumbnailIndex, seriesThumbnails[thumbnailIndex].metadataUrl || "")}
+                                    disabled={thumbnailIndex === -1 || !seriesThumbnails[thumbnailIndex].metadataUrl || seriesThumbnails[thumbnailIndex].isLoading}
+                                    className="inline-flex items-center rounded-r-md border border-l-0 border-gray-300 bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-75 disabled:cursor-not-allowed"
+                                  >
+                                    {thumbnailIndex !== -1 && seriesThumbnails[thumbnailIndex].isLoading ? (
+                                      <>
+                                        <FiLoader className="mr-2 h-4 w-4 animate-spin" />
+                                        Fetching...
+                                      </>
+                                    ) : (
+                                      <>
+                                        <FiDownload className="mr-2 h-4 w-4" />
+                                        Fetch Data
+                                      </>
+                                    )}
+                                  </button>
+                                </div>
+                                {thumbnailIndex !== -1 && seriesThumbnails[thumbnailIndex].errorMessage && (
+                                  <p className="mt-1 text-sm text-red-500">{seriesThumbnails[thumbnailIndex].errorMessage}</p>
+                                )}
+                                {thumbnailIndex !== -1 && seriesThumbnails[thumbnailIndex].successMessage && (
+                                  <p className="mt-1 text-sm text-green-600 flex items-center">
+                                    <FiCheckCircle className="mr-1 h-4 w-4" /> {seriesThumbnails[thumbnailIndex].successMessage}
+                                  </p>
+                                )}
+                                {thumbnailIndex !== -1 && !seriesThumbnails[thumbnailIndex].errorMessage && !seriesThumbnails[thumbnailIndex].successMessage && (
+                                  <p className="mt-1 text-xs text-gray-500">
+                                    Paste a Fandom URL for this specific book to auto-fill its details
+                                  </p>
+                                )}
+                              </div>
+                              
                               {/* Book Summary */}
                               <div className="mb-4">
                                 <label className="block text-sm font-medium text-gray-600 mb-1">
@@ -1294,6 +1730,68 @@ The PDF will be uploaded again during the final form submission.`);
               />
               {formErrors.summary && (
                 <p className="mt-1 text-sm text-red-500">{formErrors.summary}</p>
+              )}
+            </div>
+          )}
+
+          {/* Metadata URL Input for Series */}
+          {isSeries && (
+            <div className="form-field mb-6">
+              {/* Remove this entire section */}
+            </div>
+          )}
+
+          {/* Metadata URL Input for Single Books */}
+          {!isSeries && (
+            <div className="form-field">
+              <label htmlFor="metadataUrl" className="mb-1 block text-sm font-medium text-gray-700">
+                <div className="flex items-center">
+                  <FiLink className="mr-2 h-4 w-4 text-gray-500" />
+                  Metadata URL
+                </div>
+              </label>
+              <div className="mt-1 flex rounded-md shadow-sm">
+                <input
+                  type="text"
+                  id="metadataUrl"
+                  className={`block w-full flex-1 rounded-none rounded-l-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                    scrapingError ? "border-red-500" : ""
+                  }`}
+                  placeholder="Paste a Fandom URL to auto-fill book details"
+                  value={metadataUrl}
+                  onChange={handleMetadataUrlChange}
+                />
+                <button
+                  type="button"
+                  onClick={handleFetchMetadata}
+                  disabled={isScrapingMetadata || !metadataUrl.trim()}
+                  className={`inline-flex items-center rounded-r-md border border-l-0 border-gray-300 bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+                    (isScrapingMetadata || !metadataUrl.trim()) ? "cursor-not-allowed opacity-75" : ""
+                  }`}
+                >
+                  {isScrapingMetadata ? (
+                    <>
+                      <FiLoader className="mr-2 h-4 w-4 animate-spin" />
+                      Fetching...
+                    </>
+                  ) : (
+                    <>
+                      <FiDownload className="mr-2 h-4 w-4" />
+                      Fetch Data
+                    </>
+                  )}
+                </button>
+              </div>
+              {scrapingError && (
+                <p className="mt-1 text-sm text-red-500">{scrapingError}</p>
+              )}
+              {metadataSuccess && !scrapingError && (
+                <p className="mt-1 text-sm text-green-600 flex items-center">
+                  <FiCheckCircle className="mr-1 h-4 w-4" /> {metadataSuccess}
+                </p>
+              )}
+              {!scrapingError && !metadataSuccess && (
+                <p className="mt-1 text-xs text-gray-500">Paste a URL from Fandom to automatically fill book details.</p>
               )}
             </div>
           )}
