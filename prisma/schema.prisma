@@ -74,6 +74,18 @@ model Book {
   description String?
   summary     String?
   updatedAt   DateTime @updatedAt
+  positionInSeries Int?
+  series      Series?  @relation(fields: [seriesId], references: [id])
+  seriesId    String?
+}
+
+model Series {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  books       Book[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 enum UserRole {

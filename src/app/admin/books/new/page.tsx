@@ -21,6 +21,7 @@ interface SeriesThumbnail {
   publicationDate: string; // Add publication date for each book
   isYearOnly: boolean; // Track if the date is year-only format
   summary: string; // Add this for book summary
+  customName?: string; // Add this for custom book name
 }
 
 // Interface for book PDF files in a series
@@ -58,6 +59,7 @@ export default function AddNewBook() {
   const { showNotification } = useNotification();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSeries, setIsSeries] = useState(false);
+  const [useDifferentNames, setUseDifferentNames] = useState(false);
   const [formErrors, setFormErrors] = useState<{
     bookName?: string;
     authors?: string;
@@ -69,6 +71,7 @@ export default function AddNewBook() {
     bookPdf?: string; // For single book PDF error
     seriesBookPdfs?: string; // For series PDF errors
     summary?: string; // Add this for summary field errors
+    seriesBookNames?: string; // Add this for custom book name errors
   }>({});
 
   // Form state for single book
@@ -87,7 +90,6 @@ export default function AddNewBook() {
   const [seriesBaseName, setSeriesBaseName] = useState("");
   const [seriesStart, setSeriesStart] = useState(1);
   const [seriesEnd, setSeriesEnd] = useState(10);
-  const [numberingSystem, setNumberingSystem] = useState<"western" | "bengali">("western");
   const [seriesThumbnails, setSeriesThumbnails] = useState<SeriesThumbnail[]>([]); // For series mode
   const [seriesBookPdfs, setSeriesBookPdfs] = useState<SeriesBookPdf[]>([]); // For series PDFs
 
@@ -113,13 +115,8 @@ export default function AddNewBook() {
   }, [syncStatus, lastSyncMessage, showNotification]);
 
   // Number conversion functions
-  const convertToBengaliNumeral = (num: number): string => {
-    const bengaliNumerals = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-    return num.toString().split('').map(digit => bengaliNumerals[parseInt(digit)]).join('');
-  };
-  
   const getFormattedSeriesNumber = (num: number): string => {
-    return numberingSystem === "bengali" ? convertToBengaliNumeral(num) : num.toString();
+    return num.toString();
   };
 
   // Update thumbnail preview when URL changes (single book mode)
@@ -131,7 +128,7 @@ export default function AddNewBook() {
     }
   }, [thumbnailUrl, isSeries]);
 
-  // Update the useEffect that initializes seriesThumbnails to include publicationDate and isYearOnly
+  // Update the useEffect that initializes seriesThumbnails to include publicationDate, isYearOnly, and customName
   useEffect(() => {
     if (isSeries) {
       const newThumbnails: SeriesThumbnail[] = [];
@@ -152,6 +149,7 @@ export default function AddNewBook() {
           publicationDate: existingThumbnail?.publicationDate || publicationDate, // Use existing or current global date
           isYearOnly: existingThumbnail?.isYearOnly !== undefined ? existingThumbnail.isYearOnly : true, // Default to year-only
           summary: existingThumbnail?.summary || "", // Preserve existing summary or set empty
+          customName: existingThumbnail?.customName || "", // Preserve existing custom name or set empty
         });
         newBookPdfs.push({
           bookNumber: bookNumber,
@@ -299,32 +297,67 @@ export default function AddNewBook() {
     ));
   };
 
-  // Generate book series preview
+  // Generate book series preview - update to respect different names mode
   const generateSeriesPreview = (): string[] => {
     const preview: string[] = [];
-    if (!seriesBaseName) return preview;
-    
-    const maxDisplay = 5; // Show at most 5 items in preview
-    const total = getTotalBooksInSeries();
-    
-    // Show first few items
-    for (let i = seriesStart; i < seriesStart + Math.min(3, total); i++) {
-      preview.push(`${seriesBaseName} ${getFormattedSeriesNumber(i)}`);
+    if (useDifferentNames) {
+      // For different names, show actual names if provided
+      const maxDisplay = 5; // Show at most 5 items in preview
+      const total = getTotalBooksInSeries();
+      
+      // Show first few items
+      for (let i = 0; i < Math.min(3, total); i++) {
+        const bookIndex = i;
+        const book = seriesThumbnails[bookIndex];
+        const bookName = book?.customName?.trim() 
+          ? book.customName 
+          : `Book ${getFormattedSeriesNumber(book?.bookNumber || (seriesStart + i))}`;
+        preview.push(bookName);
+      }
+      
+      // If more than maxDisplay items, show ellipsis
+      if (total > maxDisplay && total > 3) {
+        preview.push("...");
+      }
+      
+      // Show last item if there are more than 3 items
+      if (total > 3) {
+        const lastBookIndex = seriesThumbnails.length - 1;
+        const lastBook = seriesThumbnails[lastBookIndex];
+        const lastBookName = lastBook?.customName?.trim()
+          ? lastBook.customName
+          : `Book ${getFormattedSeriesNumber(lastBook?.bookNumber || seriesEnd)}`;
+        
+        if (preview.length < maxDisplay || !preview.includes(lastBookName)) {
+          preview.push(lastBookName);
+        }
+      }
+    } else {
+      // Original logic for base name
+      if (!seriesBaseName) return preview;
+      
+      const maxDisplay = 5; // Show at most 5 items in preview
+      const total = getTotalBooksInSeries();
+      
+      // Show first few items
+      for (let i = seriesStart; i < seriesStart + Math.min(3, total); i++) {
+        preview.push(`${seriesBaseName} ${getFormattedSeriesNumber(i)}`);
+      }
+      
+      // If more than maxDisplay items, show ellipsis
+      if (total > maxDisplay && total > 3) { // ensure ellipsis is only added if there are actually more items
+        preview.push("...");
+      }
+      
+      // Show last item if there are more than 3 items and it's different from the already added ones
+      if (total > 3) {
+         if (preview.length < maxDisplay || !preview.includes(`${seriesBaseName} ${getFormattedSeriesNumber(seriesEnd)}`)){
+           preview.push(`${seriesBaseName} ${getFormattedSeriesNumber(seriesEnd)}`);
+         }
+      }
     }
     
-    // If more than maxDisplay items, show ellipsis
-    if (total > maxDisplay && total > 3) { // ensure ellipsis is only added if there are actually more items
-      preview.push("...");
-    }
-    
-    // Show last item if there are more than 3 items and it's different from the already added ones
-    if (total > 3) {
-       if (preview.length < maxDisplay || !preview.includes(`${seriesBaseName} ${getFormattedSeriesNumber(seriesEnd)}`)){
-         preview.push(`${seriesBaseName} ${getFormattedSeriesNumber(seriesEnd)}`);
-       }
-    }
-    
-    return preview.slice(0, maxDisplay); // Ensure we don't exceed maxDisplay
+    return preview.slice(0, 5); // Ensure we don't exceed maxDisplay
   };
   
   // Get count of total books in series
@@ -364,6 +397,7 @@ export default function AddNewBook() {
       seriesThumbnails?: string; // For general series thumbnail errors
       bookPdf?: string; // For single book PDF error
       seriesBookPdfs?: string; // For series PDF errors
+      seriesBookNames?: string;
     } = {};
 
     const urlPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/;
@@ -382,7 +416,7 @@ export default function AddNewBook() {
       }
     } else {
       // Series validation
-      if (!seriesBaseName.trim()) {
+      if (!useDifferentNames && !seriesBaseName.trim()) {
         errors.bookName = "Series base name is required";
       }
       
@@ -416,6 +450,14 @@ export default function AddNewBook() {
       
       if (invalidDates) {
         errors.seriesThumbnails = "One or more publication dates are invalid. Please check each one.";
+      }
+
+      // Validate custom book names when in different names mode
+      if (useDifferentNames) {
+        const emptyNames = seriesThumbnails.some(thumb => !thumb.customName?.trim());
+        if (emptyNames) {
+          errors.seriesBookNames = "All book names are required";
+        }
       }
     }
 
@@ -454,7 +496,7 @@ export default function AddNewBook() {
         formData.append("bookCount", getTotalBooksInSeries().toString());
         formData.append("seriesStart", seriesStart.toString());
         formData.append("seriesEnd", seriesEnd.toString());
-        formData.append("numberingSystem", numberingSystem);
+        formData.append("useDifferentNames", useDifferentNames.toString());
         
         // Add authors information
         formData.append("authorsCount", authors.length.toString());
@@ -471,10 +513,20 @@ export default function AddNewBook() {
             formData.append(`pdf_${book.bookNumber}`, pdfFile);
           }
           
+          // Add seriesName (base name) for all books in the series
+          formData.append(`seriesName_${book.bookNumber}`, seriesBaseName);
+          
+          // Add custom book name if we're using different names
+          if (useDifferentNames && book.customName) {
+            formData.append(`bookName_${book.bookNumber}`, book.customName);
+          }
+          
+          // Always include the position in series
+          formData.append(`positionInSeries_${book.bookNumber}`, book.bookNumber.toString());
+          
           formData.append(`thumbnail_${book.bookNumber}`, book.url);
           formData.append(`publicationDate_${book.bookNumber}`, book.publicationDate);
           formData.append(`isYearOnly_${book.bookNumber}`, book.isYearOnly.toString());
-          // Include summary for each book in the series
           formData.append(`summary_${book.bookNumber}`, book.summary || '');
         }
       } else {
@@ -648,6 +700,15 @@ The PDF will be uploaded again during the final form submission.`);
     );
   };
 
+  // Add function to update custom name for a specific book in the series
+  const updateSeriesBookName = (index: number, name: string) => {
+    setSeriesThumbnails(prev => 
+      prev.map((thumbnail, i) => 
+        i === index ? { ...thumbnail, customName: name } : thumbnail
+      )
+    );
+  };
+
   return (
     <div>
       <div className="mb-8 flex items-center justify-between">
@@ -702,139 +763,150 @@ The PDF will be uploaded again during the final form submission.`);
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Book Name / Series Name */}
-          <div className="form-field">
-            <label htmlFor="bookName" className="mb-1 block text-sm font-medium text-gray-700">
-              <div className="flex items-center">
-                {isSeries ? (
-                  <>
-                    <FiLayers className="mr-2 h-4 w-4 text-gray-500" />
-                    Series Base Name <span className="text-red-500">*</span>
-                  </>
-                ) : (
-                  <>
-                    <FiBook className="mr-2 h-4 w-4 text-gray-500" />
-                    Book Name <span className="text-red-500">*</span>
-                  </>
-                )}
-              </div>
-            </label>
-            {!isSeries ? (
-              <input
-                type="text"
-                id="bookName"
-                className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                  formErrors.bookName ? "border-red-500" : ""
-                }`}
-                placeholder="Enter book name"
-                value={bookName}
-                onChange={(e) => setBookName(e.target.value)}
-              />
-            ) : (
-              <input
-                type="text"
-                id="seriesBaseName"
-                className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                  formErrors.bookName ? "border-red-500" : ""
-                }`}
-                placeholder="Enter series base name (e.g. 'মাসুদ রানা')"
-                value={seriesBaseName}
-                onChange={(e) => setSeriesBaseName(e.target.value)}
-              />
-            )}
-            {formErrors.bookName && (
-              <p className="mt-1 text-sm text-red-500">{formErrors.bookName}</p>
-            )}
-          </div>
+          {!isSeries || isSeries ? (
+            <div className="form-field">
+              <label htmlFor="bookName" className="mb-1 block text-sm font-medium text-gray-700">
+                <div className="flex items-center">
+                  {isSeries ? (
+                    <>
+                      <FiLayers className="mr-2 h-4 w-4 text-gray-500" />
+                      Series Name <span className="text-red-500">*</span>
+                    </>
+                  ) : (
+                    <>
+                      <FiBook className="mr-2 h-4 w-4 text-gray-500" />
+                      Book Name <span className="text-red-500">*</span>
+                    </>
+                  )}
+                </div>
+              </label>
+              {!isSeries ? (
+                <input
+                  type="text"
+                  id="bookName"
+                  className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                    formErrors.bookName ? "border-red-500" : ""
+                  }`}
+                  placeholder="Enter book name"
+                  value={bookName}
+                  onChange={(e) => setBookName(e.target.value)}
+                />
+              ) : (
+                <input
+                  type="text"
+                  id="seriesBaseName"
+                  className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                    formErrors.bookName ? "border-red-500" : ""
+                  }`}
+                  placeholder="Enter series name (e.g. 'Harry Potter')"
+                  value={seriesBaseName}
+                  onChange={(e) => setSeriesBaseName(e.target.value)}
+                />
+              )}
+              {formErrors.bookName && (
+                <p className="mt-1 text-sm text-red-500">{formErrors.bookName}</p>
+              )}
+            </div>
+          ) : null}
 
           {/* Series Configuration - only shown when in series mode */}          
           {isSeries && (
-            <div className="series-fields space-y-4 overflow-hidden rounded-md bg-gray-50 p-4">
-              <h3 className="text-base font-medium text-gray-900">Series Configuration</h3>
-              
-              {/* Numbering System Selection */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">Numbering System</label>
-                <div className="flex space-x-4">
-                  <div className="flex items-center">
-                    <input
-                      id="western"
-                      type="radio"
-                      name="numberingSystem"
-                      checked={numberingSystem === "western"}
-                      onChange={() => setNumberingSystem("western")}
-                      className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                    />
-                    <label htmlFor="western" className="ml-2 block text-sm text-gray-700">
-                      Western (1, 2, 3...)
-                    </label>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      id="bengali"
-                      type="radio"
-                      name="numberingSystem"
-                      checked={numberingSystem === "bengali"}
-                      onChange={() => setNumberingSystem("bengali")}
-                      className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                    />
-                    <label htmlFor="bengali" className="ml-2 block text-sm text-gray-700">
-                      Bengali (১, ২, ৩...)
-                    </label>
-                  </div>
-                </div>
+            <div className="series-fields space-y-6 overflow-hidden rounded-lg border border-gray-100 bg-white p-6 shadow-sm">
+              <div className="border-b border-gray-100 pb-4">
+                <h3 className="text-lg font-medium text-gray-900">Series Configuration</h3>
+                <p className="mt-1 text-sm text-gray-500">Configure how your book series will be created and named.</p>
               </div>
               
-              {/* Series Range */}
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {/* Series Naming Mode */}
+              <div className="space-y-4">
                 <div>
-                  <label htmlFor="seriesStart" className="block text-sm font-medium text-gray-700">
-                    Start Number
-                  </label>
-                  <input
-                    type="number"
-                    id="seriesStart"
-                    min="1"
-                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                      formErrors.seriesStart ? "border-red-500" : ""
-                    }`}
-                    value={seriesStart}
-                    onChange={(e) => setSeriesStart(parseInt(e.target.value) || 1)}
-                  />
-                  {formErrors.seriesStart && (
-                    <p className="mt-1 text-sm text-red-500">{formErrors.seriesStart}</p>
-                  )}
+                  <label className="block text-sm font-medium text-gray-700">Naming Style</label>
+                  <p className="text-xs text-gray-500 mt-1">Choose whether all books in the series share the same name pattern or have individual names.</p>
+                  <div className="mt-3 flex items-center justify-between rounded-md bg-gray-50 p-4">
+                    <span className="text-sm text-gray-700">Use consistent series name</span>
+                    <div className="relative inline-block h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                      onClick={() => setUseDifferentNames(!useDifferentNames)}
+                    >
+                      <span
+                        className={`${
+                          useDifferentNames ? "translate-x-5" : "translate-x-0"
+                        } pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
+                      />
+                    </div>
+                    <span className="text-sm text-gray-700">Use different names</span>
+                  </div>
                 </div>
-                <div>
-                  <label htmlFor="seriesEnd" className="block text-sm font-medium text-gray-700">
-                    End Number
-                  </label>
-                  <input
-                    type="number"
-                    id="seriesEnd"
-                    min={seriesStart} // Ensure end is not less than start
-                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                      formErrors.seriesEnd ? "border-red-500" : ""
-                    }`}
-                    value={seriesEnd}
-                    onChange={(e) => setSeriesEnd(parseInt(e.target.value) || seriesStart)}
-                  />
-                  {formErrors.seriesEnd && (
-                    <p className="mt-1 text-sm text-red-500">{formErrors.seriesEnd}</p>
-                  )}
+                
+                {/* Series Range */}
+                <div className="pt-2">
+                  <label className="block text-sm font-medium text-gray-700">Series Range</label>
+                  <p className="text-xs text-gray-500 mt-1">Define the starting and ending numbers for your book series.</p>
+                  <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div className="group">
+                      <label htmlFor="seriesStart" className="block text-sm font-medium text-gray-700">
+                        Start Number
+                      </label>
+                      <div className="mt-1 relative rounded-md">
+                        <input
+                          type="number"
+                          id="seriesStart"
+                          min="1"
+                          className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                            formErrors.seriesStart ? "border-red-500" : ""
+                          }`}
+                          value={seriesStart}
+                          onChange={(e) => setSeriesStart(parseInt(e.target.value) || 1)}
+                        />
+                        {formErrors.seriesStart && (
+                          <p className="mt-1 text-sm text-red-500">{formErrors.seriesStart}</p>
+                        )}
+                      </div>
+                    </div>
+                    <div>
+                      <label htmlFor="seriesEnd" className="block text-sm font-medium text-gray-700">
+                        End Number
+                      </label>
+                      <div className="mt-1 relative rounded-md">
+                        <input
+                          type="number"
+                          id="seriesEnd"
+                          min={seriesStart} // Ensure end is not less than start
+                          className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                            formErrors.seriesEnd ? "border-red-500" : ""
+                          }`}
+                          value={seriesEnd}
+                          onChange={(e) => setSeriesEnd(parseInt(e.target.value) || seriesStart)}
+                        />
+                        {formErrors.seriesEnd && (
+                          <p className="mt-1 text-sm text-red-500">{formErrors.seriesEnd}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
               
               {/* Series Preview */}
-              {seriesBaseName && getTotalBooksInSeries() > 0 && (
-                <div className="rounded-md bg-gray-100 p-3">
-                  <p className="mb-2 text-sm font-medium text-gray-700">Series Preview:</p>
-                  <div className="space-y-1 text-sm">
-                    {generateSeriesPreview().map((title, index) => (
-                      <div key={index} className="text-gray-600">{title}</div>
-                    ))}
-                  </div>
-                  <div className="mt-3 text-sm font-medium text-gray-700">
-                    Total books to create: {getTotalBooksInSeries()}
+              {((!useDifferentNames && seriesBaseName) || useDifferentNames) && getTotalBooksInSeries() > 0 && (
+                <div className="mt-4 rounded-lg bg-indigo-50 p-4 border border-indigo-100">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-indigo-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <h3 className="text-sm font-medium text-indigo-800">Series Preview</h3>
+                      <div className="mt-2 space-y-1 text-sm">
+                        {generateSeriesPreview().map((title, index) => (
+                          <div key={index} className="text-indigo-700">{title}</div>
+                        ))}
+                      </div>
+                      <div className="mt-2 flex items-center gap-1">
+                        <span className="font-semibold text-indigo-800">{getTotalBooksInSeries()}</span>
+                        <span className="text-xs text-indigo-700">{getTotalBooksInSeries() === 1 ? "book" : "books"} will be created</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -909,13 +981,35 @@ The PDF will be uploaded again during the final form submission.`);
                       >
                         <div className="mb-2 flex items-center justify-between">
                           <h4 className="text-sm font-medium text-gray-900">
-                            {seriesBaseName || "Book"} {getFormattedSeriesNumber(bookNumber)}
+                            {useDifferentNames 
+                              ? `Book ${getFormattedSeriesNumber(bookNumber)}`
+                              : `${seriesBaseName || "Book"} ${getFormattedSeriesNumber(bookNumber)}`
+                            }
                           </h4>
                           <span className={`flex items-center text-xs font-medium px-2 py-0.5 rounded-full ${isApproved ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
                             {isApproved ? <FiCheckCircle className="mr-1 h-3 w-3"/> : <FiFileText className="mr-1 h-3 w-3"/>}
                             {isApproved ? 'Approved' : 'Pending'}
                           </span>
                         </div>
+
+                        {/* Add custom book name field when in different names mode */}
+                        {useDifferentNames && (
+                          <div className="mb-4">
+                            <label htmlFor={`bookName-${bookNumber}`} className="block text-xs font-medium text-gray-600">
+                              Book Name <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              id={`bookName-${bookNumber}`}
+                              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                                formErrors.seriesBookNames && thumbnailIndex !== -1 && !seriesThumbnails[thumbnailIndex].customName?.trim() ? "border-red-500" : ""
+                              }`}
+                              placeholder={`Enter name for book ${getFormattedSeriesNumber(bookNumber)}`}
+                              value={thumbnailIndex !== -1 ? seriesThumbnails[thumbnailIndex].customName || "" : ""}
+                              onChange={(e) => updateSeriesBookName(thumbnailIndex, e.target.value)}
+                            />
+                          </div>
+                        )}
                         
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                           {/* Thumbnail Input */}
@@ -1049,6 +1143,9 @@ The PDF will be uploaded again during the final form submission.`);
                 <p className="text-sm text-gray-500">
                   Adjust the series range to add books. Minimum 1 book required.
                 </p>
+              )}
+              {formErrors.seriesBookNames && (
+                <p className="mt-1 text-sm text-red-500">{formErrors.seriesBookNames}</p>
               )}
             </div>
           )}

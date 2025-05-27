@@ -42,7 +42,6 @@ model User {
   image         String?
   role          UserRole      @default(USER)
   accounts      Account[]
-  apiKeys       AdminApiKey[]
   sessions      Session[]
   settings      UserSettings?
 }
@@ -61,34 +60,30 @@ model UserSettings {
   preferYearOnlyDateFormat Boolean  @default(true)
   encryptedFilesVcApiKey   String?
   apiKeyIv                 String?
-  createdAt                DateTime @default(now())
   updatedAt                DateTime @updatedAt
   user                     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
 
-model AdminApiKey {
-  id              String   @id @default(cuid())
-  adminId         String
-  serviceName     String
-  encryptedApiKey String
-  iv              String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  admin           User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
-
-  @@unique([adminId, serviceName])
-  @@index([adminId])
-  @@index([serviceName])
+model Book {
+  id               String   @id @default(cuid())
+  title            String
+  author           String
+  imageUrl         String?
+  description      String?
+  summary          String?
+  updatedAt        DateTime @updatedAt
+  positionInSeries Int?
+  series           Series?  @relation(fields: [seriesId], references: [id])
+  seriesId         String?
 }
 
-model Book {
+model Series {
   id          String   @id @default(cuid())
-  title       String
-  author      String
-  imageUrl    String?
+  name        String
   description String?
+  books       Book[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
