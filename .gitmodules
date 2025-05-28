@@ -4,3 +4,6 @@
 [submodule "src/lib/scrapers/Goodreads-Scraper"]
 	path = src/lib/scrapers/Goodreads-Scraper
 	url = https://github.com/FahadBinHussain/Goodreads-Scraper.git
+[submodule "files.vc-Uploader"]
+	path = files.vc-Uploader
+	url = https://github.com/FahadBinHussain/files.vc-Uploader
