@@ -72,11 +72,18 @@ model Book {
   imageUrl    String?
   description String?
   summary     String?
-  updatedAt   DateTime  @updatedAt
+  publicationDate String?
+  publisher   String?
+  genres      String[]
+  ratings     Float?
+  numberOfPages Int?
   positionInSeries Int?
+  characters  String[]
+  language    String?
   series      Series?   @relation(fields: [seriesId], references: [id])
   seriesId    String?
   authors     Author[]
+  updatedAt   DateTime  @updatedAt
 }
 
 model Series {

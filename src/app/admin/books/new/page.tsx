@@ -26,6 +26,12 @@ interface SeriesThumbnail {
   isLoading: boolean; // Add this field to store loading state
   errorMessage?: string; // Add this field to store error messages
   successMessage?: string; // Add this field to store success messages
+  publisher?: string;
+  genres?: string[];
+  ratings?: number;
+  numberOfPages?: number;
+  characters?: string[];
+  language?: string;
 }
 
 // Interface for book PDF files in a series
@@ -64,6 +70,12 @@ interface ScrapedBookData {
   summary?: string;
   publicationDate?: string;
   authors?: string[];
+  publisher?: string;
+  genres?: string[];
+  ratings?: number;
+  numberOfPages?: number;
+  characters?: string[];
+  language?: string;
 }
 
 interface ScrapedSeriesData {
@@ -182,6 +194,12 @@ export default function AddNewBook() {
           isLoading: false, // Add loading state
           errorMessage: existingThumbnail?.errorMessage, // Add error message
           successMessage: existingThumbnail?.successMessage, // Add success message
+          publisher: existingThumbnail?.publisher,
+          genres: existingThumbnail?.genres,
+          ratings: existingThumbnail?.ratings,
+          numberOfPages: existingThumbnail?.numberOfPages,
+          characters: existingThumbnail?.characters,
+          language: existingThumbnail?.language,
         });
         newBookPdfs.push({
           bookNumber: bookNumber,
@@ -741,25 +759,21 @@ The PDF will be uploaded again during the final form submission.`);
     );
   };
 
-  // Function to determine URL type
-  const detectUrlType = (url: string): string | null => {
+  // Helper function to detect URL type
+  const detectUrlType = (url: string): 'fandom' | 'goodreads' | null => {
     try {
-      const urlObj = new URL(url);
-      const hostname = urlObj.hostname;
+      const parsedUrl = new URL(url);
+      const hostname = parsedUrl.hostname.toLowerCase();
       
-      if (hostname.includes('fandom.com') || hostname.endsWith('.fandom.com')) {
+      if (hostname.includes('fandom.com')) {
         return 'fandom';
+      } else if (hostname.includes('goodreads.com')) {
+        return 'goodreads';
       }
       
-      // Add more URL type detections as you add more scrapers
-      // Example:
-      // if (hostname.includes('goodreads.com')) {
-      //   return 'goodreads';
-      // }
-      
-      return null; // Unknown URL type
+      return null;
     } catch (error) {
-      // Not a valid URL
+      console.error('Invalid URL:', error);
       return null;
     }
   };
@@ -773,7 +787,7 @@ The PDF will be uploaded again during the final form submission.`);
     
     const urlType = detectUrlType(url);
     if (!urlType) {
-      setScrapingError("Unsupported URL type. Currently supports: Fandom");
+      setScrapingError("Unsupported URL type. Currently supports: Fandom, Goodreads");
       return;
     }
     
@@ -782,22 +796,13 @@ The PDF will be uploaded again during the final form submission.`);
     setMetadataSuccess(null);
     
     try {
-      // Call the appropriate scraper API endpoint based on URL type
-      let apiEndpoint = '';
-      
-      switch (urlType) {
-        case 'fandom':
-          apiEndpoint = '/api/scrapers/fandom';
-          break;
-        // Add cases for other scrapers when available
-      }
-      
-      const response = await fetch(apiEndpoint, {
+      // Call the generic scraper API endpoint
+      const response = await fetch('/api/scrapers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ fandomUrl: url }),
+        body: JSON.stringify({ url }),
       });
       
       if (!response.ok) {
@@ -860,7 +865,13 @@ The PDF will be uploaded again during the final form submission.`);
                 metadataUrl: book.imageUrl || '',
                 isLoading: false,
                 errorMessage: undefined,
-                successMessage: undefined
+                successMessage: undefined,
+                publisher: book.authors ? book.authors[0] : '',
+                genres: book.authors ? book.authors.slice(1) : [],
+                ratings: book.ratings,
+                numberOfPages: book.numberOfPages,
+                characters: book.characters,
+                language: book.language,
               };
             });
             
@@ -961,13 +972,13 @@ The PDF will be uploaded again during the final form submission.`);
         if (index >= 0 && index < updated.length) {
           updated[index] = { 
             ...updated[index], 
-            errorMessage: "Unsupported URL type. Currently supports: Fandom",
+            errorMessage: "Unsupported URL type. Currently supports: Fandom, Goodreads",
             successMessage: undefined
           };
         }
         return updated;
       });
-      showNotification('error', "Unsupported URL type. Currently supports: Fandom");
+      showNotification('error', "Unsupported URL type. Currently supports: Fandom, Goodreads");
       return;
     }
     
@@ -975,8 +986,8 @@ The PDF will be uploaded again during the final form submission.`);
     setSeriesThumbnails(prev => {
       const updated = [...prev];
       if (index >= 0 && index < updated.length) {
-        updated[index] = {
-          ...updated[index],
+        updated[index] = { 
+          ...updated[index], 
           isLoading: true,
           errorMessage: undefined,
           successMessage: undefined
@@ -986,33 +997,28 @@ The PDF will be uploaded again during the final form submission.`);
     });
     
     try {
-      // Call the appropriate scraper API endpoint based on URL type
-      let apiEndpoint = '';
-      
-      switch (urlType) {
-        case 'fandom':
-          apiEndpoint = '/api/scrapers/fandom';
-          break;
-        // Add cases for other scrapers when available
-      }
-      
-      const response = await fetch(apiEndpoint, {
+      // Call the metadata API
+      const response = await fetch('/api/scrapers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ fandomUrl: url }),
+        body: JSON.stringify({ url }),
       });
       
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `Failed to fetch metadata: ${response.statusText}`);
+        throw new Error(`Failed to fetch metadata: ${response.statusText}`);
       }
       
       const data = await response.json();
       
-      // Update only this book's data
-      if ('title' in data) {
+      // Check if we got valid data
+      if (!data) {
+        throw new Error('No data returned from the metadata API');
+      }
+      
+      // Handle the response based on whether it's a series or single book
+      if ('title' in data && !('seriesTitle' in data)) {
         // Apply the changes to just this book
         setSeriesThumbnails(prev => {
           const updated = [...prev];
@@ -1026,6 +1032,12 @@ The PDF will be uploaded again during the final form submission.`);
               preview: data.imageUrl || updated[index].preview,
               summary: data.summary || updated[index].summary,
               publicationDate: data.publicationDate || updated[index].publicationDate,
+              publisher: data.publisher || updated[index].publisher,
+              genres: data.genres || updated[index].genres,
+              ratings: data.ratings || updated[index].ratings,
+              numberOfPages: data.numberOfPages || updated[index].numberOfPages,
+              characters: data.characters || updated[index].characters,
+              language: data.language || updated[index].language,
               successMessage: `"${data.title}" data imported successfully!`,
               errorMessage: undefined,
               isLoading: false
@@ -1037,12 +1049,12 @@ The PDF will be uploaded again during the final form submission.`);
 
         // If this is the first book and it has authors, update the global authors
         if (index === 0 && data.authors && Array.isArray(data.authors) && data.authors.length > 0) {
-          const newAuthors = data.authors.map((authorName: string) => ({ name: authorName }));
+          const newAuthors = data.authors.map((authorName: string) => ({ id: crypto.randomUUID(), name: authorName }));
           setAuthors(newAuthors);
         }
 
         showNotification('success', `Book "${data.title}" data imported successfully!`);
-      } else if ('seriesTitle' in data && data.books && Array.isArray(data.books) && index < data.books.length) {
+      } else if ('seriesTitle' in data && data.books && Array.isArray(data.books)) {
         // If it returns series data, extract just this book's data based on index
         const bookData = data.books[index];
         if (bookData) {
@@ -1058,6 +1070,12 @@ The PDF will be uploaded again during the final form submission.`);
                 preview: bookData.imageUrl || updated[index].preview,
                 summary: bookData.summary || updated[index].summary,
                 publicationDate: bookData.publicationDate || updated[index].publicationDate,
+                publisher: bookData.publisher || updated[index].publisher,
+                genres: bookData.genres || updated[index].genres,
+                ratings: bookData.ratings || updated[index].ratings,
+                numberOfPages: bookData.numberOfPages || updated[index].numberOfPages,
+                characters: bookData.characters || updated[index].characters,
+                language: bookData.language || updated[index].language,
                 successMessage: `"${bookData.title}" data imported successfully!`,
                 errorMessage: undefined,
                 isLoading: false
@@ -1206,386 +1224,400 @@ The PDF will be uploaded again during the final form submission.`);
                   <p className="mt-1 text-sm text-gray-500 ml-11">Define the basic information about your book series</p>
                 </div>
                 
-                {/* Series Range */}
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Series Range</label>
-                    <p className="text-xs text-gray-500 mt-1">Define the starting and ending numbers for your book series</p>
-                    <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                      <div className="group">
-                        <label htmlFor="seriesStart" className="block text-sm font-medium text-gray-700">
-                          Start Number
-                        </label>
-                        <div className="mt-1 relative rounded-md">
-                          <input
-                            type="number"
-                            id="seriesStart"
-                            min="1"
-                            className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                              formErrors.seriesStart ? "border-red-500" : ""
-                            }`}
-                            value={seriesStart}
-                            onChange={(e) => setSeriesStart(parseInt(e.target.value) || 1)}
-                          />
-                          {formErrors.seriesStart && (
-                            <p className="mt-1 text-sm text-red-500">{formErrors.seriesStart}</p>
-                          )}
-                        </div>
-                      </div>
-                      <div>
-                        <label htmlFor="seriesEnd" className="block text-sm font-medium text-gray-700">
-                          End Number
-                        </label>
-                        <div className="mt-1 relative rounded-md">
-                          <input
-                            type="number"
-                            id="seriesEnd"
-                            min={seriesStart} // Ensure end is not less than start
-                            className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                              formErrors.seriesEnd ? "border-red-500" : ""
-                            }`}
-                            value={seriesEnd}
-                            onChange={(e) => setSeriesEnd(parseInt(e.target.value) || seriesStart)}
-                          />
-                          {formErrors.seriesEnd && (
-                            <p className="mt-1 text-sm text-red-500">{formErrors.seriesEnd}</p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Series Naming Mode */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Naming Style</label>
-                    <p className="text-xs text-gray-500 mt-1">Choose how to name books in your series</p>
-                    <div className="mt-3 flex flex-col gap-4">
-                      {/* Option 1: Use same name for all books */}
-                      <div className={`flex items-start p-4 border rounded-md ${!useDifferentNames ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'}`}>
+                {/* Series Range - Simplified to Total Books */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Total Books in Series</label>
+                  <div className="mt-3">
+                    <div className="group">
+                      <div className="mt-1 relative rounded-md">
                         <input
-                          type="radio"
-                          id="consistent-names"
-                          checked={!useDifferentNames}
-                          onChange={() => setUseDifferentNames(false)}
-                          className="h-4 w-4 mt-1 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                          type="number"
+                          id="seriesEnd"
+                          min={1}
+                          className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                            formErrors.seriesEnd ? "border-red-500" : ""
+                          }`}
+                          value={seriesEnd}
+                          onChange={(e) => {
+                            setSeriesStart(1);
+                            setSeriesEnd(parseInt(e.target.value) || 1);
+                          }}
                         />
-                        <div className="ml-3">
-                          <label htmlFor="consistent-names" className="font-medium text-gray-800 cursor-pointer">Use consistent series name</label>
-                          <p className="text-sm text-gray-600 mt-1">All books will follow the same naming pattern with different numbers</p>
-                        </div>
-                      </div>
-                      
-                      {/* Option 2: Use different names for each book */}
-                      <div className={`flex items-start p-4 border rounded-md ${useDifferentNames ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'}`}>
-                        <input
-                          type="radio"
-                          id="different-names"
-                          checked={useDifferentNames}
-                          onChange={() => setUseDifferentNames(true)}
-                          className="h-4 w-4 mt-1 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-                        />
-                        <div className="ml-3">
-                          <label htmlFor="different-names" className="font-medium text-gray-800 cursor-pointer">Use different names for each book</label>
-                          <p className="text-sm text-gray-600 mt-1">Each book in the series will have its own unique name</p>
-                        </div>
+                        {formErrors.seriesEnd && (
+                          <p className="mt-1 text-sm text-red-500">{formErrors.seriesEnd}</p>
+                        )}
                       </div>
                     </div>
                   </div>
                 </div>
-                
-                {/* Series Preview */}
-                {getTotalBooksInSeries() > 0 && (
-                  <div className="mt-6 rounded-lg bg-indigo-50 p-4 border border-indigo-100">
-                    <div className="flex items-start">
-                      <div className="flex-shrink-0 pt-0.5">
-                        <svg className="h-5 w-5 text-indigo-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <div className="ml-3">
-                        <h3 className="text-sm font-medium text-indigo-800">Series Preview</h3>
-                        <div className="mt-2 space-y-1 text-sm">
-                          {generateSeriesPreview().map((title, index) => (
-                            <div key={index} className="text-indigo-700">{title}</div>
-                          ))}
-                        </div>
-                        <div className="mt-2">
-                          <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
-                            {getTotalBooksInSeries()} {getTotalBooksInSeries() === 1 ? "book" : "books"} will be created
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
 
               {/* Step 2: Book Details */}
-              {getTotalBooksInSeries() > 0 && (
-                <div className="series-fields rounded-lg border border-gray-100 bg-white p-6 shadow-sm">
-                  <div className="border-b border-gray-100 pb-4 mb-6">
-                    <div className="flex items-center">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 mr-3">
-                        <span className="font-medium">2</span>
-                      </div>
-                      <h3 className="text-lg font-medium text-gray-900">Books Details</h3>
+              <div className="series-thumbnail-section rounded-lg border border-gray-100 bg-white p-6 shadow-sm">
+                <div className="border-b border-gray-100 pb-4 mb-6">
+                  <div className="flex items-center">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 mr-3">
+                      <span className="font-medium">2</span>
                     </div>
-                    <p className="mt-1 text-sm text-gray-500 ml-11">Configure details for each book in the series</p>
+                    <h3 className="text-lg font-medium text-gray-900">Book Details</h3>
+                  </div>
+                  <p className="mt-1 text-sm text-gray-500 ml-11">Add details for each book in the series</p>
+                </div>
+
+                {/* Book Tabs Interface */}
+                <div className="mt-4">
+                  <div className="mb-4 border-b border-gray-200">
+                    <ul className="flex flex-wrap -mb-px text-sm font-medium text-center overflow-x-auto" role="tablist">
+                      {Array.from({ length: getTotalBooksInSeries() }, (_, i) => {
+                        const bookNumber = seriesStart + i;
+                        const isActive = i === activeBookTab;
+                        return (
+                          <li className="mr-2" key={bookNumber} role="presentation">
+                            <button
+                              type="button"
+                              onClick={() => setActiveBookTab(i)}
+                              className={`inline-block p-3 rounded-t-lg border-b-2 ${
+                                isActive 
+                                  ? 'border-indigo-600 text-indigo-600' 
+                                  : 'border-transparent hover:text-gray-600 hover:border-gray-300'
+                              }`}
+                              role="tab"
+                            >
+                              Book {bookNumber}
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
                   </div>
 
-                  {/* Book Tabs Interface */}
-                  <div className="mt-4">
-                    <div className="mb-4 border-b border-gray-200">
-                      <ul className="flex flex-wrap -mb-px text-sm font-medium text-center overflow-x-auto" role="tablist">
-                        {Array.from({ length: getTotalBooksInSeries() }, (_, i) => {
-                          const bookNumber = seriesStart + i;
-                          const isActive = i === activeBookTab;
-                          return (
-                            <li className="mr-2" key={bookNumber} role="presentation">
-                              <button
-                                type="button"
-                                onClick={() => setActiveBookTab(i)}
-                                className={`inline-block p-3 rounded-t-lg border-b-2 ${
-                                  isActive 
-                                    ? 'border-indigo-600 text-indigo-600' 
-                                    : 'border-transparent hover:text-gray-600 hover:border-gray-300'
+                  {/* Individual Book Forms - For simplicity, just showing the first book by default */}
+                  {Array.from({ length: getTotalBooksInSeries() }, (_, i) => {
+                    const bookNumber = seriesStart + i;
+                    const thumbnailIndex = seriesThumbnails.findIndex(t => t.bookNumber === bookNumber);
+                    const pdfIndex = seriesBookPdfs.findIndex(p => p.bookNumber === bookNumber);
+                    const isApproved = approvedBooks.find(book => book.bookNumber === bookNumber)?.isApproved || false;
+                    
+                    // Only show the active tab
+                    if (i !== activeBookTab) return null;
+                    
+                    return (
+                      <div key={bookNumber} className="p-4 bg-gray-50 rounded-md">
+                        <div className="flex flex-col md:flex-row md:gap-8">
+                          <div className="mb-6 md:mb-0 md:w-1/3">
+                            <h4 className="font-medium text-lg mb-2">
+                              {useDifferentNames 
+                                ? `Book ${getFormattedSeriesNumber(bookNumber)}`
+                                : `${seriesBaseName || "Book"} ${getFormattedSeriesNumber(bookNumber)}`
+                              }
+                            </h4>
+                            
+                            {/* Book Name Field (always shown, but required only when using different names) */}
+                            <div className="mb-4">
+                              <label className="block text-sm font-medium text-gray-600 mb-1">
+                                Book Name {useDifferentNames && <span className="text-red-500">*</span>}
+                              </label>
+                              <input
+                                type="text"
+                                className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                                  formErrors.seriesBookNames && thumbnailIndex !== -1 && useDifferentNames && !seriesThumbnails[thumbnailIndex].customName?.trim() ? "border-red-500" : ""
                                 }`}
-                                role="tab"
-                              >
-                                Book {bookNumber}
-                              </button>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </div>
-
-                    {/* Individual Book Forms - For simplicity, just showing the first book by default */}
-                    {Array.from({ length: getTotalBooksInSeries() }, (_, i) => {
-                      const bookNumber = seriesStart + i;
-                      const thumbnailIndex = seriesThumbnails.findIndex(t => t.bookNumber === bookNumber);
-                      const pdfIndex = seriesBookPdfs.findIndex(p => p.bookNumber === bookNumber);
-                      const isApproved = approvedBooks.find(book => book.bookNumber === bookNumber)?.isApproved || false;
-                      
-                      // Only show the active tab
-                      if (i !== activeBookTab) return null;
-                      
-                      return (
-                        <div key={bookNumber} className="p-4 bg-gray-50 rounded-md">
-                          <div className="flex flex-col md:flex-row md:gap-8">
-                            <div className="mb-6 md:mb-0 md:w-1/3">
-                              <h4 className="font-medium text-lg mb-2">
-                                {useDifferentNames 
-                                  ? `Book ${getFormattedSeriesNumber(bookNumber)}`
-                                  : `${seriesBaseName || "Book"} ${getFormattedSeriesNumber(bookNumber)}`
-                                }
-                              </h4>
-                              
-                              {/* Book Name Field (always shown, but required only when using different names) */}
-                              <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-600 mb-1">
-                                  Book Name {useDifferentNames && <span className="text-red-500">*</span>}
-                                </label>
-                                <input
-                                  type="text"
-                                  className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                                    formErrors.seriesBookNames && thumbnailIndex !== -1 && useDifferentNames && !seriesThumbnails[thumbnailIndex].customName?.trim() ? "border-red-500" : ""
-                                  }`}
-                                  placeholder="Enter name for this book"
-                                  value={thumbnailIndex !== -1 ? seriesThumbnails[thumbnailIndex].customName || "" : ""}
-                                  onChange={(e) => updateSeriesBookName(thumbnailIndex, e.target.value)}
-                                  required={useDifferentNames}
-                                />
-                              </div>
-                              
-                              {/* Thumbnail Input */}
-                              <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-600 mb-1">
-                                  Thumbnail URL
-                                </label>
-                                <input
-                                  type="text"
-                                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                  placeholder="https://example.com/thumbnail.jpg"
-                                  value={thumbnailIndex !== -1 ? seriesThumbnails[thumbnailIndex].url : ""}
-                                  onChange={(e) => updateSeriesThumbnailPreview(thumbnailIndex, e.target.value)}
-                                />
-                                
-                                {thumbnailIndex !== -1 && seriesThumbnails[thumbnailIndex].preview && (
-                                  <div className="mt-2">
-                                    <div className="h-24 w-18 overflow-hidden rounded border border-gray-200">
-                                      <img 
-                                        src={seriesThumbnails[thumbnailIndex].preview} 
-                                        alt={`Preview for book ${bookNumber}`}
-                                        className="h-full w-full object-cover"
-                                        onError={(e) => {
-                                          e.currentTarget.src = "https://via.placeholder.com/120x160?text=No Preview"; 
-                                        }}
-                                      />
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                              
-                              {/* PDF Input */}
-                              <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-600 mb-1">
-                                  PDF File
-                                </label>
-                                <input
-                                  type="file"
-                                  accept=".pdf"
-                                  onChange={(e) => handleSeriesBookPdfChange(pdfIndex, e)}
-                                  className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-indigo-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-indigo-700 hover:file:bg-indigo-100"
-                                />
-                                {pdfIndex !== -1 && seriesBookPdfs[pdfIndex].file && (
-                                  <p className="mt-1 text-xs text-gray-600">
-                                    Selected: {seriesBookPdfs[pdfIndex].file.name} ({(seriesBookPdfs[pdfIndex].file.size / 1024 / 1024).toFixed(2)} MB)
-                                  </p>
-                                )}
-                              </div>
+                                placeholder="Enter name for this book"
+                                value={thumbnailIndex !== -1 ? seriesThumbnails[thumbnailIndex].customName || "" : ""}
+                                onChange={(e) => updateSeriesBookName(thumbnailIndex, e.target.value)}
+                                required={useDifferentNames}
+                              />
                             </div>
                             
-                            <div className="md:w-2/3">
-                              {/* Metadata URL for this specific book */}
-                              <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-600 mb-1">
-                                  <div className="flex items-center">
-                                    <FiLink className="mr-2 h-4 w-4 text-gray-500" />
-                                    Book Metadata URL
-                                  </div>
-                                </label>
-                                <div className="flex rounded-md shadow-sm">
-                                  <input
-                                    type="text"
-                                    className="block w-full flex-1 rounded-none rounded-l-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                    placeholder="Paste a Fandom URL for this specific book"
-                                    value={thumbnailIndex !== -1 ? seriesThumbnails[thumbnailIndex].metadataUrl || "" : ""}
-                                    onChange={(e) => updateSeriesBookMetadataUrl(thumbnailIndex, e.target.value)}
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() => thumbnailIndex !== -1 && fetchBookMetadata(thumbnailIndex, seriesThumbnails[thumbnailIndex].metadataUrl || "")}
-                                    disabled={thumbnailIndex === -1 || !seriesThumbnails[thumbnailIndex].metadataUrl || seriesThumbnails[thumbnailIndex].isLoading}
-                                    className="inline-flex items-center rounded-r-md border border-l-0 border-gray-300 bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-75 disabled:cursor-not-allowed"
-                                  >
-                                    {thumbnailIndex !== -1 && seriesThumbnails[thumbnailIndex].isLoading ? (
-                                      <>
-                                        <FiLoader className="mr-2 h-4 w-4 animate-spin" />
-                                        Fetching...
-                                      </>
-                                    ) : (
-                                      <>
-                                        <FiDownload className="mr-2 h-4 w-4" />
-                                        Fetch Data
-                                      </>
-                                    )}
-                                  </button>
-                                </div>
-                                {thumbnailIndex !== -1 && seriesThumbnails[thumbnailIndex].errorMessage && (
-                                  <p className="mt-1 text-sm text-red-500">{seriesThumbnails[thumbnailIndex].errorMessage}</p>
-                                )}
-                                {thumbnailIndex !== -1 && seriesThumbnails[thumbnailIndex].successMessage && (
-                                  <p className="mt-1 text-sm text-green-600 flex items-center">
-                                    <FiCheckCircle className="mr-1 h-4 w-4" /> {seriesThumbnails[thumbnailIndex].successMessage}
-                                  </p>
-                                )}
-                                {thumbnailIndex !== -1 && !seriesThumbnails[thumbnailIndex].errorMessage && !seriesThumbnails[thumbnailIndex].successMessage && (
-                                  <p className="mt-1 text-xs text-gray-500">
-                                    Paste a Fandom URL for this specific book to auto-fill its details
-                                  </p>
-                                )}
-                              </div>
+                            {/* Thumbnail Input */}
+                            <div className="mb-4">
+                              <label className="block text-sm font-medium text-gray-600 mb-1">
+                                Thumbnail URL
+                              </label>
+                              <input
+                                type="text"
+                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                placeholder="https://example.com/thumbnail.jpg"
+                                value={thumbnailIndex !== -1 ? seriesThumbnails[thumbnailIndex].url : ""}
+                                onChange={(e) => updateSeriesThumbnailPreview(thumbnailIndex, e.target.value)}
+                              />
                               
-                              {/* Book Summary */}
-                              <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-600 mb-1">
-                                  Book Summary
-                                </label>
-                                <textarea
-                                  rows={3}
-                                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                  placeholder="Enter a brief summary of the book..."
-                                  value={thumbnailIndex !== -1 ? seriesThumbnails[thumbnailIndex].summary || "" : ""}
-                                  onChange={(e) => updateSeriesBookSummary(thumbnailIndex, e.target.value)}
-                                />
-                              </div>
-                              
-                              {/* Publication Date */}
-                              <div className="mb-4">
-                                <div className="flex items-center justify-between mb-1">
-                                  <label className="block text-sm font-medium text-gray-600">
-                                    Publication Date <span className="text-red-500">*</span>
-                                  </label>
-                                  <div className="flex items-center space-x-3">
-                                    <div className="flex items-center">
-                                      <input
-                                        type="radio"
-                                        id={`year-only-${bookNumber}`}
-                                        checked={thumbnailIndex !== -1 && seriesThumbnails[thumbnailIndex]?.isYearOnly}
-                                        onChange={() => thumbnailIndex !== -1 && toggleSeriesBookYearOnly(thumbnailIndex)}
-                                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-                                      />
-                                      <label htmlFor={`year-only-${bookNumber}`} className="ml-2 text-xs text-gray-700">Year only</label>
-                                    </div>
-                                    <div className="flex items-center">
-                                      <input
-                                        type="radio"
-                                        id={`full-date-${bookNumber}`}
-                                        checked={thumbnailIndex !== -1 && !seriesThumbnails[thumbnailIndex]?.isYearOnly}
-                                        onChange={() => thumbnailIndex !== -1 && !seriesThumbnails[thumbnailIndex]?.isYearOnly && toggleSeriesBookYearOnly(thumbnailIndex)}
-                                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-                                      />
-                                      <label htmlFor={`full-date-${bookNumber}`} className="ml-2 text-xs text-gray-700">Full date</label>
-                                    </div>
+                              {thumbnailIndex !== -1 && seriesThumbnails[thumbnailIndex].preview && (
+                                <div className="mt-2">
+                                  <div className="h-24 w-18 overflow-hidden rounded border border-gray-200">
+                                    <img 
+                                      src={seriesThumbnails[thumbnailIndex].preview} 
+                                      alt={`Preview for book ${bookNumber}`}
+                                      className="h-full w-full object-cover"
+                                      onError={(e) => {
+                                        e.currentTarget.src = "https://via.placeholder.com/120x160?text=No Preview"; 
+                                      }}
+                                    />
                                   </div>
                                 </div>
-                                
-                                {thumbnailIndex !== -1 && seriesThumbnails[thumbnailIndex]?.isYearOnly ? (
-                                  <input
-                                    type="text"
-                                    placeholder="YYYY"
-                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                    value={thumbnailIndex !== -1 ? seriesThumbnails[thumbnailIndex].publicationDate || "" : ""}
-                                    onChange={(e) => updateSeriesBookPublicationDate(thumbnailIndex, e.target.value)}
-                                    pattern="\d{4}"
-                                  />
-                                ) : (
-                                  <input
-                                    type="date"
-                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                    value={thumbnailIndex !== -1 ? seriesThumbnails[thumbnailIndex].publicationDate || "" : ""}
-                                    onChange={(e) => updateSeriesBookPublicationDate(thumbnailIndex, e.target.value)}
-                                  />
-                                )}
-                              </div>
-                              
-                              <div className="mt-4 flex justify-end">
-                                <button
-                                  type="button"
-                                  onClick={() => handleApproveBook(bookNumber)}
-                                  className={`inline-flex items-center rounded-md px-4 py-2 text-sm font-medium ${
-                                    isApproved 
-                                      ? 'bg-green-100 text-green-800 hover:bg-green-200' 
-                                      : 'bg-indigo-100 text-indigo-800 hover:bg-indigo-200'
-                                  }`}
-                                >
-                                  <FiCheckCircle className="mr-2 h-4 w-4" />
-                                  {isApproved ? 'Approved' : 'Approve Book'}
-                                </button>
-                              </div>
+                              )}
+                            </div>
+                            
+                            {/* PDF Input */}
+                            <div className="mb-4">
+                              <label className="block text-sm font-medium text-gray-600 mb-1">
+                                PDF File
+                              </label>
+                              <input
+                                type="file"
+                                accept=".pdf"
+                                onChange={(e) => handleSeriesBookPdfChange(pdfIndex, e)}
+                                className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-indigo-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-indigo-700 hover:file:bg-indigo-100"
+                              />
+                              {pdfIndex !== -1 && seriesBookPdfs[pdfIndex].file && (
+                                <p className="mt-1 text-xs text-gray-600">
+                                  Selected: {seriesBookPdfs[pdfIndex].file.name} ({(seriesBookPdfs[pdfIndex].file.size / 1024 / 1024).toFixed(2)} MB)
+                                </p>
+                              )}
                             </div>
                           </div>
                           
-                          <div className="mt-4 text-center text-sm text-gray-500">
-                            <p>This is book {i + 1} of {getTotalBooksInSeries()}. Use the tabs above to edit other books.</p>
+                          <div className="md:w-2/3">
+                            {/* Metadata URL for this specific book */}
+                            <div className="mb-4">
+                              <label className="block text-sm font-medium text-gray-600 mb-1">
+                                <div className="flex items-center">
+                                  <FiLink className="mr-2 h-4 w-4 text-gray-500" />
+                                  Book Metadata URL
+                                </div>
+                              </label>
+                              <div className="flex rounded-md shadow-sm">
+                                <input
+                                  type="text"
+                                  className="block w-full flex-1 rounded-none rounded-l-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                  placeholder="Paste a Goodreads URL for this specific book"
+                                  value={thumbnailIndex !== -1 ? seriesThumbnails[thumbnailIndex].metadataUrl || "" : ""}
+                                  onChange={(e) => updateSeriesBookMetadataUrl(thumbnailIndex, e.target.value)}
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => thumbnailIndex !== -1 && fetchBookMetadata(thumbnailIndex, seriesThumbnails[thumbnailIndex].metadataUrl || "")}
+                                  disabled={thumbnailIndex === -1 || !seriesThumbnails[thumbnailIndex].metadataUrl || seriesThumbnails[thumbnailIndex].isLoading}
+                                  className="inline-flex items-center rounded-r-md border border-l-0 border-gray-300 bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-75 disabled:cursor-not-allowed"
+                                >
+                                  {thumbnailIndex !== -1 && seriesThumbnails[thumbnailIndex].isLoading ? (
+                                    <>
+                                      <FiLoader className="mr-2 h-4 w-4 animate-spin" />
+                                      Fetching...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <FiDownload className="mr-2 h-4 w-4" />
+                                      Fetch Data
+                                    </>
+                                  )}
+                                </button>
+                              </div>
+                              {thumbnailIndex !== -1 && seriesThumbnails[thumbnailIndex].errorMessage && (
+                                <p className="mt-1 text-sm text-red-500">{seriesThumbnails[thumbnailIndex].errorMessage}</p>
+                              )}
+                              {thumbnailIndex !== -1 && seriesThumbnails[thumbnailIndex].successMessage && (
+                                <p className="mt-1 text-sm text-green-600 flex items-center">
+                                  <FiCheckCircle className="mr-1 h-4 w-4" /> {seriesThumbnails[thumbnailIndex].successMessage}
+                                </p>
+                              )}
+                              {thumbnailIndex !== -1 && !seriesThumbnails[thumbnailIndex].errorMessage && !seriesThumbnails[thumbnailIndex].successMessage && (
+                                <p className="mt-1 text-xs text-gray-500">
+                                  Paste a Goodreads URL to auto-fill book details
+                                </p>
+                              )}
+                            </div>
+                            
+                            {/* Book Summary */}
+                            <div className="mb-4">
+                              <label className="block text-sm font-medium text-gray-600 mb-1">
+                                Book Summary
+                              </label>
+                              <textarea
+                                rows={3}
+                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                placeholder="Enter a brief summary of the book..."
+                                value={thumbnailIndex !== -1 ? seriesThumbnails[thumbnailIndex].summary || "" : ""}
+                                onChange={(e) => updateSeriesBookSummary(thumbnailIndex, e.target.value)}
+                              />
+                            </div>
+                            
+                            {/* New fields */}
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                              {/* Publication Date */}
+                              <div className="mb-4">
+                                <label className="block text-sm font-medium text-gray-600 mb-1">
+                                  Publication Date
+                                </label>
+                                <div className="flex items-center">
+                                  {thumbnailIndex !== -1 && seriesThumbnails[thumbnailIndex]?.isYearOnly ? (
+                                    <input
+                                      type="text"
+                                      placeholder="YYYY"
+                                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                      value={thumbnailIndex !== -1 ? seriesThumbnails[thumbnailIndex].publicationDate || "" : ""}
+                                      onChange={(e) => updateSeriesBookPublicationDate(thumbnailIndex, e.target.value)}
+                                      pattern="\d{4}"
+                                    />
+                                  ) : (
+                                    <input
+                                      type="date"
+                                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                      value={thumbnailIndex !== -1 ? seriesThumbnails[thumbnailIndex].publicationDate || "" : ""}
+                                      onChange={(e) => updateSeriesBookPublicationDate(thumbnailIndex, e.target.value)}
+                                    />
+                                  )}
+                                </div>
+                              </div>
+                              
+                              {/* Publisher */}
+                              <div className="mb-4">
+                                <label className="block text-sm font-medium text-gray-600 mb-1">
+                                  Publisher
+                                </label>
+                                <input
+                                  type="text"
+                                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                  placeholder="Publisher name"
+                                  value={thumbnailIndex !== -1 ? seriesThumbnails[thumbnailIndex].publisher || "" : ""}
+                                  onChange={(e) => {
+                                    if (thumbnailIndex !== -1) {
+                                      setSeriesThumbnails(prev => 
+                                        prev.map((thumbnail, i) => 
+                                          i === thumbnailIndex ? { ...thumbnail, publisher: e.target.value } : thumbnail
+                                        )
+                                      );
+                                    }
+                                  }}
+                                />
+                              </div>
+                              
+                              {/* Number of Pages */}
+                              <div className="mb-4">
+                                <label className="block text-sm font-medium text-gray-600 mb-1">
+                                  Number of Pages
+                                </label>
+                                <input
+                                  type="number"
+                                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                  placeholder="Number of pages"
+                                  value={thumbnailIndex !== -1 && seriesThumbnails[thumbnailIndex].numberOfPages ? seriesThumbnails[thumbnailIndex].numberOfPages : ""}
+                                  onChange={(e) => {
+                                    if (thumbnailIndex !== -1) {
+                                      setSeriesThumbnails(prev => 
+                                        prev.map((thumbnail, i) => 
+                                          i === thumbnailIndex ? { ...thumbnail, numberOfPages: parseInt(e.target.value) || undefined } : thumbnail
+                                        )
+                                      );
+                                    }
+                                  }}
+                                />
+                              </div>
+                              
+                              {/* Ratings */}
+                              <div className="mb-4">
+                                <label className="block text-sm font-medium text-gray-600 mb-1">
+                                  Ratings
+                                </label>
+                                <input
+                                  type="number"
+                                  step="0.1"
+                                  min="0"
+                                  max="5"
+                                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                  placeholder="Rating (0-5)"
+                                  value={thumbnailIndex !== -1 && seriesThumbnails[thumbnailIndex].ratings ? seriesThumbnails[thumbnailIndex].ratings : ""}
+                                  onChange={(e) => {
+                                    if (thumbnailIndex !== -1) {
+                                      setSeriesThumbnails(prev => 
+                                        prev.map((thumbnail, i) => 
+                                          i === thumbnailIndex ? { ...thumbnail, ratings: parseFloat(e.target.value) || undefined } : thumbnail
+                                        )
+                                      );
+                                    }
+                                  }}
+                                />
+                              </div>
+                              
+                              {/* Language */}
+                              <div className="mb-4">
+                                <label className="block text-sm font-medium text-gray-600 mb-1">
+                                  Language
+                                </label>
+                                <input
+                                  type="text"
+                                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                  placeholder="Language"
+                                  value={thumbnailIndex !== -1 ? seriesThumbnails[thumbnailIndex].language || "" : ""}
+                                  onChange={(e) => {
+                                    if (thumbnailIndex !== -1) {
+                                      setSeriesThumbnails(prev => 
+                                        prev.map((thumbnail, i) => 
+                                          i === thumbnailIndex ? { ...thumbnail, language: e.target.value } : thumbnail
+                                        )
+                                      );
+                                    }
+                                  }}
+                                />
+                              </div>
+                              
+                              {/* Genres - as a comma-separated input */}
+                              <div className="mb-4 col-span-2">
+                                <label className="block text-sm font-medium text-gray-600 mb-1">
+                                  Genres (comma separated)
+                                </label>
+                                <input
+                                  type="text"
+                                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                  placeholder="Fantasy, Adventure, Mystery"
+                                  value={thumbnailIndex !== -1 && seriesThumbnails[thumbnailIndex].genres ? seriesThumbnails[thumbnailIndex].genres.join(", ") : ""}
+                                  onChange={(e) => {
+                                    if (thumbnailIndex !== -1) {
+                                      const genresArray = e.target.value.split(",").map(genre => genre.trim()).filter(genre => genre !== "");
+                                      setSeriesThumbnails(prev => 
+                                        prev.map((thumbnail, i) => 
+                                          i === thumbnailIndex ? { ...thumbnail, genres: genresArray } : thumbnail
+                                        )
+                                      );
+                                    }
+                                  }}
+                                />
+                              </div>
+                              
+                              {/* Characters - as a comma-separated input */}
+                              <div className="mb-4 col-span-2">
+                                <label className="block text-sm font-medium text-gray-600 mb-1">
+                                  Characters (comma separated)
+                                </label>
+                                <input
+                                  type="text"
+                                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                  placeholder="Harry Potter, Hermione Granger, Ron Weasley"
+                                  value={thumbnailIndex !== -1 && seriesThumbnails[thumbnailIndex].characters ? seriesThumbnails[thumbnailIndex].characters.join(", ") : ""}
+                                  onChange={(e) => {
+                                    if (thumbnailIndex !== -1) {
+                                      const charactersArray = e.target.value.split(",").map(character => character.trim()).filter(character => character !== "");
+                                      setSeriesThumbnails(prev => 
+                                        prev.map((thumbnail, i) => 
+                                          i === thumbnailIndex ? { ...thumbnail, characters: charactersArray } : thumbnail
+                                        )
+                                      );
+                                    }
+                                  }}
+                                />
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      );
-                    })}
-                  </div>
+                        
+                        <div className="mt-4 text-center text-sm text-gray-500">
+                          <p>This is book {i + 1} of {getTotalBooksInSeries()}. Use the tabs above to edit other books.</p>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              )}
+              </div>
             </div>
           )}
 
@@ -1757,7 +1789,7 @@ The PDF will be uploaded again during the final form submission.`);
                   className={`block w-full flex-1 rounded-none rounded-l-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
                     scrapingError ? "border-red-500" : ""
                   }`}
-                  placeholder="Paste a Fandom URL to auto-fill book details"
+                  placeholder="Paste a Fandom or Goodreads URL to auto-fill book details"
                   value={metadataUrl}
                   onChange={handleMetadataUrlChange}
                 />
@@ -1791,7 +1823,7 @@ The PDF will be uploaded again during the final form submission.`);
                 </p>
               )}
               {!scrapingError && !metadataSuccess && (
-                <p className="mt-1 text-xs text-gray-500">Paste a URL from Fandom to automatically fill book details.</p>
+                <p className="mt-1 text-xs text-gray-500">Paste a URL from Fandom or Goodreads to automatically fill book details.</p>
               )}
             </div>
           )}

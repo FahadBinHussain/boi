@@ -7070,10 +7070,14 @@ export namespace Prisma {
   }
 
   export type BookAvgAggregateOutputType = {
+    ratings: number | null
+    numberOfPages: number | null
     positionInSeries: number | null
   }
 
   export type BookSumAggregateOutputType = {
+    ratings: number | null
+    numberOfPages: number | null
     positionInSeries: number | null
   }
 
@@ -7083,9 +7087,14 @@ export namespace Prisma {
     imageUrl: string | null
     description: string | null
     summary: string | null
-    updatedAt: Date | null
+    publicationDate: string | null
+    publisher: string | null
+    ratings: number | null
+    numberOfPages: number | null
     positionInSeries: number | null
+    language: string | null
     seriesId: string | null
+    updatedAt: Date | null
   }
 
   export type BookMaxAggregateOutputType = {
@@ -7094,9 +7103,14 @@ export namespace Prisma {
     imageUrl: string | null
     description: string | null
     summary: string | null
-    updatedAt: Date | null
+    publicationDate: string | null
+    publisher: string | null
+    ratings: number | null
+    numberOfPages: number | null
     positionInSeries: number | null
+    language: string | null
     seriesId: string | null
+    updatedAt: Date | null
   }
 
   export type BookCountAggregateOutputType = {
@@ -7105,18 +7119,29 @@ export namespace Prisma {
     imageUrl: number
     description: number
     summary: number
-    updatedAt: number
+    publicationDate: number
+    publisher: number
+    genres: number
+    ratings: number
+    numberOfPages: number
     positionInSeries: number
+    characters: number
+    language: number
     seriesId: number
+    updatedAt: number
     _all: number
   }
 
 
   export type BookAvgAggregateInputType = {
+    ratings?: true
+    numberOfPages?: true
     positionInSeries?: true
   }
 
   export type BookSumAggregateInputType = {
+    ratings?: true
+    numberOfPages?: true
     positionInSeries?: true
   }
 
@@ -7126,9 +7151,14 @@ export namespace Prisma {
     imageUrl?: true
     description?: true
     summary?: true
-    updatedAt?: true
+    publicationDate?: true
+    publisher?: true
+    ratings?: true
+    numberOfPages?: true
     positionInSeries?: true
+    language?: true
     seriesId?: true
+    updatedAt?: true
   }
 
   export type BookMaxAggregateInputType = {
@@ -7137,9 +7167,14 @@ export namespace Prisma {
     imageUrl?: true
     description?: true
     summary?: true
-    updatedAt?: true
+    publicationDate?: true
+    publisher?: true
+    ratings?: true
+    numberOfPages?: true
     positionInSeries?: true
+    language?: true
     seriesId?: true
+    updatedAt?: true
   }
 
   export type BookCountAggregateInputType = {
@@ -7148,9 +7183,16 @@ export namespace Prisma {
     imageUrl?: true
     description?: true
     summary?: true
-    updatedAt?: true
+    publicationDate?: true
+    publisher?: true
+    genres?: true
+    ratings?: true
+    numberOfPages?: true
     positionInSeries?: true
+    characters?: true
+    language?: true
     seriesId?: true
+    updatedAt?: true
     _all?: true
   }
 
@@ -7246,9 +7288,16 @@ export namespace Prisma {
     imageUrl: string | null
     description: string | null
     summary: string | null
-    updatedAt: Date
+    publicationDate: string | null
+    publisher: string | null
+    genres: string[]
+    ratings: number | null
+    numberOfPages: number | null
     positionInSeries: number | null
+    characters: string[]
+    language: string | null
     seriesId: string | null
+    updatedAt: Date
     _count: BookCountAggregateOutputType | null
     _avg: BookAvgAggregateOutputType | null
     _sum: BookSumAggregateOutputType | null
@@ -7276,9 +7325,16 @@ export namespace Prisma {
     imageUrl?: boolean
     description?: boolean
     summary?: boolean
-    updatedAt?: boolean
+    publicationDate?: boolean
+    publisher?: boolean
+    genres?: boolean
+    ratings?: boolean
+    numberOfPages?: boolean
     positionInSeries?: boolean
+    characters?: boolean
+    language?: boolean
     seriesId?: boolean
+    updatedAt?: boolean
     series?: boolean | Book$seriesArgs<ExtArgs>
     authors?: boolean | Book$authorsArgs<ExtArgs>
     _count?: boolean | BookCountOutputTypeDefaultArgs<ExtArgs>
@@ -7290,9 +7346,16 @@ export namespace Prisma {
     imageUrl?: boolean
     description?: boolean
     summary?: boolean
-    updatedAt?: boolean
+    publicationDate?: boolean
+    publisher?: boolean
+    genres?: boolean
+    ratings?: boolean
+    numberOfPages?: boolean
     positionInSeries?: boolean
+    characters?: boolean
+    language?: boolean
     seriesId?: boolean
+    updatedAt?: boolean
     series?: boolean | Book$seriesArgs<ExtArgs>
   }, ExtArgs["result"]["book"]>
 
@@ -7302,9 +7365,16 @@ export namespace Prisma {
     imageUrl?: boolean
     description?: boolean
     summary?: boolean
-    updatedAt?: boolean
+    publicationDate?: boolean
+    publisher?: boolean
+    genres?: boolean
+    ratings?: boolean
+    numberOfPages?: boolean
     positionInSeries?: boolean
+    characters?: boolean
+    language?: boolean
     seriesId?: boolean
+    updatedAt?: boolean
     series?: boolean | Book$seriesArgs<ExtArgs>
   }, ExtArgs["result"]["book"]>
 
@@ -7314,12 +7384,19 @@ export namespace Prisma {
     imageUrl?: boolean
     description?: boolean
     summary?: boolean
-    updatedAt?: boolean
+    publicationDate?: boolean
+    publisher?: boolean
+    genres?: boolean
+    ratings?: boolean
+    numberOfPages?: boolean
     positionInSeries?: boolean
+    characters?: boolean
+    language?: boolean
     seriesId?: boolean
+    updatedAt?: boolean
   }
 
-  export type BookOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "imageUrl" | "description" | "summary" | "updatedAt" | "positionInSeries" | "seriesId", ExtArgs["result"]["book"]>
+  export type BookOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "imageUrl" | "description" | "summary" | "publicationDate" | "publisher" | "genres" | "ratings" | "numberOfPages" | "positionInSeries" | "characters" | "language" | "seriesId" | "updatedAt", ExtArgs["result"]["book"]>
   export type BookInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     series?: boolean | Book$seriesArgs<ExtArgs>
     authors?: boolean | Book$authorsArgs<ExtArgs>
@@ -7344,9 +7421,16 @@ export namespace Prisma {
       imageUrl: string | null
       description: string | null
       summary: string | null
-      updatedAt: Date
+      publicationDate: string | null
+      publisher: string | null
+      genres: string[]
+      ratings: number | null
+      numberOfPages: number | null
       positionInSeries: number | null
+      characters: string[]
+      language: string | null
       seriesId: string | null
+      updatedAt: Date
     }, ExtArgs["result"]["book"]>
     composites: {}
   }
@@ -7777,9 +7861,16 @@ export namespace Prisma {
     readonly imageUrl: FieldRef<"Book", 'String'>
     readonly description: FieldRef<"Book", 'String'>
     readonly summary: FieldRef<"Book", 'String'>
-    readonly updatedAt: FieldRef<"Book", 'DateTime'>
+    readonly publicationDate: FieldRef<"Book", 'String'>
+    readonly publisher: FieldRef<"Book", 'String'>
+    readonly genres: FieldRef<"Book", 'String[]'>
+    readonly ratings: FieldRef<"Book", 'Float'>
+    readonly numberOfPages: FieldRef<"Book", 'Int'>
     readonly positionInSeries: FieldRef<"Book", 'Int'>
+    readonly characters: FieldRef<"Book", 'String[]'>
+    readonly language: FieldRef<"Book", 'String'>
     readonly seriesId: FieldRef<"Book", 'String'>
+    readonly updatedAt: FieldRef<"Book", 'DateTime'>
   }
     
 
@@ -10445,9 +10536,16 @@ export namespace Prisma {
     imageUrl: 'imageUrl',
     description: 'description',
     summary: 'summary',
-    updatedAt: 'updatedAt',
+    publicationDate: 'publicationDate',
+    publisher: 'publisher',
+    genres: 'genres',
+    ratings: 'ratings',
+    numberOfPages: 'numberOfPages',
     positionInSeries: 'positionInSeries',
-    seriesId: 'seriesId'
+    characters: 'characters',
+    language: 'language',
+    seriesId: 'seriesId',
+    updatedAt: 'updatedAt'
   };
 
   export type BookScalarFieldEnum = (typeof BookScalarFieldEnum)[keyof typeof BookScalarFieldEnum]
@@ -10904,9 +11002,16 @@ export namespace Prisma {
     imageUrl?: StringNullableFilter<"Book"> | string | null
     description?: StringNullableFilter<"Book"> | string | null
     summary?: StringNullableFilter<"Book"> | string | null
-    updatedAt?: DateTimeFilter<"Book"> | Date | string
+    publicationDate?: StringNullableFilter<"Book"> | string | null
+    publisher?: StringNullableFilter<"Book"> | string | null
+    genres?: StringNullableListFilter<"Book">
+    ratings?: FloatNullableFilter<"Book"> | number | null
+    numberOfPages?: IntNullableFilter<"Book"> | number | null
     positionInSeries?: IntNullableFilter<"Book"> | number | null
+    characters?: StringNullableListFilter<"Book">
+    language?: StringNullableFilter<"Book"> | string | null
     seriesId?: StringNullableFilter<"Book"> | string | null
+    updatedAt?: DateTimeFilter<"Book"> | Date | string
     series?: XOR<SeriesNullableScalarRelationFilter, SeriesWhereInput> | null
     authors?: AuthorListRelationFilter
   }
@@ -10917,9 +11022,16 @@ export namespace Prisma {
     imageUrl?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
     summary?: SortOrderInput | SortOrder
-    updatedAt?: SortOrder
+    publicationDate?: SortOrderInput | SortOrder
+    publisher?: SortOrderInput | SortOrder
+    genres?: SortOrder
+    ratings?: SortOrderInput | SortOrder
+    numberOfPages?: SortOrderInput | SortOrder
     positionInSeries?: SortOrderInput | SortOrder
+    characters?: SortOrder
+    language?: SortOrderInput | SortOrder
     seriesId?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
     series?: SeriesOrderByWithRelationInput
     authors?: AuthorOrderByRelationAggregateInput
   }
@@ -10933,9 +11045,16 @@ export namespace Prisma {
     imageUrl?: StringNullableFilter<"Book"> | string | null
     description?: StringNullableFilter<"Book"> | string | null
     summary?: StringNullableFilter<"Book"> | string | null
-    updatedAt?: DateTimeFilter<"Book"> | Date | string
+    publicationDate?: StringNullableFilter<"Book"> | string | null
+    publisher?: StringNullableFilter<"Book"> | string | null
+    genres?: StringNullableListFilter<"Book">
+    ratings?: FloatNullableFilter<"Book"> | number | null
+    numberOfPages?: IntNullableFilter<"Book"> | number | null
     positionInSeries?: IntNullableFilter<"Book"> | number | null
+    characters?: StringNullableListFilter<"Book">
+    language?: StringNullableFilter<"Book"> | string | null
     seriesId?: StringNullableFilter<"Book"> | string | null
+    updatedAt?: DateTimeFilter<"Book"> | Date | string
     series?: XOR<SeriesNullableScalarRelationFilter, SeriesWhereInput> | null
     authors?: AuthorListRelationFilter
   }, "id">
@@ -10946,9 +11065,16 @@ export namespace Prisma {
     imageUrl?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
     summary?: SortOrderInput | SortOrder
-    updatedAt?: SortOrder
+    publicationDate?: SortOrderInput | SortOrder
+    publisher?: SortOrderInput | SortOrder
+    genres?: SortOrder
+    ratings?: SortOrderInput | SortOrder
+    numberOfPages?: SortOrderInput | SortOrder
     positionInSeries?: SortOrderInput | SortOrder
+    characters?: SortOrder
+    language?: SortOrderInput | SortOrder
     seriesId?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
     _count?: BookCountOrderByAggregateInput
     _avg?: BookAvgOrderByAggregateInput
     _max?: BookMaxOrderByAggregateInput
@@ -10965,9 +11091,16 @@ export namespace Prisma {
     imageUrl?: StringNullableWithAggregatesFilter<"Book"> | string | null
     description?: StringNullableWithAggregatesFilter<"Book"> | string | null
     summary?: StringNullableWithAggregatesFilter<"Book"> | string | null
-    updatedAt?: DateTimeWithAggregatesFilter<"Book"> | Date | string
+    publicationDate?: StringNullableWithAggregatesFilter<"Book"> | string | null
+    publisher?: StringNullableWithAggregatesFilter<"Book"> | string | null
+    genres?: StringNullableListFilter<"Book">
+    ratings?: FloatNullableWithAggregatesFilter<"Book"> | number | null
+    numberOfPages?: IntNullableWithAggregatesFilter<"Book"> | number | null
     positionInSeries?: IntNullableWithAggregatesFilter<"Book"> | number | null
+    characters?: StringNullableListFilter<"Book">
+    language?: StringNullableWithAggregatesFilter<"Book"> | string | null
     seriesId?: StringNullableWithAggregatesFilter<"Book"> | string | null
+    updatedAt?: DateTimeWithAggregatesFilter<"Book"> | Date | string
   }
 
   export type SeriesWhereInput = {
@@ -11412,8 +11545,15 @@ export namespace Prisma {
     imageUrl?: string | null
     description?: string | null
     summary?: string | null
-    updatedAt?: Date | string
+    publicationDate?: string | null
+    publisher?: string | null
+    genres?: BookCreategenresInput | string[]
+    ratings?: number | null
+    numberOfPages?: number | null
     positionInSeries?: number | null
+    characters?: BookCreatecharactersInput | string[]
+    language?: string | null
+    updatedAt?: Date | string
     series?: SeriesCreateNestedOneWithoutBooksInput
     authors?: AuthorCreateNestedManyWithoutBooksInput
   }
@@ -11424,9 +11564,16 @@ export namespace Prisma {
     imageUrl?: string | null
     description?: string | null
     summary?: string | null
-    updatedAt?: Date | string
+    publicationDate?: string | null
+    publisher?: string | null
+    genres?: BookCreategenresInput | string[]
+    ratings?: number | null
+    numberOfPages?: number | null
     positionInSeries?: number | null
+    characters?: BookCreatecharactersInput | string[]
+    language?: string | null
     seriesId?: string | null
+    updatedAt?: Date | string
     authors?: AuthorUncheckedCreateNestedManyWithoutBooksInput
   }
 
@@ -11436,8 +11583,15 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     summary?: NullableStringFieldUpdateOperationsInput | string | null
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    publicationDate?: NullableStringFieldUpdateOperationsInput | string | null
+    publisher?: NullableStringFieldUpdateOperationsInput | string | null
+    genres?: BookUpdategenresInput | string[]
+    ratings?: NullableFloatFieldUpdateOperationsInput | number | null
+    numberOfPages?: NullableIntFieldUpdateOperationsInput | number | null
     positionInSeries?: NullableIntFieldUpdateOperationsInput | number | null
+    characters?: BookUpdatecharactersInput | string[]
+    language?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     series?: SeriesUpdateOneWithoutBooksNestedInput
     authors?: AuthorUpdateManyWithoutBooksNestedInput
   }
@@ -11448,9 +11602,16 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     summary?: NullableStringFieldUpdateOperationsInput | string | null
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    publicationDate?: NullableStringFieldUpdateOperationsInput | string | null
+    publisher?: NullableStringFieldUpdateOperationsInput | string | null
+    genres?: BookUpdategenresInput | string[]
+    ratings?: NullableFloatFieldUpdateOperationsInput | number | null
+    numberOfPages?: NullableIntFieldUpdateOperationsInput | number | null
     positionInSeries?: NullableIntFieldUpdateOperationsInput | number | null
+    characters?: BookUpdatecharactersInput | string[]
+    language?: NullableStringFieldUpdateOperationsInput | string | null
     seriesId?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     authors?: AuthorUncheckedUpdateManyWithoutBooksNestedInput
   }
 
@@ -11460,9 +11621,16 @@ export namespace Prisma {
     imageUrl?: string | null
     description?: string | null
     summary?: string | null
-    updatedAt?: Date | string
+    publicationDate?: string | null
+    publisher?: string | null
+    genres?: BookCreategenresInput | string[]
+    ratings?: number | null
+    numberOfPages?: number | null
     positionInSeries?: number | null
+    characters?: BookCreatecharactersInput | string[]
+    language?: string | null
     seriesId?: string | null
+    updatedAt?: Date | string
   }
 
   export type BookUpdateManyMutationInput = {
@@ -11471,8 +11639,15 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     summary?: NullableStringFieldUpdateOperationsInput | string | null
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    publicationDate?: NullableStringFieldUpdateOperationsInput | string | null
+    publisher?: NullableStringFieldUpdateOperationsInput | string | null
+    genres?: BookUpdategenresInput | string[]
+    ratings?: NullableFloatFieldUpdateOperationsInput | number | null
+    numberOfPages?: NullableIntFieldUpdateOperationsInput | number | null
     positionInSeries?: NullableIntFieldUpdateOperationsInput | number | null
+    characters?: BookUpdatecharactersInput | string[]
+    language?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type BookUncheckedUpdateManyInput = {
@@ -11481,9 +11656,16 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     summary?: NullableStringFieldUpdateOperationsInput | string | null
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    publicationDate?: NullableStringFieldUpdateOperationsInput | string | null
+    publisher?: NullableStringFieldUpdateOperationsInput | string | null
+    genres?: BookUpdategenresInput | string[]
+    ratings?: NullableFloatFieldUpdateOperationsInput | number | null
+    numberOfPages?: NullableIntFieldUpdateOperationsInput | number | null
     positionInSeries?: NullableIntFieldUpdateOperationsInput | number | null
+    characters?: BookUpdatecharactersInput | string[]
+    language?: NullableStringFieldUpdateOperationsInput | string | null
     seriesId?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type SeriesCreateInput = {
@@ -11963,6 +12145,25 @@ export namespace Prisma {
     _max?: NestedBoolFilter<$PrismaModel>
   }
 
+  export type StringNullableListFilter<$PrismaModel = never> = {
+    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    has?: string | StringFieldRefInput<$PrismaModel> | null
+    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
+    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
+  }
+
+  export type FloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
   export type SeriesNullableScalarRelationFilter = {
     is?: SeriesWhereInput | null
     isNot?: SeriesWhereInput | null
@@ -11984,12 +12185,21 @@ export namespace Prisma {
     imageUrl?: SortOrder
     description?: SortOrder
     summary?: SortOrder
-    updatedAt?: SortOrder
+    publicationDate?: SortOrder
+    publisher?: SortOrder
+    genres?: SortOrder
+    ratings?: SortOrder
+    numberOfPages?: SortOrder
     positionInSeries?: SortOrder
+    characters?: SortOrder
+    language?: SortOrder
     seriesId?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type BookAvgOrderByAggregateInput = {
+    ratings?: SortOrder
+    numberOfPages?: SortOrder
     positionInSeries?: SortOrder
   }
 
@@ -11999,9 +12209,14 @@ export namespace Prisma {
     imageUrl?: SortOrder
     description?: SortOrder
     summary?: SortOrder
-    updatedAt?: SortOrder
+    publicationDate?: SortOrder
+    publisher?: SortOrder
+    ratings?: SortOrder
+    numberOfPages?: SortOrder
     positionInSeries?: SortOrder
+    language?: SortOrder
     seriesId?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type BookMinOrderByAggregateInput = {
@@ -12010,13 +12225,36 @@ export namespace Prisma {
     imageUrl?: SortOrder
     description?: SortOrder
     summary?: SortOrder
-    updatedAt?: SortOrder
+    publicationDate?: SortOrder
+    publisher?: SortOrder
+    ratings?: SortOrder
+    numberOfPages?: SortOrder
     positionInSeries?: SortOrder
+    language?: SortOrder
     seriesId?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type BookSumOrderByAggregateInput = {
+    ratings?: SortOrder
+    numberOfPages?: SortOrder
     positionInSeries?: SortOrder
+  }
+
+  export type FloatNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedFloatNullableFilter<$PrismaModel>
+    _min?: NestedFloatNullableFilter<$PrismaModel>
+    _max?: NestedFloatNullableFilter<$PrismaModel>
   }
 
   export type BookListRelationFilter = {
@@ -12264,6 +12502,14 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSettingsInput, UserUpdateWithoutSettingsInput>, UserUncheckedUpdateWithoutSettingsInput>
   }
 
+  export type BookCreategenresInput = {
+    set: string[]
+  }
+
+  export type BookCreatecharactersInput = {
+    set: string[]
+  }
+
   export type SeriesCreateNestedOneWithoutBooksInput = {
     create?: XOR<SeriesCreateWithoutBooksInput, SeriesUncheckedCreateWithoutBooksInput>
     connectOrCreate?: SeriesCreateOrConnectWithoutBooksInput
@@ -12280,6 +12526,24 @@ export namespace Prisma {
     create?: XOR<AuthorCreateWithoutBooksInput, AuthorUncheckedCreateWithoutBooksInput> | AuthorCreateWithoutBooksInput[] | AuthorUncheckedCreateWithoutBooksInput[]
     connectOrCreate?: AuthorCreateOrConnectWithoutBooksInput | AuthorCreateOrConnectWithoutBooksInput[]
     connect?: AuthorWhereUniqueInput | AuthorWhereUniqueInput[]
+  }
+
+  export type BookUpdategenresInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type NullableFloatFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type BookUpdatecharactersInput = {
+    set?: string[]
+    push?: string | string[]
   }
 
   export type SeriesUpdateOneWithoutBooksNestedInput = {
@@ -12587,6 +12851,22 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedFloatNullableFilter<$PrismaModel>
+    _min?: NestedFloatNullableFilter<$PrismaModel>
+    _max?: NestedFloatNullableFilter<$PrismaModel>
   }
 
   export type UserCreateWithoutAccountsInput = {
@@ -13036,8 +13316,15 @@ export namespace Prisma {
     imageUrl?: string | null
     description?: string | null
     summary?: string | null
-    updatedAt?: Date | string
+    publicationDate?: string | null
+    publisher?: string | null
+    genres?: BookCreategenresInput | string[]
+    ratings?: number | null
+    numberOfPages?: number | null
     positionInSeries?: number | null
+    characters?: BookCreatecharactersInput | string[]
+    language?: string | null
+    updatedAt?: Date | string
     authors?: AuthorCreateNestedManyWithoutBooksInput
   }
 
@@ -13047,8 +13334,15 @@ export namespace Prisma {
     imageUrl?: string | null
     description?: string | null
     summary?: string | null
-    updatedAt?: Date | string
+    publicationDate?: string | null
+    publisher?: string | null
+    genres?: BookCreategenresInput | string[]
+    ratings?: number | null
+    numberOfPages?: number | null
     positionInSeries?: number | null
+    characters?: BookCreatecharactersInput | string[]
+    language?: string | null
+    updatedAt?: Date | string
     authors?: AuthorUncheckedCreateNestedManyWithoutBooksInput
   }
 
@@ -13087,9 +13381,16 @@ export namespace Prisma {
     imageUrl?: StringNullableFilter<"Book"> | string | null
     description?: StringNullableFilter<"Book"> | string | null
     summary?: StringNullableFilter<"Book"> | string | null
-    updatedAt?: DateTimeFilter<"Book"> | Date | string
+    publicationDate?: StringNullableFilter<"Book"> | string | null
+    publisher?: StringNullableFilter<"Book"> | string | null
+    genres?: StringNullableListFilter<"Book">
+    ratings?: FloatNullableFilter<"Book"> | number | null
+    numberOfPages?: IntNullableFilter<"Book"> | number | null
     positionInSeries?: IntNullableFilter<"Book"> | number | null
+    characters?: StringNullableListFilter<"Book">
+    language?: StringNullableFilter<"Book"> | string | null
     seriesId?: StringNullableFilter<"Book"> | string | null
+    updatedAt?: DateTimeFilter<"Book"> | Date | string
   }
 
   export type BookCreateWithoutAuthorsInput = {
@@ -13098,8 +13399,15 @@ export namespace Prisma {
     imageUrl?: string | null
     description?: string | null
     summary?: string | null
-    updatedAt?: Date | string
+    publicationDate?: string | null
+    publisher?: string | null
+    genres?: BookCreategenresInput | string[]
+    ratings?: number | null
+    numberOfPages?: number | null
     positionInSeries?: number | null
+    characters?: BookCreatecharactersInput | string[]
+    language?: string | null
+    updatedAt?: Date | string
     series?: SeriesCreateNestedOneWithoutBooksInput
   }
 
@@ -13109,9 +13417,16 @@ export namespace Prisma {
     imageUrl?: string | null
     description?: string | null
     summary?: string | null
-    updatedAt?: Date | string
+    publicationDate?: string | null
+    publisher?: string | null
+    genres?: BookCreategenresInput | string[]
+    ratings?: number | null
+    numberOfPages?: number | null
     positionInSeries?: number | null
+    characters?: BookCreatecharactersInput | string[]
+    language?: string | null
     seriesId?: string | null
+    updatedAt?: Date | string
   }
 
   export type BookCreateOrConnectWithoutAuthorsInput = {
@@ -13242,8 +13557,15 @@ export namespace Prisma {
     imageUrl?: string | null
     description?: string | null
     summary?: string | null
-    updatedAt?: Date | string
+    publicationDate?: string | null
+    publisher?: string | null
+    genres?: BookCreategenresInput | string[]
+    ratings?: number | null
+    numberOfPages?: number | null
     positionInSeries?: number | null
+    characters?: BookCreatecharactersInput | string[]
+    language?: string | null
+    updatedAt?: Date | string
   }
 
   export type BookUpdateWithoutSeriesInput = {
@@ -13252,8 +13574,15 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     summary?: NullableStringFieldUpdateOperationsInput | string | null
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    publicationDate?: NullableStringFieldUpdateOperationsInput | string | null
+    publisher?: NullableStringFieldUpdateOperationsInput | string | null
+    genres?: BookUpdategenresInput | string[]
+    ratings?: NullableFloatFieldUpdateOperationsInput | number | null
+    numberOfPages?: NullableIntFieldUpdateOperationsInput | number | null
     positionInSeries?: NullableIntFieldUpdateOperationsInput | number | null
+    characters?: BookUpdatecharactersInput | string[]
+    language?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     authors?: AuthorUpdateManyWithoutBooksNestedInput
   }
 
@@ -13263,8 +13592,15 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     summary?: NullableStringFieldUpdateOperationsInput | string | null
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    publicationDate?: NullableStringFieldUpdateOperationsInput | string | null
+    publisher?: NullableStringFieldUpdateOperationsInput | string | null
+    genres?: BookUpdategenresInput | string[]
+    ratings?: NullableFloatFieldUpdateOperationsInput | number | null
+    numberOfPages?: NullableIntFieldUpdateOperationsInput | number | null
     positionInSeries?: NullableIntFieldUpdateOperationsInput | number | null
+    characters?: BookUpdatecharactersInput | string[]
+    language?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     authors?: AuthorUncheckedUpdateManyWithoutBooksNestedInput
   }
 
@@ -13274,8 +13610,15 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     summary?: NullableStringFieldUpdateOperationsInput | string | null
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    publicationDate?: NullableStringFieldUpdateOperationsInput | string | null
+    publisher?: NullableStringFieldUpdateOperationsInput | string | null
+    genres?: BookUpdategenresInput | string[]
+    ratings?: NullableFloatFieldUpdateOperationsInput | number | null
+    numberOfPages?: NullableIntFieldUpdateOperationsInput | number | null
     positionInSeries?: NullableIntFieldUpdateOperationsInput | number | null
+    characters?: BookUpdatecharactersInput | string[]
+    language?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type BookUpdateWithoutAuthorsInput = {
@@ -13284,8 +13627,15 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     summary?: NullableStringFieldUpdateOperationsInput | string | null
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    publicationDate?: NullableStringFieldUpdateOperationsInput | string | null
+    publisher?: NullableStringFieldUpdateOperationsInput | string | null
+    genres?: BookUpdategenresInput | string[]
+    ratings?: NullableFloatFieldUpdateOperationsInput | number | null
+    numberOfPages?: NullableIntFieldUpdateOperationsInput | number | null
     positionInSeries?: NullableIntFieldUpdateOperationsInput | number | null
+    characters?: BookUpdatecharactersInput | string[]
+    language?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     series?: SeriesUpdateOneWithoutBooksNestedInput
   }
 
@@ -13295,9 +13645,16 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     summary?: NullableStringFieldUpdateOperationsInput | string | null
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    publicationDate?: NullableStringFieldUpdateOperationsInput | string | null
+    publisher?: NullableStringFieldUpdateOperationsInput | string | null
+    genres?: BookUpdategenresInput | string[]
+    ratings?: NullableFloatFieldUpdateOperationsInput | number | null
+    numberOfPages?: NullableIntFieldUpdateOperationsInput | number | null
     positionInSeries?: NullableIntFieldUpdateOperationsInput | number | null
+    characters?: BookUpdatecharactersInput | string[]
+    language?: NullableStringFieldUpdateOperationsInput | string | null
     seriesId?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type BookUncheckedUpdateManyWithoutAuthorsInput = {
@@ -13306,9 +13663,16 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     summary?: NullableStringFieldUpdateOperationsInput | string | null
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    publicationDate?: NullableStringFieldUpdateOperationsInput | string | null
+    publisher?: NullableStringFieldUpdateOperationsInput | string | null
+    genres?: BookUpdategenresInput | string[]
+    ratings?: NullableFloatFieldUpdateOperationsInput | number | null
+    numberOfPages?: NullableIntFieldUpdateOperationsInput | number | null
     positionInSeries?: NullableIntFieldUpdateOperationsInput | number | null
+    characters?: BookUpdatecharactersInput | string[]
+    language?: NullableStringFieldUpdateOperationsInput | string | null
     seriesId?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

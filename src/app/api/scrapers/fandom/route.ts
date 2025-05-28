@@ -25,34 +25,82 @@ interface ScrapedBookData {
   summary?: string;
   publicationDate?: string;
   authors?: string[];
+  publisher?: string;
+  genres?: string[];
+  ratings?: number;
+  numberOfPages?: number;
+  characters?: string[];
+  language?: string;
+}
+
+interface ScrapedSeriesData {
+  seriesTitle: string;
+  books?: ScrapedBookData[];
+}
+
+// Helper function to detect URL type
+function detectUrlType(url: string): 'fandom' | 'goodreads' | null {
+  try {
+    const parsedUrl = new URL(url);
+    const hostname = parsedUrl.hostname.toLowerCase();
+    
+    if (hostname.includes('fandom.com')) {
+      return 'fandom';
+    } else if (hostname.includes('goodreads.com')) {
+      return 'goodreads';
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Invalid URL:', error);
+    return null;
+  }
 }
 
 export async function POST(request: NextRequest) {
   console.log('Fandom scraper API endpoint hit');
   try {
     const body = await request.json();
-    const { fandomUrl } = body;
+    // Accept both 'fandomUrl' (legacy) and 'url' (new) parameters
+    const url = body.url || body.fandomUrl;
 
-    if (!fandomUrl || typeof fandomUrl !== 'string') {
-      return NextResponse.json({ error: 'Missing or invalid fandomUrl' }, { status: 400 });
+    if (!url || typeof url !== 'string') {
+      return NextResponse.json({ error: 'Missing or invalid URL' }, { status: 400 });
     }
 
-    console.log(`Scraping URL: ${fandomUrl}`);
+    // Determine the URL type to use the appropriate scraper
+    const urlType = detectUrlType(url);
+    if (!urlType) {
+      return NextResponse.json({ error: 'Unsupported URL type. Currently supports: Fandom, Goodreads' }, { status: 400 });
+    }
+
+    console.log(`Scraping URL: ${url} (type: ${urlType})`);
+    
+    let scraperScriptPath;
+    if (urlType === 'fandom') {
+      // Path to Fandom scraper
+      scraperScriptPath = path.resolve(process.cwd(), 'src/lib/scrapers/Fandom-Scraper/scraper.js');
+    } else if (urlType === 'goodreads') {
+      // Path to Goodreads scraper
+      scraperScriptPath = path.resolve(process.cwd(), 'src/lib/scrapers/Goodreads-Scraper/scraper.js');
+    } else {
+      return NextResponse.json({ error: 'Unsupported URL type' }, { status: 400 });
+    }
+    
     console.log(`Executing scraper script at: ${scraperScriptPath}`);
 
-    // Ensure the Fandom-Scraper submodule has its dependencies installed.
-    // This is a simplified approach; in production, you'd ensure this during a build/deploy step.
+    // Ensure the scraper submodule has its dependencies installed.
     try {
-      console.log('Ensuring Fandom-Scraper dependencies...');
+      console.log(`Ensuring ${urlType} scraper dependencies...`);
       await execAsync('npm install', { cwd: path.dirname(scraperScriptPath) });
-      console.log('Fandom-Scraper dependencies are ready.');
+      console.log(`${urlType} scraper dependencies are ready.`);
     } catch (depError) {
-      console.error('Error installing Fandom-Scraper dependencies:', depError);
-      return NextResponse.json({ error: 'Failed to prepare scraper dependencies', details: depError instanceof Error ? depError.message : String(depError) }, { status: 500 });
+      console.error(`Error installing ${urlType} scraper dependencies:`, depError);
+      return NextResponse.json({ error: `Failed to prepare ${urlType} scraper dependencies`, details: depError instanceof Error ? depError.message : String(depError) }, { status: 500 });
     }
 
     // Execute the scraper script
-    const { stdout, stderr } = await execAsync(`node ${scraperScriptPath} "${fandomUrl}"`);
+    const { stdout, stderr } = await execAsync(`node ${scraperScriptPath} "${url}"`);
 
     if (stderr) {
       console.error('Error output from scraper:', stderr);
@@ -69,18 +117,66 @@ export async function POST(request: NextRequest) {
 
     try {
       // Parse the JSON output from the scraper
-      const scrapedData: FandomScraperOutput = JSON.parse(stdout);
+      const scrapedData = JSON.parse(stdout);
       
-      // Map the Fandom scraper output to our expected format
-      const bookData: ScrapedBookData = {
-        title: scrapedData.title || 'Untitled Book',
-        imageUrl: scrapedData.cover_image_url,
-        summary: scrapedData.plot_summary,
-        publicationDate: scrapedData.publication_date,
-        authors: scrapedData.author ? [scrapedData.author] : undefined
-      };
+      // Transform the data based on which scraper was used
+      let transformedData;
       
-      return NextResponse.json(bookData, { status: 200 });
+      if (urlType === 'fandom') {
+        // Map the Fandom scraper output to our expected format
+        transformedData = {
+          title: scrapedData.title || 'Untitled Book',
+          imageUrl: scrapedData.cover_image_url,
+          summary: scrapedData.plot_summary,
+          publicationDate: scrapedData.publication_date,
+          authors: scrapedData.author ? [scrapedData.author] : undefined,
+          publisher: scrapedData.publisher,
+          genres: scrapedData.genres,
+          ratings: scrapedData.ratings,
+          numberOfPages: scrapedData.numberOfPages,
+          characters: scrapedData.characters,
+          language: scrapedData.language
+        };
+      } else if (urlType === 'goodreads') {
+        // Goodreads data is already in the expected format or needs different transformation
+        if (scrapedData.bookName) {
+          transformedData = {
+            title: scrapedData.bookName,
+            imageUrl: scrapedData.imageUrl,
+            summary: scrapedData.bookSummary,
+            publicationDate: scrapedData.publicationDate,
+            authors: scrapedData.authors,
+            publisher: scrapedData.publisher,
+            genres: scrapedData.genres,
+            ratings: scrapedData.ratings,
+            numberOfPages: scrapedData.numberOfPages,
+            characters: scrapedData.characters,
+            language: scrapedData.language
+          };
+        } else if (scrapedData.seriesName) {
+          // Handle series data if needed
+          transformedData = {
+            seriesTitle: scrapedData.seriesName,
+            books: scrapedData.books?.map((book: any) => ({
+              title: book.bookName,
+              imageUrl: book.imageUrl,
+              summary: book.bookSummary,
+              publicationDate: book.publicationDate,
+              authors: book.authors,
+              publisher: book.publisher,
+              genres: book.genres,
+              ratings: book.ratings,
+              numberOfPages: book.numberOfPages,
+              characters: book.characters,
+              language: book.language
+            }))
+          };
+        } else {
+          transformedData = scrapedData; // Use as-is if structure is unknown
+        }
+      }
+      
+      return NextResponse.json(transformedData, { status: 200 });
     } catch (parseError) {
       console.error('Failed to parse scraper output:', parseError);
       console.error('Raw stdout:', stdout);
@@ -91,8 +187,8 @@ export async function POST(request: NextRequest) {
       }, { status: 500 });
     }
   } catch (error) {
-    console.error('Error in Fandom scraper API:', error);
-    let errorMessage = 'Failed to scrape Fandom URL.';
+    console.error('Error in scraper API:', error);
+    let errorMessage = 'Failed to scrape URL.';
     if (error instanceof SyntaxError) {
       errorMessage = 'Failed to parse scraped data (not valid JSON). Check scraper output.';
     } else if (error instanceof Error) {
