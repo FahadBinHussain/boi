@@ -29,6 +29,7 @@ interface SeriesThumbnail {
   publisher?: string;
   genres?: string[];
   ratings?: number;
+  averageRating?: number;
   numberOfPages?: number;
   characters?: string[];
   language?: string;
@@ -73,6 +74,7 @@ interface ScrapedBookData {
   publisher?: string;
   genres?: string[];
   ratings?: number;
+  averageRating?: number;
   numberOfPages?: number;
   characters?: string[];
   language?: string;
@@ -113,6 +115,13 @@ export default function AddNewBook() {
   const [thumbnailPreview, setThumbnailPreview] = useState(""); // Used for single book mode
   const [bookPdfFile, setBookPdfFile] = useState<File | null>(null); // For single book PDF
   const [summary, setSummary] = useState("");  // Add this after line 65 with other single book state
+  const [publisher, setPublisher] = useState(""); // For single book publisher
+  const [genres, setGenres] = useState<string[]>([]); // For single book genres
+  const [ratings, setRatings] = useState<number | undefined>(undefined); // For single book ratings
+  const [averageRating, setAverageRating] = useState<number | undefined>(undefined); // For single book average rating
+  const [numberOfPages, setNumberOfPages] = useState<number | undefined>(undefined); // For single book page count
+  const [characters, setCharacters] = useState<string[]>([]); // For single book characters
+  const [language, setLanguage] = useState(""); // For single book language
   
   // Use user's preferred date format from settings or default to year-only
   const [isYearOnly, setIsYearOnly] = useState(true);
@@ -197,6 +206,7 @@ export default function AddNewBook() {
           publisher: existingThumbnail?.publisher,
           genres: existingThumbnail?.genres,
           ratings: existingThumbnail?.ratings,
+          averageRating: existingThumbnail?.averageRating,
           numberOfPages: existingThumbnail?.numberOfPages,
           characters: existingThumbnail?.characters,
           language: existingThumbnail?.language,
@@ -596,6 +606,28 @@ export default function AddNewBook() {
         // Include summary for single book
         formData.append("summary", summary || '');
         
+        // Include additional fields
+        formData.append("publisher", publisher || '');
+        formData.append("language", language || '');
+        
+        if (numberOfPages !== undefined) {
+          formData.append("numberOfPages", numberOfPages.toString());
+        }
+        
+        if (ratings !== undefined) {
+          formData.append("ratings", ratings.toString());
+        }
+        
+        if (averageRating !== undefined) {
+          formData.append("averageRating", averageRating.toString());
+        }
+        
+        // Add genres as a JSON string
+        formData.append("genres", JSON.stringify(genres));
+        
+        // Add characters as a JSON string
+        formData.append("characters", JSON.stringify(characters));
+        
         if (bookPdfFile) {
           formData.append("pdf", bookPdfFile);
         }
@@ -866,9 +898,10 @@ The PDF will be uploaded again during the final form submission.`);
                 isLoading: false,
                 errorMessage: undefined,
                 successMessage: undefined,
-                publisher: book.authors ? book.authors[0] : '',
-                genres: book.authors ? book.authors.slice(1) : [],
+                publisher: book.publisher || '',
+                genres: book.genres || [],
                 ratings: book.ratings,
+                averageRating: book.averageRating,
                 numberOfPages: book.numberOfPages,
                 characters: book.characters,
                 language: book.language,
@@ -918,6 +951,35 @@ The PDF will be uploaded again during the final form submission.`);
         if (data.authors && Array.isArray(data.authors) && data.authors.length > 0) {
           const newAuthors = data.authors.map((authorName: string) => ({ name: authorName }));
           setAuthors(newAuthors);
+        }
+        
+        // Populate additional fields
+        if (data.publisher) {
+          setPublisher(data.publisher);
+        }
+        
+        if (data.genres && Array.isArray(data.genres)) {
+          setGenres(data.genres);
+        }
+        
+        if (data.ratings !== undefined) {
+          setRatings(data.ratings);
+        }
+        
+        if (data.averageRating !== undefined) {
+          setAverageRating(data.averageRating);
+        }
+        
+        if (data.numberOfPages !== undefined) {
+          setNumberOfPages(data.numberOfPages);
+        }
+        
+        if (data.characters && Array.isArray(data.characters)) {
+          setCharacters(data.characters);
+        }
+        
+        if (data.language) {
+          setLanguage(data.language);
         }
       }
     }
@@ -1035,6 +1097,7 @@ The PDF will be uploaded again during the final form submission.`);
               publisher: data.publisher || updated[index].publisher,
               genres: data.genres || updated[index].genres,
               ratings: data.ratings || updated[index].ratings,
+              averageRating: data.averageRating || updated[index].averageRating,
               numberOfPages: data.numberOfPages || updated[index].numberOfPages,
               characters: data.characters || updated[index].characters,
               language: data.language || updated[index].language,
@@ -1073,6 +1136,7 @@ The PDF will be uploaded again during the final form submission.`);
                 publisher: bookData.publisher || updated[index].publisher,
                 genres: bookData.genres || updated[index].genres,
                 ratings: bookData.ratings || updated[index].ratings,
+                averageRating: bookData.averageRating || updated[index].averageRating,
                 numberOfPages: bookData.numberOfPages || updated[index].numberOfPages,
                 characters: bookData.characters || updated[index].characters,
                 language: bookData.language || updated[index].language,
@@ -1539,6 +1603,31 @@ The PDF will be uploaded again during the final form submission.`);
                                 />
                               </div>
                               
+                              {/* Average Rating */}
+                              <div className="mb-4">
+                                <label className="block text-sm font-medium text-gray-600 mb-1">
+                                  Average Rating
+                                </label>
+                                <input
+                                  type="number"
+                                  step="0.01"
+                                  min="0"
+                                  max="5"
+                                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                  placeholder="Average Rating (0-5)"
+                                  value={thumbnailIndex !== -1 && seriesThumbnails[thumbnailIndex].averageRating ? seriesThumbnails[thumbnailIndex].averageRating : ""}
+                                  onChange={(e) => {
+                                    if (thumbnailIndex !== -1) {
+                                      setSeriesThumbnails(prev => 
+                                        prev.map((thumbnail, i) => 
+                                          i === thumbnailIndex ? { ...thumbnail, averageRating: parseFloat(e.target.value) || undefined } : thumbnail
+                                        )
+                                      );
+                                    }
+                                  }}
+                                />
+                              </div>
+                              
                               {/* Language */}
                               <div className="mb-4">
                                 <label className="block text-sm font-medium text-gray-600 mb-1">
@@ -1763,6 +1852,128 @@ The PDF will be uploaded again during the final form submission.`);
               {formErrors.summary && (
                 <p className="mt-1 text-sm text-red-500">{formErrors.summary}</p>
               )}
+            </div>
+          )}
+
+          {/* Additional fields for single book */}
+          {!isSeries && (
+            <div className="form-field">
+              <h3 className="mb-3 text-sm font-medium text-gray-700">Additional Book Details</h3>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {/* Publisher */}
+                <div className="mb-4">
+                  <label htmlFor="publisher" className="block text-sm font-medium text-gray-600 mb-1">
+                    Publisher
+                  </label>
+                  <input
+                    type="text"
+                    id="publisher"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    placeholder="Publisher name"
+                    value={publisher}
+                    onChange={(e) => setPublisher(e.target.value)}
+                  />
+                </div>
+                
+                {/* Language */}
+                <div className="mb-4">
+                  <label htmlFor="language" className="block text-sm font-medium text-gray-600 mb-1">
+                    Language
+                  </label>
+                  <input
+                    type="text"
+                    id="language"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    placeholder="Language"
+                    value={language}
+                    onChange={(e) => setLanguage(e.target.value)}
+                  />
+                </div>
+                
+                {/* Number of Pages */}
+                <div className="mb-4">
+                  <label htmlFor="numberOfPages" className="block text-sm font-medium text-gray-600 mb-1">
+                    Number of Pages
+                  </label>
+                  <input
+                    type="number"
+                    id="numberOfPages"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    placeholder="Number of pages"
+                    value={numberOfPages || ""}
+                    onChange={(e) => setNumberOfPages(parseInt(e.target.value) || undefined)}
+                  />
+                </div>
+                
+                {/* Ratings */}
+                <div className="mb-4">
+                  <label htmlFor="ratings" className="block text-sm font-medium text-gray-600 mb-1">
+                    Ratings
+                  </label>
+                  <input
+                    type="number"
+                    id="ratings"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    placeholder="Number of ratings"
+                    value={ratings || ""}
+                    onChange={(e) => setRatings(parseInt(e.target.value) || undefined)}
+                  />
+                </div>
+                
+                {/* Average Rating */}
+                <div className="mb-4">
+                  <label htmlFor="averageRating" className="block text-sm font-medium text-gray-600 mb-1">
+                    Average Rating
+                  </label>
+                  <input
+                    type="number"
+                    id="averageRating"
+                    step="0.01"
+                    min="0"
+                    max="5"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    placeholder="Average Rating (0-5)"
+                    value={averageRating || ""}
+                    onChange={(e) => setAverageRating(parseFloat(e.target.value) || undefined)}
+                  />
+                </div>
+                
+                {/* Genres - as a comma-separated input */}
+                <div className="mb-4 col-span-2">
+                  <label htmlFor="genres" className="block text-sm font-medium text-gray-600 mb-1">
+                    Genres (comma separated)
+                  </label>
+                  <input
+                    type="text"
+                    id="genres"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    placeholder="Fantasy, Adventure, Mystery"
+                    value={genres.join(", ")}
+                    onChange={(e) => {
+                      const genresArray = e.target.value.split(",").map(genre => genre.trim()).filter(genre => genre !== "");
+                      setGenres(genresArray);
+                    }}
+                  />
+                </div>
+                
+                {/* Characters - as a comma-separated input */}
+                <div className="mb-4 col-span-2">
+                  <label htmlFor="characters" className="block text-sm font-medium text-gray-600 mb-1">
+                    Characters (comma separated)
+                  </label>
+                  <input
+                    type="text"
+                    id="characters"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    placeholder="Harry Potter, Hermione Granger, Ron Weasley"
+                    value={characters.join(", ")}
+                    onChange={(e) => {
+                      const charactersArray = e.target.value.split(",").map(character => character.trim()).filter(character => character !== "");
+                      setCharacters(charactersArray);
+                    }}
+                  />
+                </div>
+              </div>
             </div>
           )}
 

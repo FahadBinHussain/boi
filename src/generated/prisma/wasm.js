@@ -176,6 +176,7 @@ exports.Prisma.BookScalarFieldEnum = {
   publisher: 'publisher',
   genres: 'genres',
   ratings: 'ratings',
+  averageRating: 'averageRating',
   numberOfPages: 'numberOfPages',
   positionInSeries: 'positionInSeries',
   characters: 'characters',

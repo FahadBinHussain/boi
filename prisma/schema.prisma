@@ -76,6 +76,7 @@ model Book {
   publisher   String?
   genres      String[]
   ratings     Float?
+  averageRating Float?
   numberOfPages Int?
   positionInSeries Int?
   characters  String[]
