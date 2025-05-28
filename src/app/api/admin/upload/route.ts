@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
-import { getApiKey } from '@/app/api/admin/settings/api-keys/route';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
@@ -94,7 +93,13 @@ export async function POST(req: NextRequest) {
         console.log('Using hardcoded API key for testing');
         apiKey = HARDCODED_API_KEY;
       } else {
-        apiKey = await getApiKey(adminUser.id, 'files_vc');
+        // Get API key from UserSettings
+        const userSettings = await prisma.userSettings.findUnique({
+          where: { userId: adminUser.id },
+          select: { filesVcApiKey: true }
+        });
+        
+        apiKey = userSettings?.filesVcApiKey;
       }
     } catch (error) {
       console.error(`API key retrieval error for admin ${adminUser.id}:`, error);

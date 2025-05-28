@@ -33,12 +33,17 @@ interface SeriesThumbnail {
   numberOfPages?: number;
   characters?: string[];
   language?: string;
+  uploadProgress?: number; // Add upload progress field
+  pdfUrl?: string; // Add PDF URL field after successful upload
 }
 
 // Interface for book PDF files in a series
 interface SeriesBookPdf {
   bookNumber: number;
   file: File | null;
+  isUploading?: boolean; // Add upload status
+  uploadProgress?: number; // Add upload progress
+  pdfUrl?: string; // Add URL after successful upload
 }
 
 // Add these interface definitions at the top of the file with the other interfaces
@@ -99,7 +104,7 @@ export default function AddNewBook() {
     publicationDate?: string;
     seriesStart?: string;
     seriesEnd?: string;
-    seriesThumbnails?: string;
+    seriesThumbnails?: string; // For general series thumbnail errors
     bookPdf?: string; // For single book PDF error
     seriesBookPdfs?: string; // For series PDF errors
     summary?: string; // Add this for summary field errors
@@ -144,6 +149,12 @@ export default function AddNewBook() {
 
   // Update the state to track the active book tab
   const [activeBookTab, setActiveBookTab] = useState<number>(0);
+
+  // Add these state variables for single book upload
+  const [singleBookUploadProgress, setSingleBookUploadProgress] = useState<number | null>(null);
+  const [singleBookUploadStatus, setSingleBookUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
+  const [singleBookPdfUrl, setSingleBookPdfUrl] = useState<string | null>(null);
+  const [singleBookUploadError, setSingleBookUploadError] = useState<string | null>(null);
 
   // Load user settings when component mounts
   useEffect(() => {
@@ -210,10 +221,15 @@ export default function AddNewBook() {
           numberOfPages: existingThumbnail?.numberOfPages,
           characters: existingThumbnail?.characters,
           language: existingThumbnail?.language,
+          uploadProgress: existingThumbnail?.uploadProgress, // Add upload progress
+          pdfUrl: existingThumbnail?.pdfUrl, // Add PDF URL
         });
         newBookPdfs.push({
           bookNumber: bookNumber,
           file: existingPdf?.file || null,
+          isUploading: existingPdf?.isUploading, // Add upload status
+          uploadProgress: existingPdf?.uploadProgress, // Add upload progress
+          pdfUrl: existingPdf?.pdfUrl, // Add URL after successful upload
         });
         newApprovedBooks.push({
           bookNumber: bookNumber,
@@ -284,20 +300,248 @@ export default function AddNewBook() {
   };
 
   const handleSingleBookPdfChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      setBookPdfFile(event.target.files[0]);
+    const file = event.target.files && event.target.files[0] ? event.target.files[0] : null;
+    setBookPdfFile(file);
+    
+    // If file is selected, start upload immediately
+    if (file) {
+      uploadSingleBookWithProgress(file);
     } else {
-      setBookPdfFile(null);
+      // Reset upload state if no file is selected
+      setSingleBookUploadProgress(null);
+      setSingleBookUploadStatus('idle');
+      setSingleBookPdfUrl(null);
+      setSingleBookUploadError(null);
     }
+  };
+
+  // Function to upload single book PDF with progress tracking
+  const uploadSingleBookWithProgress = async (file: File) => {
+    try {
+      // Set upload status to uploading
+      setSingleBookUploadStatus('uploading');
+      setSingleBookUploadProgress(0);
+      setSingleBookUploadError(null);
+      
+      // Create FormData
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      // Use XMLHttpRequest for progress tracking
+      const xhr = new XMLHttpRequest();
+      
+      // Track upload progress
+      xhr.upload.addEventListener('progress', (event) => {
+        if (event.lengthComputable) {
+          const progress = Math.round((event.loaded / event.total) * 100);
+          setSingleBookUploadProgress(progress);
+        }
+      });
+      
+      // Handle completion
+      xhr.addEventListener('load', () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          // Success
+          try {
+            const response = JSON.parse(xhr.responseText);
+            
+            if (response.success && response.fileData && response.fileData.url) {
+              setSingleBookUploadStatus('success');
+              setSingleBookPdfUrl(response.fileData.url);
+              showNotification('success', 'File uploaded successfully!');
+            } else {
+              handleSingleBookUploadError('Upload failed: Invalid response from server');
+            }
+          } catch (parseError) {
+            handleSingleBookUploadError('Upload failed: Could not parse server response');
+          }
+        } else {
+          // HTTP error
+          handleSingleBookUploadError(`Upload failed with status ${xhr.status}`);
+        }
+      });
+      
+      // Handle network errors
+      xhr.addEventListener('error', () => {
+        handleSingleBookUploadError('Network error during upload');
+      });
+      
+      // Handle aborted uploads
+      xhr.addEventListener('abort', () => {
+        handleSingleBookUploadError('Upload was aborted');
+      });
+      
+      // Open and send the request
+      xhr.open('POST', '/api/admin/upload', true);
+      xhr.send(formData);
+      
+    } catch (error) {
+      handleSingleBookUploadError('Error preparing upload');
+      console.error('Error uploading file:', error);
+    }
+  };
+  
+  // Helper function to handle single book upload errors
+  const handleSingleBookUploadError = (errorMessage: string) => {
+    setSingleBookUploadStatus('error');
+    setSingleBookUploadError(errorMessage);
+    showNotification('error', `Upload failed: ${errorMessage}`);
   };
 
   const handleSeriesBookPdfChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files && event.target.files[0] ? event.target.files[0] : null;
+    
+    // First update the PDF file in state
+    setSeriesBookPdfs(prev => {
+      const updated = prev.map((pdfItem, i) => 
+        i === index ? { 
+          ...pdfItem, 
+          file,
+          isUploading: !!file,
+          uploadProgress: file ? 0 : undefined,
+          pdfUrl: undefined // Reset URL when new file is selected
+        } : pdfItem
+      );
+      
+      // If we have a file, start the upload immediately
+      if (file) {
+        // Get the book number for this index
+        const bookNumber = updated[index].bookNumber;
+        
+        // Start upload in the background
+        uploadFileWithProgress(file, index, bookNumber);
+      }
+      
+      return updated;
+    });
+  };
+
+  // New function to upload files with progress tracking
+  const uploadFileWithProgress = async (file: File, index: number, bookNumber: number) => {
+    try {
+      // Create FormData
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      // Update the thumbnail to show loading state
+      setSeriesThumbnails(prev => 
+        prev.map((thumbnail, i) => 
+          thumbnail.bookNumber === bookNumber ? { 
+            ...thumbnail, 
+            isLoading: true,
+            errorMessage: undefined,
+            successMessage: undefined,
+            uploadProgress: 0
+          } : thumbnail
+        )
+      );
+      
+      // Use XMLHttpRequest for progress tracking
+      const xhr = new XMLHttpRequest();
+      
+      // Track upload progress
+      xhr.upload.addEventListener('progress', (event) => {
+        if (event.lengthComputable) {
+          const progress = Math.round((event.loaded / event.total) * 100);
+          
+          // Update progress in both states
+          setSeriesBookPdfs(prev => 
+            prev.map((pdf) => 
+              pdf.bookNumber === bookNumber ? { ...pdf, uploadProgress: progress } : pdf
+            )
+          );
+          
+          setSeriesThumbnails(prev => 
+            prev.map((thumbnail) => 
+              thumbnail.bookNumber === bookNumber ? { ...thumbnail, uploadProgress: progress } : thumbnail
+            )
+          );
+        }
+      });
+      
+      // Handle completion
+      xhr.addEventListener('load', () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          // Success
+          try {
+            const response = JSON.parse(xhr.responseText);
+            
+            if (response.success && response.fileData && response.fileData.url) {
+              // Update PDF URL in both states
+              setSeriesBookPdfs(prev => 
+                prev.map((pdf) => 
+                  pdf.bookNumber === bookNumber ? { 
+                    ...pdf, 
+                    isUploading: false,
+                    pdfUrl: response.fileData.url 
+                  } : pdf
+                )
+              );
+              
+              setSeriesThumbnails(prev => 
+                prev.map((thumbnail) => 
+                  thumbnail.bookNumber === bookNumber ? { 
+                    ...thumbnail, 
+                    isLoading: false,
+                    successMessage: 'Upload successful!',
+                    pdfUrl: response.fileData.url
+                  } : thumbnail
+                )
+              );
+              
+              // Show success notification
+              showNotification('success', `File for book ${getFormattedSeriesNumber(bookNumber)} uploaded successfully!`);
+            } else {
+              handleUploadError(bookNumber, 'Upload failed: Invalid response from server');
+            }
+          } catch (parseError) {
+            handleUploadError(bookNumber, 'Upload failed: Could not parse server response');
+          }
+        } else {
+          // HTTP error
+          handleUploadError(bookNumber, `Upload failed with status ${xhr.status}`);
+        }
+      });
+      
+      // Handle network errors
+      xhr.addEventListener('error', () => {
+        handleUploadError(bookNumber, 'Network error during upload');
+      });
+      
+      // Handle aborted uploads
+      xhr.addEventListener('abort', () => {
+        handleUploadError(bookNumber, 'Upload was aborted');
+      });
+      
+      // Open and send the request
+      xhr.open('POST', '/api/admin/upload', true);
+      xhr.send(formData);
+      
+    } catch (error) {
+      handleUploadError(bookNumber, 'Error preparing upload');
+      console.error('Error uploading file:', error);
+    }
+  };
+
+  // Helper function to handle upload errors
+  const handleUploadError = (bookNumber: number, errorMessage: string) => {
     setSeriesBookPdfs(prev => 
-      prev.map((pdfItem, i) => 
-        i === index ? { ...pdfItem, file } : pdfItem
+      prev.map((pdf) => 
+        pdf.bookNumber === bookNumber ? { ...pdf, isUploading: false } : pdf
       )
     );
+    
+    setSeriesThumbnails(prev => 
+      prev.map((thumbnail) => 
+        thumbnail.bookNumber === bookNumber ? { 
+          ...thumbnail, 
+          isLoading: false,
+          errorMessage: errorMessage
+        } : thumbnail
+      )
+    );
+    
+    showNotification('error', `Upload failed for book ${getFormattedSeriesNumber(bookNumber)}: ${errorMessage}`);
   };
 
   // GSAP animations
@@ -450,86 +694,86 @@ export default function AddNewBook() {
     const errors: {
       bookName?: string;
       authors?: string;
-      thumbnailUrl?: string; // For single book thumbnail error
+      thumbnailUrl?: string;
       publicationDate?: string;
       seriesStart?: string;
       seriesEnd?: string;
-      seriesThumbnails?: string; // For general series thumbnail errors
+      seriesThumbnails?: string;
       bookPdf?: string; // For single book PDF error
       seriesBookPdfs?: string; // For series PDF errors
-      seriesBookNames?: string;
+      summary?: string; // Add this for summary field errors
+      seriesBookNames?: string; // Add this for custom book name errors
+      metadataUrl?: string;
     } = {};
-
-    const urlPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/;
-
+    
+    // Validate authors
+    if (authors.length === 0 || authors.some(author => !author.name.trim())) {
+      errors.authors = "Please add at least one author with a name";
+    }
+    
     if (!isSeries) {
       // Single book validation
       if (!bookName.trim()) {
         errors.bookName = "Book name is required";
       }
-      if (thumbnailUrl && !urlPattern.test(thumbnailUrl)) { // Validate single thumbnail URL
-        errors.thumbnailUrl = "Please enter a valid URL for the thumbnail";
+      
+      if (!thumbnailUrl.trim()) {
+        errors.thumbnailUrl = "Thumbnail URL is required";
       }
-      // Validate single book publication date
-      if (!publicationDate) {
+      
+      if (!publicationDate.trim()) {
         errors.publicationDate = "Publication date is required";
+      }
+      
+      // Only require PDF if it's not already uploaded
+      if (!bookPdfFile && !singleBookPdfUrl) {
+        errors.bookPdf = "Please select a PDF file for the book";
       }
     } else {
       // Series validation
-      if (!useDifferentNames && !seriesBaseName.trim()) {
+      if (!seriesBaseName.trim()) {
         errors.bookName = "Series base name is required";
       }
       
-      if (seriesStart <= 0) {
-        errors.seriesStart = "Start number must be greater than 0.";
-      }
-      if (seriesStart > seriesEnd) {
-        errors.seriesStart = "Start number must be less than or equal to end number";
+      if (seriesStart < 1) {
+        errors.seriesStart = "Series start must be at least 1";
       }
       
-      if (seriesEnd - seriesStart + 1 > 1000) { // Max 1000 books
-        errors.seriesEnd = "Series is too large. Please create series with at most 1000 books at once.";
-      }
-
-      // Validate series thumbnails
-      const invalidThumbnails = seriesThumbnails.some(thumb => thumb.url.trim() !== "" && !urlPattern.test(thumb.url));
-      if (invalidThumbnails) {
-        errors.seriesThumbnails = "One or more thumbnail URLs are invalid. Please check each one.";
+      if (seriesEnd < seriesStart) {
+        errors.seriesEnd = "Series end must be greater than or equal to series start";
       }
       
-      // Validate publication dates in series
-      const invalidDates = seriesThumbnails.some(thumb => {
-        if (!thumb.publicationDate) return true;
-        
-        if (thumb.isYearOnly) {
-          return !/^\d{4}$/.test(thumb.publicationDate);
-        } else {
-          return !/^\d{4}-\d{2}-\d{2}$/.test(thumb.publicationDate);
+      // Check if all thumbnails have URLs
+      const missingThumbnails = seriesThumbnails.filter(t => !t.url.trim());
+      if (missingThumbnails.length > 0) {
+        errors.seriesThumbnails = `Missing thumbnail URLs for ${missingThumbnails.length} book(s)`;
+      }
+      
+      // Check if all books have publication dates
+      const missingDates = seriesThumbnails.filter(t => !t.publicationDate.trim());
+      if (missingDates.length > 0) {
+        errors.publicationDate = `Missing publication dates for ${missingDates.length} book(s)`;
+      }
+      
+      // Check if all books have custom names when using different names
+      if (useDifferentNames) {
+        const missingNames = seriesThumbnails.filter(t => !t.customName?.trim());
+        if (missingNames.length > 0) {
+          errors.seriesBookNames = `Missing custom names for ${missingNames.length} book(s)`;
         }
+      }
+      
+      // Check if all books have PDFs (either file or URL)
+      const missingPdfs = seriesThumbnails.filter(t => {
+        const pdfData = seriesBookPdfs.find(p => p.bookNumber === t.bookNumber);
+        return !pdfData?.file && !pdfData?.pdfUrl;
       });
       
-      if (invalidDates) {
-        errors.seriesThumbnails = "One or more publication dates are invalid. Please check each one.";
-      }
-
-      // Validate custom book names when in different names mode
-      if (useDifferentNames) {
-        const emptyNames = seriesThumbnails.some(thumb => !thumb.customName?.trim());
-        if (emptyNames) {
-          errors.seriesBookNames = "All book names are required";
-        }
+      if (missingPdfs.length > 0) {
+        errors.seriesBookPdfs = `Missing PDF files for ${missingPdfs.length} book(s)`;
       }
     }
-
-    const hasEmptyAuthor = authors.some(author => !author.name.trim());
-    if (hasEmptyAuthor) {
-      errors.authors = "All author fields must be filled";
-    }
-
-    if (!isSeries && !publicationDate) {
-      errors.publicationDate = "Publication date is required";
-    }
-
+    
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -538,39 +782,68 @@ export default function AddNewBook() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validate form
     if (!validateForm()) {
-      console.error("Form validation failed");
-      showNotification('error', 'Please fix the errors in the form before submitting.');
       return;
     }
     
     setIsSubmitting(true);
     
     try {
-      // Prepare form data
       const formData = new FormData();
       
-      if (isSeries) {
-        // Adding series metadata
-        formData.append("seriesName", seriesBaseName);
-        formData.append("bookCount", getTotalBooksInSeries().toString());
-        formData.append("seriesStart", seriesStart.toString());
-        formData.append("seriesEnd", seriesEnd.toString());
-        formData.append("useDifferentNames", useDifferentNames.toString());
+      // Common fields for both single book and series
+      for (const author of authors) {
+        formData.append('authors', author.name);
+      }
+      
+      // Add isSeries flag
+      formData.append('isSeries', isSeries.toString());
+      
+      if (!isSeries) {
+        // Single book mode
+        formData.append('bookName', bookName);
+        formData.append('thumbnailUrl', thumbnailUrl);
+        formData.append('publicationDate', publicationDate);
+        formData.append('isYearOnly', isYearOnly.toString());
+        formData.append('summary', summary);
         
-        // Add authors information
-        formData.append("authorsCount", authors.length.toString());
-        authors.forEach((author, index) => {
-          formData.append(`author_${index}`, author.name);
-        });
+        // Add publisher and other metadata if available
+        if (publisher) formData.append('publisher', publisher);
+        if (genres.length > 0) formData.append('genres', JSON.stringify(genres));
+        if (ratings !== undefined) formData.append('ratings', ratings.toString());
+        if (averageRating !== undefined) formData.append('averageRating', averageRating.toString());
+        if (numberOfPages !== undefined) formData.append('numberOfPages', numberOfPages.toString());
+        if (characters.length > 0) formData.append('characters', JSON.stringify(characters));
+        if (language) formData.append('language', language);
+        
+        // For single book mode, use the already uploaded PDF URL if available
+        if (singleBookPdfUrl) {
+          formData.append('pdfUrl', singleBookPdfUrl);
+        } 
+        // Otherwise, attach the PDF file directly if we have one
+        else if (bookPdfFile) {
+          formData.append('pdf', bookPdfFile);
+        }
+      } else {
+        // Series mode
+        formData.append('seriesName', seriesBaseName);
+        formData.append('seriesStart', seriesStart.toString());
+        formData.append('seriesEnd', seriesEnd.toString());
+        formData.append('useDifferentNames', useDifferentNames.toString());
         
         // Add each book's information
         for (let i = 0; i < seriesThumbnails.length; i++) {
           const book = seriesThumbnails[i];
-          const pdfFile = seriesBookPdfs.find(p => p.bookNumber === book.bookNumber)?.file;
+          const pdfData = seriesBookPdfs.find(p => p.bookNumber === book.bookNumber);
           
-          if (pdfFile) {
-            formData.append(`pdf_${book.bookNumber}`, pdfFile);
+          // Use the already uploaded PDF URL if available
+          if (pdfData?.pdfUrl) {
+            formData.append(`pdfUrl_${book.bookNumber}`, pdfData.pdfUrl);
+          }
+          // Otherwise, attach the PDF file directly if we have one
+          else if (pdfData?.file) {
+            formData.append(`pdf_${book.bookNumber}`, pdfData.file);
           }
           
           // Add seriesName (base name) for all books in the series
@@ -588,59 +861,6 @@ export default function AddNewBook() {
           formData.append(`publicationDate_${book.bookNumber}`, book.publicationDate);
           formData.append(`isYearOnly_${book.bookNumber}`, book.isYearOnly.toString());
           formData.append(`summary_${book.bookNumber}`, book.summary || '');
-        }
-      } else {
-        // Single book details
-        formData.append("bookName", bookName);
-        
-        // Add authors information
-        formData.append("authorsCount", authors.length.toString());
-        authors.forEach((author, index) => {
-          formData.append(`author_${index}`, author.name);
-        });
-        
-        formData.append("thumbnailUrl", thumbnailUrl);
-        formData.append("publicationDate", publicationDate);
-        formData.append("isYearOnly", isYearOnly.toString());
-        
-        // Include summary for single book
-        formData.append("summary", summary || '');
-        
-        // Include additional fields
-        formData.append("publisher", publisher || '');
-        formData.append("language", language || '');
-        
-        if (numberOfPages !== undefined) {
-          formData.append("numberOfPages", numberOfPages.toString());
-        }
-        
-        if (ratings !== undefined) {
-          formData.append("ratings", ratings.toString());
-        }
-        
-        if (averageRating !== undefined) {
-          formData.append("averageRating", averageRating.toString());
-        }
-        
-        // Add genres as a JSON string
-        formData.append("genres", JSON.stringify(genres));
-        
-        // Add characters as a JSON string
-        formData.append("characters", JSON.stringify(characters));
-        
-        if (bookPdfFile) {
-          formData.append("pdf", bookPdfFile);
-        }
-      }
-      
-      // Add log to see form data before submission
-      console.log("Form submission data:");
-      for (const [key, value] of formData.entries()) {
-        // Don't log the actual PDF file contents
-        if (key.startsWith('pdf_') || key === 'pdf') {
-          console.log(key, '[PDF File]');
-        } else {
-          console.log(key, value);
         }
       }
       
@@ -683,93 +903,51 @@ export default function AddNewBook() {
 
   // Update the handleApproveBook function to check publication date format based on isYearOnly
   const handleApproveBook = async (bookNumber: number) => {
-    // Find this book's data
-    const thumbnail = seriesThumbnails.find(t => t.bookNumber === bookNumber);
-    const pdf = seriesBookPdfs.find(p => p.bookNumber === bookNumber);
-    
-    // Validate this specific book
-    let canApprove = true;
-    let message = "";
-    
-    if (!thumbnail?.url) {
-      canApprove = false;
-      message += "Missing thumbnail URL. ";
-    }
-    
-    if (!pdf?.file) {
-      canApprove = false;
-      message += "Missing PDF file. ";
-    }
-
-    // Check publication date based on format
-    if (!thumbnail?.publicationDate) {
-      canApprove = false;
-      message += "Missing publication date. ";
-    } else if (thumbnail.isYearOnly) {
-      // For year-only format, validate that it's a valid year (4 digits)
-      const yearRegex = /^\d{4}$/;
-      if (!yearRegex.test(thumbnail.publicationDate)) {
-        canApprove = false;
-        message += "Invalid year format (should be YYYY). ";
-      }
-    } else {
-      // For full date format, validate that it's a valid date
-      if (!(/^\d{4}-\d{2}-\d{2}$/.test(thumbnail.publicationDate))) {
-        canApprove = false;
-        message += "Invalid date format (should be YYYY-MM-DD). ";
-      }
-    }
-    
-    if (!canApprove) {
-      alert(`Cannot approve book ${seriesBaseName} ${getFormattedSeriesNumber(bookNumber)}: ${message}`);
+    // Find the book in our series
+    const bookIndex = seriesThumbnails.findIndex(t => t.bookNumber === bookNumber);
+    if (bookIndex === -1) {
+      alert(`Book ${bookNumber} not found in the series`);
       return;
     }
     
-    // If we get here, we know pdf and pdf.file are defined
-    const pdfFile = pdf!.file as File;
+    // Find the PDF for this book
+    const pdfIndex = seriesBookPdfs.findIndex(p => p.bookNumber === bookNumber);
+    if (pdfIndex === -1 || !seriesBookPdfs[pdfIndex].file) {
+      alert(`No PDF file selected for book ${seriesBaseName} ${getFormattedSeriesNumber(bookNumber)}. Please select a PDF file first.`);
+      return;
+    }
     
-    try {
-      // Show progress message
-      alert(`Attempting to upload PDF for book ${seriesBaseName} ${getFormattedSeriesNumber(bookNumber)}. Please wait...`);
-      
-      // Test upload the PDF to files.vc
-      const uploadResult = await uploadPdfToFilesVc(pdfFile);
-      
-      if (!uploadResult) {
-        alert(`Failed to upload PDF for book ${seriesBaseName} ${getFormattedSeriesNumber(bookNumber)}. Please try again.`);
-        return;
-      }
-      
-      // PDF upload successful, get the URL
-      const pdfUrl = uploadResult.fileData.url;
-      
-      // Check if the URL is valid
-      if (!pdfUrl) {
-        alert(`Received invalid URL from Files.vc for book ${seriesBaseName} ${getFormattedSeriesNumber(bookNumber)}. Please try again.`);
-        return;
-      }
-      
-      // Update approval state
+    const pdfFile = seriesBookPdfs[pdfIndex].file;
+    
+    // Check if the PDF is already uploaded
+    if (seriesBookPdfs[pdfIndex].pdfUrl) {
+      // PDF is already uploaded, just mark it as approved
       setApprovedBooks(prev => 
         prev.map(book => 
           book.bookNumber === bookNumber ? { ...book, isApproved: true } : book
         )
       );
       
-      // Now try to access the URL to make sure it works
-      alert(`Book ${seriesBaseName} ${getFormattedSeriesNumber(bookNumber)} was approved!
+      showNotification('success', `Book ${seriesBaseName} ${getFormattedSeriesNumber(bookNumber)} was approved!`);
       
-PDF uploaded successfully to Files.vc
-URL: ${pdfUrl}
-      
-The PDF will be uploaded again during the final form submission.`);
-
       // Open in a new tab to test URL
-      window.open(pdfUrl, '_blank');
+      window.open(seriesBookPdfs[pdfIndex].pdfUrl, '_blank');
+      return;
+    }
+    
+    // If not already uploaded, start the upload process
+    try {
+      // Show progress message
+      showNotification('info', `Uploading PDF for book ${seriesBaseName} ${getFormattedSeriesNumber(bookNumber)}. Please wait...`);
       
+      // Start the upload
+      uploadFileWithProgress(pdfFile, pdfIndex, bookNumber);
+      
+      // The upload progress and completion will be handled by the uploadFileWithProgress function
+      // which will update the UI accordingly
     } catch (error) {
       console.error('Error during book approval:', error);
-      alert(`An error occurred while approving book ${seriesBaseName} ${getFormattedSeriesNumber(bookNumber)}. Please try again.`);
+      showNotification('error', `An error occurred while approving book ${seriesBaseName} ${getFormattedSeriesNumber(bookNumber)}. Please try again.`);
     }
   };
 
@@ -905,6 +1083,8 @@ The PDF will be uploaded again during the final form submission.`);
                 numberOfPages: book.numberOfPages,
                 characters: book.characters,
                 language: book.language,
+                uploadProgress: undefined, // Add upload progress
+                pdfUrl: undefined, // Add PDF URL
               };
             });
             
@@ -1432,11 +1612,52 @@ The PDF will be uploaded again during the final form submission.`);
                                 accept=".pdf"
                                 onChange={(e) => handleSeriesBookPdfChange(pdfIndex, e)}
                                 className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-indigo-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-indigo-700 hover:file:bg-indigo-100"
+                                disabled={pdfIndex !== -1 && seriesBookPdfs[pdfIndex].isUploading}
                               />
                               {pdfIndex !== -1 && seriesBookPdfs[pdfIndex].file && (
                                 <p className="mt-1 text-xs text-gray-600">
                                   Selected: {seriesBookPdfs[pdfIndex].file.name} ({(seriesBookPdfs[pdfIndex].file.size / 1024 / 1024).toFixed(2)} MB)
                                 </p>
+                              )}
+                              
+                              {/* Add progress bar for uploading files */}
+                              {pdfIndex !== -1 && seriesBookPdfs[pdfIndex].isUploading && (
+                                <div className="mt-2">
+                                  <div className="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div 
+                                      className="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-in-out" 
+                                      style={{ width: `${seriesBookPdfs[pdfIndex].uploadProgress || 0}%` }}
+                                    ></div>
+                                  </div>
+                                  <p className="text-xs text-gray-600 mt-1">
+                                    Uploading... {seriesBookPdfs[pdfIndex].uploadProgress || 0}%
+                                  </p>
+                                </div>
+                              )}
+                              
+                              {/* Show success message when upload is complete */}
+                              {pdfIndex !== -1 && seriesBookPdfs[pdfIndex].pdfUrl && (
+                                <div className="mt-2 flex items-center text-sm text-green-600">
+                                  <FiCheckCircle className="mr-1" />
+                                  <span>Upload complete!</span>
+                                  <button 
+                                    type="button"
+                                    onClick={() => window.open(seriesBookPdfs[pdfIndex].pdfUrl, '_blank')}
+                                    className="ml-2 text-blue-600 hover:text-blue-800 underline text-xs"
+                                  >
+                                    View file
+                                  </button>
+                                </div>
+                              )}
+                              
+                              {/* Show error message if upload failed */}
+                              {pdfIndex !== -1 && 
+                               seriesThumbnails.find(t => t.bookNumber === seriesBookPdfs[pdfIndex].bookNumber)?.errorMessage && (
+                                <div className="mt-2 text-sm text-red-600">
+                                  <span>
+                                    {seriesThumbnails.find(t => t.bookNumber === seriesBookPdfs[pdfIndex].bookNumber)?.errorMessage}
+                                  </span>
+                                </div>
                               )}
                             </div>
                           </div>
@@ -1766,12 +1987,51 @@ The PDF will be uploaded again during the final form submission.`);
                 accept=".pdf"
                 onChange={handleSingleBookPdfChange}
                 className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-indigo-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-indigo-700 hover:file:bg-indigo-100"
+                disabled={singleBookUploadStatus === 'uploading'}
               />
               {bookPdfFile && (
                 <p className="mt-1 text-sm text-gray-600">
                   Selected: {bookPdfFile.name} ({(bookPdfFile.size / 1024 / 1024).toFixed(2)} MB)
                 </p>
               )}
+              
+              {/* Add progress bar for uploading single book file */}
+              {singleBookUploadStatus === 'uploading' && singleBookUploadProgress !== null && (
+                <div className="mt-2">
+                  <div className="w-full bg-gray-200 rounded-full h-2.5">
+                    <div 
+                      className="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-in-out" 
+                      style={{ width: `${singleBookUploadProgress}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-xs text-gray-600 mt-1">
+                    Uploading... {singleBookUploadProgress}%
+                  </p>
+                </div>
+              )}
+              
+              {/* Show success message when upload is complete */}
+              {singleBookUploadStatus === 'success' && singleBookPdfUrl && (
+                <div className="mt-2 flex items-center text-sm text-green-600">
+                  <FiCheckCircle className="mr-1" />
+                  <span>Upload complete!</span>
+                  <button 
+                    type="button"
+                    onClick={() => window.open(singleBookPdfUrl, '_blank')}
+                    className="ml-2 text-blue-600 hover:text-blue-800 underline text-xs"
+                  >
+                    View file
+                  </button>
+                </div>
+              )}
+              
+              {/* Show error message if upload failed */}
+              {singleBookUploadStatus === 'error' && singleBookUploadError && (
+                <div className="mt-2 text-sm text-red-600">
+                  <span>{singleBookUploadError}</span>
+                </div>
+              )}
+              
               {formErrors.bookPdf && (
                 <p className="mt-1 text-sm text-red-500">{formErrors.bookPdf}</p>
               )}
