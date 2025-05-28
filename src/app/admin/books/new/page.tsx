@@ -564,6 +564,12 @@ export default function AddNewBook() {
               
               // Show success notification
               showNotification('success', `File for book ${getFormattedSeriesNumber(bookNumber)} uploaded successfully!`);
+              
+              // Automatically call handleApproveBook again to complete the approval process
+              // Use setTimeout to ensure state updates have been applied
+              setTimeout(() => {
+                handleApproveBook(bookNumber);
+              }, 500);
             } else {
               handleUploadError(bookNumber, 'Upload failed: Invalid response from server');
             }
@@ -836,15 +842,8 @@ export default function AddNewBook() {
         }
       }
       
-      // Check if all books have PDFs (either file or URL)
-      const missingPdfs = seriesThumbnails.filter(t => {
-        const pdfData = seriesBookPdfs.find(p => p.bookNumber === t.bookNumber);
-        return !pdfData?.file && !pdfData?.pdfUrl;
-      });
-      
-      if (missingPdfs.length > 0) {
-        errors.seriesBookPdfs = `Missing PDF files for ${missingPdfs.length} book(s)`;
-      }
+      // No longer require PDFs for all books since we're approving them individually
+      // Each book will be validated when it's approved
     }
     
     setFormErrors(errors);
@@ -905,40 +904,35 @@ export default function AddNewBook() {
         formData.append('seriesEnd', seriesEnd.toString());
         formData.append('useDifferentNames', useDifferentNames.toString());
         
-        // Add each book's information
-        for (let i = 0; i < seriesThumbnails.length; i++) {
-          const book = seriesThumbnails[i];
-          const pdfData = seriesBookPdfs.find(p => p.bookNumber === book.bookNumber);
+        // Count how many books have been approved
+        const approvedCount = approvedBooks.filter(book => book.isApproved).length;
+        
+        // If no books have been approved yet, just save the series metadata
+        if (approvedCount === 0) {
+          formData.append('onlyCreateSeries', 'true');
+        } else {
+          // Add information about which books are approved
+          formData.append('approvedBooksCount', approvedCount.toString());
           
-          // Use the already uploaded PDF URL if available
-          if (pdfData?.pdfUrl) {
-            formData.append(`pdfUrl_${book.bookNumber}`, pdfData.pdfUrl);
-          }
-          // Otherwise, attach the PDF file directly if we have one
-          else if (pdfData?.file) {
-            formData.append(`pdf_${book.bookNumber}`, pdfData.file);
-          }
+          // Include the list of approved book numbers
+          const approvedBookNumbers = approvedBooks
+            .filter(book => book.isApproved)
+            .map(book => book.bookNumber);
           
-          // Add seriesName (base name) for all books in the series
-          formData.append(`seriesName_${book.bookNumber}`, seriesBaseName);
-          
-          // Add custom book name if we're using different names
-          if (useDifferentNames && book.customName) {
-            formData.append(`bookName_${book.bookNumber}`, book.customName);
-          }
-          
-          // Always include the position in series
-          formData.append(`positionInSeries_${book.bookNumber}`, book.bookNumber.toString());
-          
-          formData.append(`thumbnail_${book.bookNumber}`, book.url);
-          formData.append(`publicationDate_${book.bookNumber}`, book.publicationDate);
-          formData.append(`isYearOnly_${book.bookNumber}`, book.isYearOnly.toString());
-          formData.append(`summary_${book.bookNumber}`, book.summary || '');
+          formData.append('approvedBookNumbers', JSON.stringify(approvedBookNumbers));
         }
       }
       
-      // Simulate server response for now
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Make API call to save the form data
+      const response = await fetch('/api/admin/books/create', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Failed to save: ${response.statusText}`);
+      }
       
       showNotification('success', isSeries ? 'Book series added successfully!' : 'Book added successfully!');
       router.push('/admin/books');
@@ -991,20 +985,76 @@ export default function AddNewBook() {
     }
     
     const pdfFile = seriesBookPdfs[pdfIndex].file;
+    const bookData = seriesThumbnails[bookIndex];
     
     // Check if the PDF is already uploaded
     if (seriesBookPdfs[pdfIndex].pdfUrl) {
-      // PDF is already uploaded, just mark it as approved
-      setApprovedBooks(prev => 
-        prev.map(book => 
-          book.bookNumber === bookNumber ? { ...book, isApproved: true } : book
-        )
-      );
+      // PDF is already uploaded, proceed with adding the book to database
+      try {
+        setIsSubmitting(true);
+        
+        // Create form data for just this book
+        const formData = new FormData();
+        
+        // Add authors
+        for (const author of authors) {
+          formData.append('authors', author.name);
+        }
+        
+        // Add book-specific data
+        formData.append('isSeries', 'true');
+        formData.append('isIndividualBook', 'true'); // Flag to indicate this is a single book from a series
+        formData.append('seriesName', seriesBaseName);
+        formData.append('bookNumber', bookNumber.toString());
+        formData.append('pdfUrl', seriesBookPdfs[pdfIndex].pdfUrl);
+        
+        // Add custom book name if we're using different names or default to series format
+        const bookTitle = bookData.customName || `${seriesBaseName} ${getFormattedSeriesNumber(bookNumber)}`;
+        formData.append('bookName', bookTitle);
+        
+        // Add other book metadata
+        formData.append('thumbnailUrl', bookData.url);
+        formData.append('publicationDate', bookData.publicationDate);
+        formData.append('isYearOnly', bookData.isYearOnly.toString());
+        formData.append('summary', bookData.summary || '');
+        formData.append('positionInSeries', bookNumber.toString());
+        
+        // Add additional metadata if available
+        if (bookData.publisher) formData.append('publisher', bookData.publisher);
+        if (bookData.genres && bookData.genres.length > 0) formData.append('genres', JSON.stringify(bookData.genres));
+        if (bookData.ratings !== undefined) formData.append('ratings', bookData.ratings.toString());
+        if (bookData.averageRating !== undefined) formData.append('averageRating', bookData.averageRating.toString());
+        if (bookData.numberOfPages !== undefined) formData.append('numberOfPages', bookData.numberOfPages.toString());
+        if (bookData.characters && bookData.characters.length > 0) formData.append('characters', JSON.stringify(bookData.characters));
+        if (bookData.language) formData.append('language', bookData.language);
+        
+        // Make API call to add just this book
+        const response = await fetch('/api/admin/books/create', {
+          method: 'POST',
+          body: formData
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || `Failed to add book: ${response.statusText}`);
+        }
+        
+        // Mark as approved
+        setApprovedBooks(prev => 
+          prev.map(book => 
+            book.bookNumber === bookNumber ? { ...book, isApproved: true } : book
+          )
+        );
+        
+        showNotification('success', `Book ${bookTitle} was approved and added successfully!`);
+        
+      } catch (error) {
+        console.error('Error adding book to database:', error);
+        showNotification('error', `Failed to add book to database: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      } finally {
+        setIsSubmitting(false);
+      }
       
-      showNotification('success', `Book ${seriesBaseName} ${getFormattedSeriesNumber(bookNumber)} was approved!`);
-      
-      // Open in a new tab to test URL
-      window.open(seriesBookPdfs[pdfIndex].pdfUrl, '_blank');
       return;
     }
     
@@ -1018,6 +1068,9 @@ export default function AddNewBook() {
       
       // The upload progress and completion will be handled by the uploadFileWithProgress function
       // which will update the UI accordingly
+      
+      // Note: We'll need to update the uploadFileWithProgress function to call this function again
+      // once the upload is complete, so it can proceed with adding the book to the database
     } catch (error) {
       console.error('Error during book approval:', error);
       showNotification('error', `An error occurred while approving book ${seriesBaseName} ${getFormattedSeriesNumber(bookNumber)}. Please try again.`);
@@ -1580,6 +1633,26 @@ export default function AddNewBook() {
                   </div>
                   <p className="mt-1 text-sm text-gray-500 ml-11">Add details for each book in the series</p>
                 </div>
+                
+                {/* Add Series Approval Progress */}
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-700">
+                      Series Approval Progress
+                    </span>
+                    <span className="text-sm font-medium text-gray-700">
+                      {approvedBooks.filter(book => book.isApproved).length} of {getTotalBooksInSeries()} books
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2.5">
+                    <div 
+                      className="bg-green-600 h-2.5 rounded-full transition-all duration-500 ease-in-out" 
+                      style={{ 
+                        width: `${(approvedBooks.filter(book => book.isApproved).length / getTotalBooksInSeries()) * 100}%` 
+                      }}
+                    ></div>
+                  </div>
+                </div>
 
                 {/* Book Tabs Interface */}
                 <div className="mt-4">
@@ -1588,19 +1661,24 @@ export default function AddNewBook() {
                       {Array.from({ length: getTotalBooksInSeries() }, (_, i) => {
                         const bookNumber = seriesStart + i;
                         const isActive = i === activeBookTab;
+                        const isApproved = approvedBooks.find(book => book.bookNumber === bookNumber)?.isApproved || false;
+                        
                         return (
                           <li className="mr-2" key={bookNumber} role="presentation">
                             <button
                               type="button"
                               onClick={() => setActiveBookTab(i)}
-                              className={`inline-block p-3 rounded-t-lg border-b-2 ${
+                              className={`inline-flex items-center p-3 rounded-t-lg border-b-2 ${
                                 isActive 
                                   ? 'border-indigo-600 text-indigo-600' 
                                   : 'border-transparent hover:text-gray-600 hover:border-gray-300'
-                              }`}
+                              } ${isApproved ? 'bg-green-50' : ''}`}
                               role="tab"
                             >
                               Book {bookNumber}
+                              {isApproved && (
+                                <FiCheckCircle className="ml-1 h-4 w-4 text-green-600" />
+                              )}
                             </button>
                           </li>
                         );
@@ -1992,6 +2070,30 @@ export default function AddNewBook() {
                         
                         <div className="mt-4 text-center text-sm text-gray-500">
                           <p>This is book {i + 1} of {getTotalBooksInSeries()}. Use the tabs above to edit other books.</p>
+                        </div>
+
+                        {/* Add Approve Button */}
+                        <div className="mt-6 flex justify-center">
+                          {isApproved ? (
+                            <div className="flex items-center text-green-600">
+                              <FiCheckCircle className="mr-2 h-5 w-5" />
+                              <span className="font-medium">Book Approved</span>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => handleApproveBook(bookNumber)}
+                              disabled={pdfIndex === -1 || !seriesBookPdfs[pdfIndex].file}
+                              className={`inline-flex items-center rounded-md border border-transparent px-4 py-2 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                                pdfIndex === -1 || !seriesBookPdfs[pdfIndex].file
+                                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                  : "bg-green-600 text-white hover:bg-green-700 focus:ring-green-500"
+                              }`}
+                            >
+                              <FiCheckCircle className="mr-2 h-4 w-4" />
+                              Approve & Add Book
+                            </button>
+                          )}
                         </div>
                       </div>
                     );
