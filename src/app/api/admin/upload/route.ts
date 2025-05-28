@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
-import { getDecryptedApiKey } from '@/app/api/admin/settings/api-keys/route';
+import { getApiKey } from '@/app/api/admin/settings/api-keys/route';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
 
 // Import the uploadFile function from our submodule
 // We need to require it dynamically since it's not a proper module
-const uploadFilesVc = async (filePath, apiKey, accountId = null) => {
+const uploadFilesVc = async (filePath: string, apiKey: string, accountId: string | null = null) => {
   try {
     // Since the files.vc-Uploader expects the API key in an environment variable,
     // we'll create a custom implementation based on its code
@@ -45,11 +45,12 @@ const uploadFilesVc = async (filePath, apiKey, accountId = null) => {
         error: 'Unexpected response format from Files.vc'
       };
     }
-  } catch (error) {
-    console.error('Upload failed:', error.response?.data || error.message);
+  } catch (error: unknown) {
+    const errorResponse = error as { response?: { data?: unknown }, message?: string };
+    console.error('Upload failed:', errorResponse.response?.data || errorResponse.message);
     return {
       success: false,
-      error: error.response?.data || error.message
+      error: errorResponse.response?.data || errorResponse.message
     };
   }
 };
@@ -93,20 +94,20 @@ export async function POST(req: NextRequest) {
         console.log('Using hardcoded API key for testing');
         apiKey = HARDCODED_API_KEY;
       } else {
-        apiKey = await getDecryptedApiKey(adminUser.id, 'files_vc');
+        apiKey = await getApiKey(adminUser.id, 'files_vc');
       }
-    } catch (decryptError) {
-      console.error(`API key decryption error for admin ${adminUser.id}:`, decryptError);
+    } catch (error) {
+      console.error(`API key retrieval error for admin ${adminUser.id}:`, error);
       return NextResponse.json({
-        error: 'API Key Decryption Error',
-        details: 'Failed to decrypt the Files.vc API key. Please re-save your API key in the admin settings.'
+        error: 'API Key Error',
+        details: 'Failed to retrieve the Files.vc API key. Please re-save your API key in the admin settings.'
       }, { status: 400 });
     }
     
     if (!apiKey) {
       return NextResponse.json({
         error: 'Missing Files.vc API Key',
-        details: 'No API key found for Files.vc or decryption failed. Please set or re-save your API key in the admin settings.'
+        details: 'No API key found for Files.vc. Please set your API key in the admin settings.'
       }, { status: 400 });
     }
 

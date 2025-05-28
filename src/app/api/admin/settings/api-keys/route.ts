@@ -1,68 +1,8 @@
 import { NextResponse } from 'next/server';
-import crypto from 'crypto';
-import { PrismaClient } from '@prisma/client';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { prisma } from '@/lib/prisma'; // Use the singleton Prisma instance instead of creating a new one
-
-// Removed separate PrismaClient instantiation to avoid connection pool issues
-// const prisma = new PrismaClient();
-
-const ENCRYPTION_KEY = process.env.API_ENCRYPTION_KEY; // Must be 32-byte (256-bit) key
-const ALGORITHM = 'aes-256-gcm';
-
-// Log environment status at startup for debugging
-console.log('API_ENCRYPTION_KEY status:', {
-  isSet: !!ENCRYPTION_KEY,
-  length: ENCRYPTION_KEY?.length || 0,
-});
-
-if (!ENCRYPTION_KEY) {
-  console.error('FATAL ERROR: API_ENCRYPTION_KEY is not set in .env.local. It must be a 64-character hex string (32 bytes).');
-  // In a real app, you might throw an error here or prevent startup if the key is critical.
-}
-
-function ensureKeyIsValid(key: string | undefined): Buffer {
-  if (!key || typeof key !== 'string' || key.length !== 64 || !/^[0-9a-fA-F]+$/.test(key)) {
-    throw new Error(
-      'Invalid API_ENCRYPTION_KEY: Must be a 64-character hex string (32 bytes).',
-    );
-  }
-  return Buffer.from(key, 'hex');
-}
-
-// Encryption function
-function encrypt(text: string): { iv: string; encryptedData: string } {
-  try {
-    const keyBuffer = ensureKeyIsValid(ENCRYPTION_KEY);
-    const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipheriv(ALGORITHM, keyBuffer, iv);
-    let encrypted = cipher.update(text, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    return { iv: iv.toString('hex'), encryptedData: encrypted };
-  } catch (error) {
-    console.error('Encryption error:', error);
-    throw error; // Re-throw for proper error handling upstream
-  }
-}
-
-// Decryption function (will be needed by the upload handler later)
-function decrypt(text: { iv: string; encryptedData: string }): string {
-  try {
-    const keyBuffer = ensureKeyIsValid(ENCRYPTION_KEY);
-    const decipher = crypto.createDecipheriv(
-      ALGORITHM,
-      keyBuffer,
-      Buffer.from(text.iv, 'hex'),
-    );
-    let decrypted = decipher.update(text.encryptedData, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-    return decrypted;
-  } catch (error) {
-    console.error('Decryption error:', error);
-    throw error; // Re-throw for proper error handling upstream
-  }
-}
+import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 // Real authentication implementation using NextAuth.js
 async function getAuthenticatedAdminId(req: Request): Promise<string | null> {
@@ -109,15 +49,6 @@ async function getAuthenticatedAdminId(req: Request): Promise<string | null> {
 
 export async function POST(req: Request) {
   try {
-    // Check encryption key first for clearer error messages
-    if (!ENCRYPTION_KEY) {
-      console.error('API_ENCRYPTION_KEY is not set - POST request failed');
-      return NextResponse.json({ 
-        error: 'Server configuration error: Encryption service not available.',
-        details: 'API_ENCRYPTION_KEY environment variable is not set'
-      }, { status: 500 });
-    }
-
     // Authenticate the admin
     const adminId = await getAuthenticatedAdminId(req);
     if (!adminId) {
@@ -148,25 +79,15 @@ export async function POST(req: Request) {
       );
     }
 
-    // Encrypt the API key
-    let encryptedPayload;
-    try {
-      encryptedPayload = encrypt(apiKey);
-    } catch (error) {
-      console.error('Failed to encrypt API key:', error);
-      return NextResponse.json({ 
-        error: 'Server Error', 
-        details: 'Failed to encrypt API key. Check server logs.' 
-      }, { status: 500 });
-    }
-
     // Save to database
     try {
-      await prisma.adminApiKey.upsert({
-        where: { adminId_serviceName: { adminId, serviceName } },
-        update: { encryptedApiKey: encryptedPayload.encryptedData, iv: encryptedPayload.iv },
-        create: { adminId, serviceName, encryptedApiKey: encryptedPayload.encryptedData, iv: encryptedPayload.iv },
-      });
+      // Use raw query to handle the AdminApiKey model that might not be fully recognized by TypeScript
+      await prisma.$executeRaw`
+        INSERT INTO "AdminApiKey" ("adminId", "serviceName", "apiKey")
+        VALUES (${adminId}, ${serviceName}, ${apiKey})
+        ON CONFLICT ("adminId", "serviceName") 
+        DO UPDATE SET "apiKey" = ${apiKey}
+      `;
     } catch (error) {
       console.error('Database error when saving API key:', error);
       return NextResponse.json({ 
@@ -191,15 +112,6 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
   try {
-    // Check encryption key first for clearer error messages
-    if (!ENCRYPTION_KEY) {
-      console.error('API_ENCRYPTION_KEY is not set - GET request failed');
-      return NextResponse.json({ 
-        error: 'Server configuration error: Encryption service not available.',
-        details: 'API_ENCRYPTION_KEY environment variable is not set'
-      }, { status: 500 });
-    }
-
     // Authenticate the admin
     const adminId = await getAuthenticatedAdminId(req);
     if (!adminId) {
@@ -221,12 +133,16 @@ export async function GET(req: Request) {
 
     // Check if the API key exists
     try {
-      const apiKeyRecord = await prisma.adminApiKey.findUnique({
-        where: { adminId_serviceName: { adminId, serviceName } },
-      });
+      // Use raw query to check if the API key exists
+      const result = await prisma.$queryRaw<{ exists: boolean }[]>`
+        SELECT EXISTS(
+          SELECT 1 FROM "AdminApiKey" 
+          WHERE "adminId" = ${adminId} AND "serviceName" = ${serviceName}
+        ) as "exists"
+      `;
 
       return NextResponse.json(
-        { isSet: !!apiKeyRecord, serviceName },
+        { isSet: result[0].exists, serviceName },
         { status: 200 },
       );
     } catch (error) {
@@ -246,26 +162,23 @@ export async function GET(req: Request) {
   }
 }
 
-// Function to retrieve and decrypt an API key (will be used by your upload handler)
-// This should also be protected and only callable from trusted server-side code.
-export async function getDecryptedApiKey(adminId: string, serviceName: string): Promise<string | null> {
+// Function to retrieve an API key
+export async function getApiKey(adminId: string, serviceName: string): Promise<string | null> {
   if (!adminId || !serviceName) return null;
-  if (!ENCRYPTION_KEY) {
-    console.error("Cannot decrypt: Encryption key not set.");
-    return null;
-  }
 
   try {
-    const apiKeyRecord = await prisma.adminApiKey.findUnique({
-      where: { adminId_serviceName: { adminId, serviceName } },
-    });
+    // Use raw query to get the API key
+    const result = await prisma.$queryRaw<{ apiKey: string }[]>`
+      SELECT "apiKey" FROM "AdminApiKey" 
+      WHERE "adminId" = ${adminId} AND "serviceName" = ${serviceName}
+    `;
 
-    if (apiKeyRecord && apiKeyRecord.encryptedApiKey && apiKeyRecord.iv) {
-      return decrypt({ iv: apiKeyRecord.iv, encryptedData: apiKeyRecord.encryptedApiKey });
+    if (result.length > 0 && result[0].apiKey) {
+      return result[0].apiKey;
     }
     return null;
   } catch (error) {
-    console.error(`Failed to retrieve or decrypt API key for admin ${adminId}, service ${serviceName}:`, error);
+    console.error(`Failed to retrieve API key for admin ${adminId}, service ${serviceName}:`, error);
     return null;
   }
 }

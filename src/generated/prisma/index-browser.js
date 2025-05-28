@@ -161,8 +161,7 @@ exports.Prisma.UserSettingsScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   preferYearOnlyDateFormat: 'preferYearOnlyDateFormat',
-  encryptedFilesVcApiKey: 'encryptedFilesVcApiKey',
-  apiKeyIv: 'apiKeyIv',
+  filesVcApiKey: 'filesVcApiKey',
   updatedAt: 'updatedAt'
 };
 
@@ -200,6 +199,12 @@ exports.Prisma.AuthorScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.AdminApiKeyScalarFieldEnum = {
+  adminId: 'adminId',
+  serviceName: 'serviceName',
+  apiKey: 'apiKey'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -227,7 +232,8 @@ exports.Prisma.ModelName = {
   UserSettings: 'UserSettings',
   Book: 'Book',
   Series: 'Series',
-  Author: 'Author'
+  Author: 'Author',
+  AdminApiKey: 'AdminApiKey'
 };
 
 /**

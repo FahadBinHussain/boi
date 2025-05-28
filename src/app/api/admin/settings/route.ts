@@ -1,34 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { cookies } from 'next/headers';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-
-// IMPORTANT: Use a proper key management system in production
-const ENCRYPTION_KEY = process.env.SETTINGS_ENCRYPTION_KEY || '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
-
-// Encrypt sensitive data
-function encryptData(data: string): { encryptedData: string, iv: string } {
-  const iv = randomBytes(16);
-  const cipher = createCipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY, 'hex'), iv);
-  let encrypted = cipher.update(data, 'utf8', 'hex');
-  encrypted += cipher.final('hex');
-  return {
-    encryptedData: encrypted,
-    iv: iv.toString('hex')
-  };
-}
-
-// Decrypt sensitive data
-function decryptData(encryptedData: string, iv: string): string {
-  const decipher = createDecipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY, 'hex'), Buffer.from(iv, 'hex'));
-  let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
-  decrypted += decipher.final('utf8');
-  return decrypted;
-}
 
 // Get user ID from session
 async function getUserId(request: NextRequest): Promise<string | null> {
@@ -137,7 +113,7 @@ export async function GET(request: NextRequest) {
     const response = {
       preferYearOnlyDateFormat: userSettings.preferYearOnlyDateFormat,
       // Don't expose the actual API key, just whether it exists
-      filesVcApiKey: userSettings.encryptedFilesVcApiKey ? true : undefined
+      filesVcApiKey: (userSettings as unknown as { filesVcApiKey?: string }).filesVcApiKey ? true : undefined
     };
     
     console.log('GET settings: Returning existing settings from database');
@@ -204,25 +180,23 @@ export async function PUT(request: NextRequest) {
     // Prepare the data for upsert
     const updateData: any = {};
     
-    // Process settings and encrypt sensitive data if needed
+    // Process settings
     if ('preferYearOnlyDateFormat' in data) {
       updateData.preferYearOnlyDateFormat = data.preferYearOnlyDateFormat;
     }
     
-    // For sensitive data like API keys, encrypt before storing
+    // For sensitive data like API keys, store as plain text
     if ('filesVcApiKey' in data && typeof data.filesVcApiKey === 'string') {
-      // Only encrypt and update if a new value is provided
+      // Only update if a new value is provided
       if (data.filesVcApiKey) {
-        const { encryptedData, iv } = encryptData(data.filesVcApiKey);
-        updateData.encryptedFilesVcApiKey = encryptedData;
-        updateData.apiKeyIv = iv;
+        updateData.filesVcApiKey = data.filesVcApiKey;
       }
     }
     
     console.log('Processed update data (without sensitive values):', 
       { 
         ...updateData, 
-        encryptedFilesVcApiKey: updateData.encryptedFilesVcApiKey ? '[ENCRYPTED]' : undefined 
+        filesVcApiKey: updateData.filesVcApiKey ? '[REDACTED]' : undefined 
       }
     );
     
@@ -285,7 +259,7 @@ export async function PUT(request: NextRequest) {
           id: result.id, 
           userId: result.userId,
           hasPreferYearOnlyDateFormat: !!result.preferYearOnlyDateFormat,
-          hasApiKey: !!result.encryptedFilesVcApiKey
+          hasApiKey: !!(result as unknown as { filesVcApiKey?: string }).filesVcApiKey
         });
       } catch (upsertError) {
         // Log detailed error information

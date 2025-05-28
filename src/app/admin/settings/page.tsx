@@ -211,8 +211,8 @@ export default function AdminSettings() {
                 />
                 <p className="mt-1 text-xs text-gray-400">
                   {!isApiKeyModified && settings?.filesVcApiKey 
-                    ? "API key is saved and encrypted. Leave blank to keep the existing key." 
-                    : "Your API key will be stored securely and encrypted."}
+                    ? "API key is saved. Leave blank to keep the existing key." 
+                    : "Your API key will be stored in the database."}
                 </p>
               </div>
             </div>

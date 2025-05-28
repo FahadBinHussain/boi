@@ -53,6 +53,11 @@ export type Series = $Result.DefaultSelection<Prisma.$SeriesPayload>
  * 
  */
 export type Author = $Result.DefaultSelection<Prisma.$AuthorPayload>
+/**
+ * Model AdminApiKey
+ * 
+ */
+export type AdminApiKey = $Result.DefaultSelection<Prisma.$AdminApiKeyPayload>
 
 /**
  * Enums
@@ -275,6 +280,16 @@ export class PrismaClient<
     * ```
     */
   get author(): Prisma.AuthorDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.adminApiKey`: Exposes CRUD operations for the **AdminApiKey** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AdminApiKeys
+    * const adminApiKeys = await prisma.adminApiKey.findMany()
+    * ```
+    */
+  get adminApiKey(): Prisma.AdminApiKeyDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -722,7 +737,8 @@ export namespace Prisma {
     UserSettings: 'UserSettings',
     Book: 'Book',
     Series: 'Series',
-    Author: 'Author'
+    Author: 'Author',
+    AdminApiKey: 'AdminApiKey'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -741,7 +757,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "account" | "session" | "user" | "verificationToken" | "userSettings" | "book" | "series" | "author"
+      modelProps: "account" | "session" | "user" | "verificationToken" | "userSettings" | "book" | "series" | "author" | "adminApiKey"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1337,6 +1353,80 @@ export namespace Prisma {
           }
         }
       }
+      AdminApiKey: {
+        payload: Prisma.$AdminApiKeyPayload<ExtArgs>
+        fields: Prisma.AdminApiKeyFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AdminApiKeyFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminApiKeyPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AdminApiKeyFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminApiKeyPayload>
+          }
+          findFirst: {
+            args: Prisma.AdminApiKeyFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminApiKeyPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AdminApiKeyFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminApiKeyPayload>
+          }
+          findMany: {
+            args: Prisma.AdminApiKeyFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminApiKeyPayload>[]
+          }
+          create: {
+            args: Prisma.AdminApiKeyCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminApiKeyPayload>
+          }
+          createMany: {
+            args: Prisma.AdminApiKeyCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AdminApiKeyCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminApiKeyPayload>[]
+          }
+          delete: {
+            args: Prisma.AdminApiKeyDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminApiKeyPayload>
+          }
+          update: {
+            args: Prisma.AdminApiKeyUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminApiKeyPayload>
+          }
+          deleteMany: {
+            args: Prisma.AdminApiKeyDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AdminApiKeyUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.AdminApiKeyUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminApiKeyPayload>[]
+          }
+          upsert: {
+            args: Prisma.AdminApiKeyUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminApiKeyPayload>
+          }
+          aggregate: {
+            args: Prisma.AdminApiKeyAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAdminApiKey>
+          }
+          groupBy: {
+            args: Prisma.AdminApiKeyGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AdminApiKeyGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AdminApiKeyCountArgs<ExtArgs>
+            result: $Utils.Optional<AdminApiKeyCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1429,6 +1519,7 @@ export namespace Prisma {
     book?: BookOmit
     series?: SeriesOmit
     author?: AuthorOmit
+    adminApiKey?: AdminApiKeyOmit
   }
 
   /* Types for Logging */
@@ -6000,8 +6091,7 @@ export namespace Prisma {
     id: string | null
     userId: string | null
     preferYearOnlyDateFormat: boolean | null
-    encryptedFilesVcApiKey: string | null
-    apiKeyIv: string | null
+    filesVcApiKey: string | null
     updatedAt: Date | null
   }
 
@@ -6009,8 +6099,7 @@ export namespace Prisma {
     id: string | null
     userId: string | null
     preferYearOnlyDateFormat: boolean | null
-    encryptedFilesVcApiKey: string | null
-    apiKeyIv: string | null
+    filesVcApiKey: string | null
     updatedAt: Date | null
   }
 
@@ -6018,8 +6107,7 @@ export namespace Prisma {
     id: number
     userId: number
     preferYearOnlyDateFormat: number
-    encryptedFilesVcApiKey: number
-    apiKeyIv: number
+    filesVcApiKey: number
     updatedAt: number
     _all: number
   }
@@ -6029,8 +6117,7 @@ export namespace Prisma {
     id?: true
     userId?: true
     preferYearOnlyDateFormat?: true
-    encryptedFilesVcApiKey?: true
-    apiKeyIv?: true
+    filesVcApiKey?: true
     updatedAt?: true
   }
 
@@ -6038,8 +6125,7 @@ export namespace Prisma {
     id?: true
     userId?: true
     preferYearOnlyDateFormat?: true
-    encryptedFilesVcApiKey?: true
-    apiKeyIv?: true
+    filesVcApiKey?: true
     updatedAt?: true
   }
 
@@ -6047,8 +6133,7 @@ export namespace Prisma {
     id?: true
     userId?: true
     preferYearOnlyDateFormat?: true
-    encryptedFilesVcApiKey?: true
-    apiKeyIv?: true
+    filesVcApiKey?: true
     updatedAt?: true
     _all?: true
   }
@@ -6129,8 +6214,7 @@ export namespace Prisma {
     id: string
     userId: string
     preferYearOnlyDateFormat: boolean
-    encryptedFilesVcApiKey: string | null
-    apiKeyIv: string | null
+    filesVcApiKey: string | null
     updatedAt: Date
     _count: UserSettingsCountAggregateOutputType | null
     _min: UserSettingsMinAggregateOutputType | null
@@ -6155,8 +6239,7 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     preferYearOnlyDateFormat?: boolean
-    encryptedFilesVcApiKey?: boolean
-    apiKeyIv?: boolean
+    filesVcApiKey?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["userSettings"]>
@@ -6165,8 +6248,7 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     preferYearOnlyDateFormat?: boolean
-    encryptedFilesVcApiKey?: boolean
-    apiKeyIv?: boolean
+    filesVcApiKey?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["userSettings"]>
@@ -6175,8 +6257,7 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     preferYearOnlyDateFormat?: boolean
-    encryptedFilesVcApiKey?: boolean
-    apiKeyIv?: boolean
+    filesVcApiKey?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["userSettings"]>
@@ -6185,12 +6266,11 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     preferYearOnlyDateFormat?: boolean
-    encryptedFilesVcApiKey?: boolean
-    apiKeyIv?: boolean
+    filesVcApiKey?: boolean
     updatedAt?: boolean
   }
 
-  export type UserSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "preferYearOnlyDateFormat" | "encryptedFilesVcApiKey" | "apiKeyIv" | "updatedAt", ExtArgs["result"]["userSettings"]>
+  export type UserSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "preferYearOnlyDateFormat" | "filesVcApiKey" | "updatedAt", ExtArgs["result"]["userSettings"]>
   export type UserSettingsInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -6210,8 +6290,7 @@ export namespace Prisma {
       id: string
       userId: string
       preferYearOnlyDateFormat: boolean
-      encryptedFilesVcApiKey: string | null
-      apiKeyIv: string | null
+      filesVcApiKey: string | null
       updatedAt: Date
     }, ExtArgs["result"]["userSettings"]>
     composites: {}
@@ -6640,8 +6719,7 @@ export namespace Prisma {
     readonly id: FieldRef<"UserSettings", 'String'>
     readonly userId: FieldRef<"UserSettings", 'String'>
     readonly preferYearOnlyDateFormat: FieldRef<"UserSettings", 'Boolean'>
-    readonly encryptedFilesVcApiKey: FieldRef<"UserSettings", 'String'>
-    readonly apiKeyIv: FieldRef<"UserSettings", 'String'>
+    readonly filesVcApiKey: FieldRef<"UserSettings", 'String'>
     readonly updatedAt: FieldRef<"UserSettings", 'DateTime'>
   }
     
@@ -10473,6 +10551,975 @@ export namespace Prisma {
 
 
   /**
+   * Model AdminApiKey
+   */
+
+  export type AggregateAdminApiKey = {
+    _count: AdminApiKeyCountAggregateOutputType | null
+    _min: AdminApiKeyMinAggregateOutputType | null
+    _max: AdminApiKeyMaxAggregateOutputType | null
+  }
+
+  export type AdminApiKeyMinAggregateOutputType = {
+    adminId: string | null
+    serviceName: string | null
+    apiKey: string | null
+  }
+
+  export type AdminApiKeyMaxAggregateOutputType = {
+    adminId: string | null
+    serviceName: string | null
+    apiKey: string | null
+  }
+
+  export type AdminApiKeyCountAggregateOutputType = {
+    adminId: number
+    serviceName: number
+    apiKey: number
+    _all: number
+  }
+
+
+  export type AdminApiKeyMinAggregateInputType = {
+    adminId?: true
+    serviceName?: true
+    apiKey?: true
+  }
+
+  export type AdminApiKeyMaxAggregateInputType = {
+    adminId?: true
+    serviceName?: true
+    apiKey?: true
+  }
+
+  export type AdminApiKeyCountAggregateInputType = {
+    adminId?: true
+    serviceName?: true
+    apiKey?: true
+    _all?: true
+  }
+
+  export type AdminApiKeyAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AdminApiKey to aggregate.
+     */
+    where?: AdminApiKeyWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AdminApiKeys to fetch.
+     */
+    orderBy?: AdminApiKeyOrderByWithRelationInput | AdminApiKeyOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AdminApiKeyWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AdminApiKeys from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AdminApiKeys.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AdminApiKeys
+    **/
+    _count?: true | AdminApiKeyCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AdminApiKeyMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AdminApiKeyMaxAggregateInputType
+  }
+
+  export type GetAdminApiKeyAggregateType<T extends AdminApiKeyAggregateArgs> = {
+        [P in keyof T & keyof AggregateAdminApiKey]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAdminApiKey[P]>
+      : GetScalarType<T[P], AggregateAdminApiKey[P]>
+  }
+
+
+
+
+  export type AdminApiKeyGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AdminApiKeyWhereInput
+    orderBy?: AdminApiKeyOrderByWithAggregationInput | AdminApiKeyOrderByWithAggregationInput[]
+    by: AdminApiKeyScalarFieldEnum[] | AdminApiKeyScalarFieldEnum
+    having?: AdminApiKeyScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AdminApiKeyCountAggregateInputType | true
+    _min?: AdminApiKeyMinAggregateInputType
+    _max?: AdminApiKeyMaxAggregateInputType
+  }
+
+  export type AdminApiKeyGroupByOutputType = {
+    adminId: string
+    serviceName: string
+    apiKey: string
+    _count: AdminApiKeyCountAggregateOutputType | null
+    _min: AdminApiKeyMinAggregateOutputType | null
+    _max: AdminApiKeyMaxAggregateOutputType | null
+  }
+
+  type GetAdminApiKeyGroupByPayload<T extends AdminApiKeyGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AdminApiKeyGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AdminApiKeyGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AdminApiKeyGroupByOutputType[P]>
+            : GetScalarType<T[P], AdminApiKeyGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AdminApiKeySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    adminId?: boolean
+    serviceName?: boolean
+    apiKey?: boolean
+  }, ExtArgs["result"]["adminApiKey"]>
+
+  export type AdminApiKeySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    adminId?: boolean
+    serviceName?: boolean
+    apiKey?: boolean
+  }, ExtArgs["result"]["adminApiKey"]>
+
+  export type AdminApiKeySelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    adminId?: boolean
+    serviceName?: boolean
+    apiKey?: boolean
+  }, ExtArgs["result"]["adminApiKey"]>
+
+  export type AdminApiKeySelectScalar = {
+    adminId?: boolean
+    serviceName?: boolean
+    apiKey?: boolean
+  }
+
+  export type AdminApiKeyOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"adminId" | "serviceName" | "apiKey", ExtArgs["result"]["adminApiKey"]>
+
+  export type $AdminApiKeyPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AdminApiKey"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      adminId: string
+      serviceName: string
+      apiKey: string
+    }, ExtArgs["result"]["adminApiKey"]>
+    composites: {}
+  }
+
+  type AdminApiKeyGetPayload<S extends boolean | null | undefined | AdminApiKeyDefaultArgs> = $Result.GetResult<Prisma.$AdminApiKeyPayload, S>
+
+  type AdminApiKeyCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<AdminApiKeyFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: AdminApiKeyCountAggregateInputType | true
+    }
+
+  export interface AdminApiKeyDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AdminApiKey'], meta: { name: 'AdminApiKey' } }
+    /**
+     * Find zero or one AdminApiKey that matches the filter.
+     * @param {AdminApiKeyFindUniqueArgs} args - Arguments to find a AdminApiKey
+     * @example
+     * // Get one AdminApiKey
+     * const adminApiKey = await prisma.adminApiKey.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AdminApiKeyFindUniqueArgs>(args: SelectSubset<T, AdminApiKeyFindUniqueArgs<ExtArgs>>): Prisma__AdminApiKeyClient<$Result.GetResult<Prisma.$AdminApiKeyPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one AdminApiKey that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {AdminApiKeyFindUniqueOrThrowArgs} args - Arguments to find a AdminApiKey
+     * @example
+     * // Get one AdminApiKey
+     * const adminApiKey = await prisma.adminApiKey.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AdminApiKeyFindUniqueOrThrowArgs>(args: SelectSubset<T, AdminApiKeyFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AdminApiKeyClient<$Result.GetResult<Prisma.$AdminApiKeyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AdminApiKey that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminApiKeyFindFirstArgs} args - Arguments to find a AdminApiKey
+     * @example
+     * // Get one AdminApiKey
+     * const adminApiKey = await prisma.adminApiKey.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AdminApiKeyFindFirstArgs>(args?: SelectSubset<T, AdminApiKeyFindFirstArgs<ExtArgs>>): Prisma__AdminApiKeyClient<$Result.GetResult<Prisma.$AdminApiKeyPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AdminApiKey that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminApiKeyFindFirstOrThrowArgs} args - Arguments to find a AdminApiKey
+     * @example
+     * // Get one AdminApiKey
+     * const adminApiKey = await prisma.adminApiKey.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AdminApiKeyFindFirstOrThrowArgs>(args?: SelectSubset<T, AdminApiKeyFindFirstOrThrowArgs<ExtArgs>>): Prisma__AdminApiKeyClient<$Result.GetResult<Prisma.$AdminApiKeyPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more AdminApiKeys that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminApiKeyFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AdminApiKeys
+     * const adminApiKeys = await prisma.adminApiKey.findMany()
+     * 
+     * // Get first 10 AdminApiKeys
+     * const adminApiKeys = await prisma.adminApiKey.findMany({ take: 10 })
+     * 
+     * // Only select the `adminId`
+     * const adminApiKeyWithAdminIdOnly = await prisma.adminApiKey.findMany({ select: { adminId: true } })
+     * 
+     */
+    findMany<T extends AdminApiKeyFindManyArgs>(args?: SelectSubset<T, AdminApiKeyFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminApiKeyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a AdminApiKey.
+     * @param {AdminApiKeyCreateArgs} args - Arguments to create a AdminApiKey.
+     * @example
+     * // Create one AdminApiKey
+     * const AdminApiKey = await prisma.adminApiKey.create({
+     *   data: {
+     *     // ... data to create a AdminApiKey
+     *   }
+     * })
+     * 
+     */
+    create<T extends AdminApiKeyCreateArgs>(args: SelectSubset<T, AdminApiKeyCreateArgs<ExtArgs>>): Prisma__AdminApiKeyClient<$Result.GetResult<Prisma.$AdminApiKeyPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many AdminApiKeys.
+     * @param {AdminApiKeyCreateManyArgs} args - Arguments to create many AdminApiKeys.
+     * @example
+     * // Create many AdminApiKeys
+     * const adminApiKey = await prisma.adminApiKey.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AdminApiKeyCreateManyArgs>(args?: SelectSubset<T, AdminApiKeyCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AdminApiKeys and returns the data saved in the database.
+     * @param {AdminApiKeyCreateManyAndReturnArgs} args - Arguments to create many AdminApiKeys.
+     * @example
+     * // Create many AdminApiKeys
+     * const adminApiKey = await prisma.adminApiKey.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AdminApiKeys and only return the `adminId`
+     * const adminApiKeyWithAdminIdOnly = await prisma.adminApiKey.createManyAndReturn({
+     *   select: { adminId: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AdminApiKeyCreateManyAndReturnArgs>(args?: SelectSubset<T, AdminApiKeyCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminApiKeyPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a AdminApiKey.
+     * @param {AdminApiKeyDeleteArgs} args - Arguments to delete one AdminApiKey.
+     * @example
+     * // Delete one AdminApiKey
+     * const AdminApiKey = await prisma.adminApiKey.delete({
+     *   where: {
+     *     // ... filter to delete one AdminApiKey
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AdminApiKeyDeleteArgs>(args: SelectSubset<T, AdminApiKeyDeleteArgs<ExtArgs>>): Prisma__AdminApiKeyClient<$Result.GetResult<Prisma.$AdminApiKeyPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one AdminApiKey.
+     * @param {AdminApiKeyUpdateArgs} args - Arguments to update one AdminApiKey.
+     * @example
+     * // Update one AdminApiKey
+     * const adminApiKey = await prisma.adminApiKey.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AdminApiKeyUpdateArgs>(args: SelectSubset<T, AdminApiKeyUpdateArgs<ExtArgs>>): Prisma__AdminApiKeyClient<$Result.GetResult<Prisma.$AdminApiKeyPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more AdminApiKeys.
+     * @param {AdminApiKeyDeleteManyArgs} args - Arguments to filter AdminApiKeys to delete.
+     * @example
+     * // Delete a few AdminApiKeys
+     * const { count } = await prisma.adminApiKey.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AdminApiKeyDeleteManyArgs>(args?: SelectSubset<T, AdminApiKeyDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AdminApiKeys.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminApiKeyUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AdminApiKeys
+     * const adminApiKey = await prisma.adminApiKey.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AdminApiKeyUpdateManyArgs>(args: SelectSubset<T, AdminApiKeyUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AdminApiKeys and returns the data updated in the database.
+     * @param {AdminApiKeyUpdateManyAndReturnArgs} args - Arguments to update many AdminApiKeys.
+     * @example
+     * // Update many AdminApiKeys
+     * const adminApiKey = await prisma.adminApiKey.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more AdminApiKeys and only return the `adminId`
+     * const adminApiKeyWithAdminIdOnly = await prisma.adminApiKey.updateManyAndReturn({
+     *   select: { adminId: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends AdminApiKeyUpdateManyAndReturnArgs>(args: SelectSubset<T, AdminApiKeyUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminApiKeyPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one AdminApiKey.
+     * @param {AdminApiKeyUpsertArgs} args - Arguments to update or create a AdminApiKey.
+     * @example
+     * // Update or create a AdminApiKey
+     * const adminApiKey = await prisma.adminApiKey.upsert({
+     *   create: {
+     *     // ... data to create a AdminApiKey
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AdminApiKey we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AdminApiKeyUpsertArgs>(args: SelectSubset<T, AdminApiKeyUpsertArgs<ExtArgs>>): Prisma__AdminApiKeyClient<$Result.GetResult<Prisma.$AdminApiKeyPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of AdminApiKeys.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminApiKeyCountArgs} args - Arguments to filter AdminApiKeys to count.
+     * @example
+     * // Count the number of AdminApiKeys
+     * const count = await prisma.adminApiKey.count({
+     *   where: {
+     *     // ... the filter for the AdminApiKeys we want to count
+     *   }
+     * })
+    **/
+    count<T extends AdminApiKeyCountArgs>(
+      args?: Subset<T, AdminApiKeyCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AdminApiKeyCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AdminApiKey.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminApiKeyAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AdminApiKeyAggregateArgs>(args: Subset<T, AdminApiKeyAggregateArgs>): Prisma.PrismaPromise<GetAdminApiKeyAggregateType<T>>
+
+    /**
+     * Group by AdminApiKey.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminApiKeyGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AdminApiKeyGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AdminApiKeyGroupByArgs['orderBy'] }
+        : { orderBy?: AdminApiKeyGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AdminApiKeyGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAdminApiKeyGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AdminApiKey model
+   */
+  readonly fields: AdminApiKeyFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AdminApiKey.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AdminApiKeyClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AdminApiKey model
+   */
+  interface AdminApiKeyFieldRefs {
+    readonly adminId: FieldRef<"AdminApiKey", 'String'>
+    readonly serviceName: FieldRef<"AdminApiKey", 'String'>
+    readonly apiKey: FieldRef<"AdminApiKey", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AdminApiKey findUnique
+   */
+  export type AdminApiKeyFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminApiKey
+     */
+    select?: AdminApiKeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminApiKey
+     */
+    omit?: AdminApiKeyOmit<ExtArgs> | null
+    /**
+     * Filter, which AdminApiKey to fetch.
+     */
+    where: AdminApiKeyWhereUniqueInput
+  }
+
+  /**
+   * AdminApiKey findUniqueOrThrow
+   */
+  export type AdminApiKeyFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminApiKey
+     */
+    select?: AdminApiKeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminApiKey
+     */
+    omit?: AdminApiKeyOmit<ExtArgs> | null
+    /**
+     * Filter, which AdminApiKey to fetch.
+     */
+    where: AdminApiKeyWhereUniqueInput
+  }
+
+  /**
+   * AdminApiKey findFirst
+   */
+  export type AdminApiKeyFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminApiKey
+     */
+    select?: AdminApiKeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminApiKey
+     */
+    omit?: AdminApiKeyOmit<ExtArgs> | null
+    /**
+     * Filter, which AdminApiKey to fetch.
+     */
+    where?: AdminApiKeyWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AdminApiKeys to fetch.
+     */
+    orderBy?: AdminApiKeyOrderByWithRelationInput | AdminApiKeyOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AdminApiKeys.
+     */
+    cursor?: AdminApiKeyWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AdminApiKeys from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AdminApiKeys.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AdminApiKeys.
+     */
+    distinct?: AdminApiKeyScalarFieldEnum | AdminApiKeyScalarFieldEnum[]
+  }
+
+  /**
+   * AdminApiKey findFirstOrThrow
+   */
+  export type AdminApiKeyFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminApiKey
+     */
+    select?: AdminApiKeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminApiKey
+     */
+    omit?: AdminApiKeyOmit<ExtArgs> | null
+    /**
+     * Filter, which AdminApiKey to fetch.
+     */
+    where?: AdminApiKeyWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AdminApiKeys to fetch.
+     */
+    orderBy?: AdminApiKeyOrderByWithRelationInput | AdminApiKeyOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AdminApiKeys.
+     */
+    cursor?: AdminApiKeyWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AdminApiKeys from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AdminApiKeys.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AdminApiKeys.
+     */
+    distinct?: AdminApiKeyScalarFieldEnum | AdminApiKeyScalarFieldEnum[]
+  }
+
+  /**
+   * AdminApiKey findMany
+   */
+  export type AdminApiKeyFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminApiKey
+     */
+    select?: AdminApiKeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminApiKey
+     */
+    omit?: AdminApiKeyOmit<ExtArgs> | null
+    /**
+     * Filter, which AdminApiKeys to fetch.
+     */
+    where?: AdminApiKeyWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AdminApiKeys to fetch.
+     */
+    orderBy?: AdminApiKeyOrderByWithRelationInput | AdminApiKeyOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AdminApiKeys.
+     */
+    cursor?: AdminApiKeyWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AdminApiKeys from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AdminApiKeys.
+     */
+    skip?: number
+    distinct?: AdminApiKeyScalarFieldEnum | AdminApiKeyScalarFieldEnum[]
+  }
+
+  /**
+   * AdminApiKey create
+   */
+  export type AdminApiKeyCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminApiKey
+     */
+    select?: AdminApiKeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminApiKey
+     */
+    omit?: AdminApiKeyOmit<ExtArgs> | null
+    /**
+     * The data needed to create a AdminApiKey.
+     */
+    data: XOR<AdminApiKeyCreateInput, AdminApiKeyUncheckedCreateInput>
+  }
+
+  /**
+   * AdminApiKey createMany
+   */
+  export type AdminApiKeyCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AdminApiKeys.
+     */
+    data: AdminApiKeyCreateManyInput | AdminApiKeyCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AdminApiKey createManyAndReturn
+   */
+  export type AdminApiKeyCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminApiKey
+     */
+    select?: AdminApiKeySelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminApiKey
+     */
+    omit?: AdminApiKeyOmit<ExtArgs> | null
+    /**
+     * The data used to create many AdminApiKeys.
+     */
+    data: AdminApiKeyCreateManyInput | AdminApiKeyCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AdminApiKey update
+   */
+  export type AdminApiKeyUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminApiKey
+     */
+    select?: AdminApiKeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminApiKey
+     */
+    omit?: AdminApiKeyOmit<ExtArgs> | null
+    /**
+     * The data needed to update a AdminApiKey.
+     */
+    data: XOR<AdminApiKeyUpdateInput, AdminApiKeyUncheckedUpdateInput>
+    /**
+     * Choose, which AdminApiKey to update.
+     */
+    where: AdminApiKeyWhereUniqueInput
+  }
+
+  /**
+   * AdminApiKey updateMany
+   */
+  export type AdminApiKeyUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AdminApiKeys.
+     */
+    data: XOR<AdminApiKeyUpdateManyMutationInput, AdminApiKeyUncheckedUpdateManyInput>
+    /**
+     * Filter which AdminApiKeys to update
+     */
+    where?: AdminApiKeyWhereInput
+    /**
+     * Limit how many AdminApiKeys to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * AdminApiKey updateManyAndReturn
+   */
+  export type AdminApiKeyUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminApiKey
+     */
+    select?: AdminApiKeySelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminApiKey
+     */
+    omit?: AdminApiKeyOmit<ExtArgs> | null
+    /**
+     * The data used to update AdminApiKeys.
+     */
+    data: XOR<AdminApiKeyUpdateManyMutationInput, AdminApiKeyUncheckedUpdateManyInput>
+    /**
+     * Filter which AdminApiKeys to update
+     */
+    where?: AdminApiKeyWhereInput
+    /**
+     * Limit how many AdminApiKeys to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * AdminApiKey upsert
+   */
+  export type AdminApiKeyUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminApiKey
+     */
+    select?: AdminApiKeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminApiKey
+     */
+    omit?: AdminApiKeyOmit<ExtArgs> | null
+    /**
+     * The filter to search for the AdminApiKey to update in case it exists.
+     */
+    where: AdminApiKeyWhereUniqueInput
+    /**
+     * In case the AdminApiKey found by the `where` argument doesn't exist, create a new AdminApiKey with this data.
+     */
+    create: XOR<AdminApiKeyCreateInput, AdminApiKeyUncheckedCreateInput>
+    /**
+     * In case the AdminApiKey was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AdminApiKeyUpdateInput, AdminApiKeyUncheckedUpdateInput>
+  }
+
+  /**
+   * AdminApiKey delete
+   */
+  export type AdminApiKeyDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminApiKey
+     */
+    select?: AdminApiKeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminApiKey
+     */
+    omit?: AdminApiKeyOmit<ExtArgs> | null
+    /**
+     * Filter which AdminApiKey to delete.
+     */
+    where: AdminApiKeyWhereUniqueInput
+  }
+
+  /**
+   * AdminApiKey deleteMany
+   */
+  export type AdminApiKeyDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AdminApiKeys to delete
+     */
+    where?: AdminApiKeyWhereInput
+    /**
+     * Limit how many AdminApiKeys to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * AdminApiKey without action
+   */
+  export type AdminApiKeyDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminApiKey
+     */
+    select?: AdminApiKeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminApiKey
+     */
+    omit?: AdminApiKeyOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -10539,8 +11586,7 @@ export namespace Prisma {
     id: 'id',
     userId: 'userId',
     preferYearOnlyDateFormat: 'preferYearOnlyDateFormat',
-    encryptedFilesVcApiKey: 'encryptedFilesVcApiKey',
-    apiKeyIv: 'apiKeyIv',
+    filesVcApiKey: 'filesVcApiKey',
     updatedAt: 'updatedAt'
   };
 
@@ -10588,6 +11634,15 @@ export namespace Prisma {
   };
 
   export type AuthorScalarFieldEnum = (typeof AuthorScalarFieldEnum)[keyof typeof AuthorScalarFieldEnum]
+
+
+  export const AdminApiKeyScalarFieldEnum: {
+    adminId: 'adminId',
+    serviceName: 'serviceName',
+    apiKey: 'apiKey'
+  };
+
+  export type AdminApiKeyScalarFieldEnum = (typeof AdminApiKeyScalarFieldEnum)[keyof typeof AdminApiKeyScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -10958,8 +12013,7 @@ export namespace Prisma {
     id?: StringFilter<"UserSettings"> | string
     userId?: StringFilter<"UserSettings"> | string
     preferYearOnlyDateFormat?: BoolFilter<"UserSettings"> | boolean
-    encryptedFilesVcApiKey?: StringNullableFilter<"UserSettings"> | string | null
-    apiKeyIv?: StringNullableFilter<"UserSettings"> | string | null
+    filesVcApiKey?: StringNullableFilter<"UserSettings"> | string | null
     updatedAt?: DateTimeFilter<"UserSettings"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
@@ -10968,8 +12022,7 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     preferYearOnlyDateFormat?: SortOrder
-    encryptedFilesVcApiKey?: SortOrderInput | SortOrder
-    apiKeyIv?: SortOrderInput | SortOrder
+    filesVcApiKey?: SortOrderInput | SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
   }
@@ -10981,8 +12034,7 @@ export namespace Prisma {
     OR?: UserSettingsWhereInput[]
     NOT?: UserSettingsWhereInput | UserSettingsWhereInput[]
     preferYearOnlyDateFormat?: BoolFilter<"UserSettings"> | boolean
-    encryptedFilesVcApiKey?: StringNullableFilter<"UserSettings"> | string | null
-    apiKeyIv?: StringNullableFilter<"UserSettings"> | string | null
+    filesVcApiKey?: StringNullableFilter<"UserSettings"> | string | null
     updatedAt?: DateTimeFilter<"UserSettings"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id" | "userId">
@@ -10991,8 +12043,7 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     preferYearOnlyDateFormat?: SortOrder
-    encryptedFilesVcApiKey?: SortOrderInput | SortOrder
-    apiKeyIv?: SortOrderInput | SortOrder
+    filesVcApiKey?: SortOrderInput | SortOrder
     updatedAt?: SortOrder
     _count?: UserSettingsCountOrderByAggregateInput
     _max?: UserSettingsMaxOrderByAggregateInput
@@ -11006,8 +12057,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"UserSettings"> | string
     userId?: StringWithAggregatesFilter<"UserSettings"> | string
     preferYearOnlyDateFormat?: BoolWithAggregatesFilter<"UserSettings"> | boolean
-    encryptedFilesVcApiKey?: StringNullableWithAggregatesFilter<"UserSettings"> | string | null
-    apiKeyIv?: StringNullableWithAggregatesFilter<"UserSettings"> | string | null
+    filesVcApiKey?: StringNullableWithAggregatesFilter<"UserSettings"> | string | null
     updatedAt?: DateTimeWithAggregatesFilter<"UserSettings"> | Date | string
   }
 
@@ -11229,6 +12279,49 @@ export namespace Prisma {
     name?: StringWithAggregatesFilter<"Author"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Author"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Author"> | Date | string
+  }
+
+  export type AdminApiKeyWhereInput = {
+    AND?: AdminApiKeyWhereInput | AdminApiKeyWhereInput[]
+    OR?: AdminApiKeyWhereInput[]
+    NOT?: AdminApiKeyWhereInput | AdminApiKeyWhereInput[]
+    adminId?: StringFilter<"AdminApiKey"> | string
+    serviceName?: StringFilter<"AdminApiKey"> | string
+    apiKey?: StringFilter<"AdminApiKey"> | string
+  }
+
+  export type AdminApiKeyOrderByWithRelationInput = {
+    adminId?: SortOrder
+    serviceName?: SortOrder
+    apiKey?: SortOrder
+  }
+
+  export type AdminApiKeyWhereUniqueInput = Prisma.AtLeast<{
+    adminId_serviceName?: AdminApiKeyAdminIdServiceNameCompoundUniqueInput
+    AND?: AdminApiKeyWhereInput | AdminApiKeyWhereInput[]
+    OR?: AdminApiKeyWhereInput[]
+    NOT?: AdminApiKeyWhereInput | AdminApiKeyWhereInput[]
+    adminId?: StringFilter<"AdminApiKey"> | string
+    serviceName?: StringFilter<"AdminApiKey"> | string
+    apiKey?: StringFilter<"AdminApiKey"> | string
+  }, "adminId_serviceName">
+
+  export type AdminApiKeyOrderByWithAggregationInput = {
+    adminId?: SortOrder
+    serviceName?: SortOrder
+    apiKey?: SortOrder
+    _count?: AdminApiKeyCountOrderByAggregateInput
+    _max?: AdminApiKeyMaxOrderByAggregateInput
+    _min?: AdminApiKeyMinOrderByAggregateInput
+  }
+
+  export type AdminApiKeyScalarWhereWithAggregatesInput = {
+    AND?: AdminApiKeyScalarWhereWithAggregatesInput | AdminApiKeyScalarWhereWithAggregatesInput[]
+    OR?: AdminApiKeyScalarWhereWithAggregatesInput[]
+    NOT?: AdminApiKeyScalarWhereWithAggregatesInput | AdminApiKeyScalarWhereWithAggregatesInput[]
+    adminId?: StringWithAggregatesFilter<"AdminApiKey"> | string
+    serviceName?: StringWithAggregatesFilter<"AdminApiKey"> | string
+    apiKey?: StringWithAggregatesFilter<"AdminApiKey"> | string
   }
 
   export type AccountCreateInput = {
@@ -11503,8 +12596,7 @@ export namespace Prisma {
   export type UserSettingsCreateInput = {
     id?: string
     preferYearOnlyDateFormat?: boolean
-    encryptedFilesVcApiKey?: string | null
-    apiKeyIv?: string | null
+    filesVcApiKey?: string | null
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSettingsInput
   }
@@ -11513,16 +12605,14 @@ export namespace Prisma {
     id?: string
     userId: string
     preferYearOnlyDateFormat?: boolean
-    encryptedFilesVcApiKey?: string | null
-    apiKeyIv?: string | null
+    filesVcApiKey?: string | null
     updatedAt?: Date | string
   }
 
   export type UserSettingsUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     preferYearOnlyDateFormat?: BoolFieldUpdateOperationsInput | boolean
-    encryptedFilesVcApiKey?: NullableStringFieldUpdateOperationsInput | string | null
-    apiKeyIv?: NullableStringFieldUpdateOperationsInput | string | null
+    filesVcApiKey?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSettingsNestedInput
   }
@@ -11531,8 +12621,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     preferYearOnlyDateFormat?: BoolFieldUpdateOperationsInput | boolean
-    encryptedFilesVcApiKey?: NullableStringFieldUpdateOperationsInput | string | null
-    apiKeyIv?: NullableStringFieldUpdateOperationsInput | string | null
+    filesVcApiKey?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -11540,16 +12629,14 @@ export namespace Prisma {
     id?: string
     userId: string
     preferYearOnlyDateFormat?: boolean
-    encryptedFilesVcApiKey?: string | null
-    apiKeyIv?: string | null
+    filesVcApiKey?: string | null
     updatedAt?: Date | string
   }
 
   export type UserSettingsUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     preferYearOnlyDateFormat?: BoolFieldUpdateOperationsInput | boolean
-    encryptedFilesVcApiKey?: NullableStringFieldUpdateOperationsInput | string | null
-    apiKeyIv?: NullableStringFieldUpdateOperationsInput | string | null
+    filesVcApiKey?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -11557,8 +12644,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     preferYearOnlyDateFormat?: BoolFieldUpdateOperationsInput | boolean
-    encryptedFilesVcApiKey?: NullableStringFieldUpdateOperationsInput | string | null
-    apiKeyIv?: NullableStringFieldUpdateOperationsInput | string | null
+    filesVcApiKey?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -11809,6 +12895,48 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminApiKeyCreateInput = {
+    adminId: string
+    serviceName: string
+    apiKey: string
+  }
+
+  export type AdminApiKeyUncheckedCreateInput = {
+    adminId: string
+    serviceName: string
+    apiKey: string
+  }
+
+  export type AdminApiKeyUpdateInput = {
+    adminId?: StringFieldUpdateOperationsInput | string
+    serviceName?: StringFieldUpdateOperationsInput | string
+    apiKey?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type AdminApiKeyUncheckedUpdateInput = {
+    adminId?: StringFieldUpdateOperationsInput | string
+    serviceName?: StringFieldUpdateOperationsInput | string
+    apiKey?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type AdminApiKeyCreateManyInput = {
+    adminId: string
+    serviceName: string
+    apiKey: string
+  }
+
+  export type AdminApiKeyUpdateManyMutationInput = {
+    adminId?: StringFieldUpdateOperationsInput | string
+    serviceName?: StringFieldUpdateOperationsInput | string
+    apiKey?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type AdminApiKeyUncheckedUpdateManyInput = {
+    adminId?: StringFieldUpdateOperationsInput | string
+    serviceName?: StringFieldUpdateOperationsInput | string
+    apiKey?: StringFieldUpdateOperationsInput | string
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -12144,8 +13272,7 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     preferYearOnlyDateFormat?: SortOrder
-    encryptedFilesVcApiKey?: SortOrder
-    apiKeyIv?: SortOrder
+    filesVcApiKey?: SortOrder
     updatedAt?: SortOrder
   }
 
@@ -12153,8 +13280,7 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     preferYearOnlyDateFormat?: SortOrder
-    encryptedFilesVcApiKey?: SortOrder
-    apiKeyIv?: SortOrder
+    filesVcApiKey?: SortOrder
     updatedAt?: SortOrder
   }
 
@@ -12162,8 +13288,7 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     preferYearOnlyDateFormat?: SortOrder
-    encryptedFilesVcApiKey?: SortOrder
-    apiKeyIv?: SortOrder
+    filesVcApiKey?: SortOrder
     updatedAt?: SortOrder
   }
 
@@ -12345,6 +13470,29 @@ export namespace Prisma {
     name?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type AdminApiKeyAdminIdServiceNameCompoundUniqueInput = {
+    adminId: string
+    serviceName: string
+  }
+
+  export type AdminApiKeyCountOrderByAggregateInput = {
+    adminId?: SortOrder
+    serviceName?: SortOrder
+    apiKey?: SortOrder
+  }
+
+  export type AdminApiKeyMaxOrderByAggregateInput = {
+    adminId?: SortOrder
+    serviceName?: SortOrder
+    apiKey?: SortOrder
+  }
+
+  export type AdminApiKeyMinOrderByAggregateInput = {
+    adminId?: SortOrder
+    serviceName?: SortOrder
+    apiKey?: SortOrder
   }
 
   export type UserCreateNestedOneWithoutAccountsInput = {
@@ -13087,16 +14235,14 @@ export namespace Prisma {
   export type UserSettingsCreateWithoutUserInput = {
     id?: string
     preferYearOnlyDateFormat?: boolean
-    encryptedFilesVcApiKey?: string | null
-    apiKeyIv?: string | null
+    filesVcApiKey?: string | null
     updatedAt?: Date | string
   }
 
   export type UserSettingsUncheckedCreateWithoutUserInput = {
     id?: string
     preferYearOnlyDateFormat?: boolean
-    encryptedFilesVcApiKey?: string | null
-    apiKeyIv?: string | null
+    filesVcApiKey?: string | null
     updatedAt?: Date | string
   }
 
@@ -13179,16 +14325,14 @@ export namespace Prisma {
   export type UserSettingsUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     preferYearOnlyDateFormat?: BoolFieldUpdateOperationsInput | boolean
-    encryptedFilesVcApiKey?: NullableStringFieldUpdateOperationsInput | string | null
-    apiKeyIv?: NullableStringFieldUpdateOperationsInput | string | null
+    filesVcApiKey?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type UserSettingsUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     preferYearOnlyDateFormat?: BoolFieldUpdateOperationsInput | boolean
-    encryptedFilesVcApiKey?: NullableStringFieldUpdateOperationsInput | string | null
-    apiKeyIv?: NullableStringFieldUpdateOperationsInput | string | null
+    filesVcApiKey?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
