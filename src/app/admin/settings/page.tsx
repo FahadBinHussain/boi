@@ -17,7 +17,9 @@ export default function AdminSettings() {
   // Local state for form controls
   const [preferYearOnlyDateFormat, setPreferYearOnlyDateFormat] = useState(true);
   const [filesVcApiKey, setFilesVcApiKey] = useState("");
+  const [filesVcAccountId, setFilesVcAccountId] = useState("");
   const [isApiKeyModified, setIsApiKeyModified] = useState(false);
+  const [isAccountIdModified, setIsAccountIdModified] = useState(false);
 
   // Load settings when component mounts
   useEffect(() => {
@@ -27,6 +29,11 @@ export default function AdminSettings() {
       // If API key exists in settings, show masked version
       if (settings.filesVcApiKey) {
         setFilesVcApiKey("••••••••••••••••");
+      }
+      
+      // Set Account ID if it exists
+      if (settings.filesVcAccountId) {
+        setFilesVcAccountId(settings.filesVcAccountId);
       }
     }
   }, [isLoading, settings]);
@@ -59,6 +66,11 @@ export default function AdminSettings() {
     setFilesVcApiKey(e.target.value);
     setIsApiKeyModified(true);
   };
+  
+  const handleAccountIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFilesVcAccountId(e.target.value);
+    setIsAccountIdModified(true);
+  };
 
   const handleSaveSettings = async () => {
     setIsSaving(true);
@@ -73,6 +85,11 @@ export default function AdminSettings() {
         updatedSettings.filesVcApiKey = filesVcApiKey;
       }
       
+      // Update Account ID if it was modified
+      if (isAccountIdModified) {
+        updatedSettings.filesVcAccountId = filesVcAccountId;
+      }
+      
       // First just update local state
       await updateSettings(updatedSettings);
       
@@ -80,6 +97,7 @@ export default function AdminSettings() {
       await saveChanges();
       
       setIsApiKeyModified(false);
+      setIsAccountIdModified(false);
     } catch (error) {
       console.error("Failed to save settings:", error);
       // The error notification will be shown by the useEffect watching syncStatus
@@ -213,6 +231,23 @@ export default function AdminSettings() {
                   {!isApiKeyModified && settings?.filesVcApiKey 
                     ? "API key is saved. Leave blank to keep the existing key." 
                     : "Your API key will be stored in the database."}
+                </p>
+              </div>
+              
+              <div>
+                <label htmlFor="accountId" className="mb-1 block text-sm font-medium text-gray-700">
+                  Account ID
+                </label>
+                <input
+                  type="text"
+                  id="accountId"
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  placeholder="Enter your Files.vc Account ID"
+                  value={filesVcAccountId}
+                  onChange={handleAccountIdChange}
+                />
+                <p className="mt-1 text-xs text-gray-400">
+                  Required to associate uploads with your Files.vc account. Find this in your Files.vc dashboard.
                 </p>
               </div>
             </div>

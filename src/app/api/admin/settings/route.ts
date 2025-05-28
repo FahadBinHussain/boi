@@ -113,7 +113,8 @@ export async function GET(request: NextRequest) {
     const response = {
       preferYearOnlyDateFormat: userSettings.preferYearOnlyDateFormat,
       // Don't expose the actual API key, just whether it exists
-      filesVcApiKey: (userSettings as unknown as { filesVcApiKey?: string }).filesVcApiKey ? true : undefined
+      filesVcApiKey: (userSettings as unknown as { filesVcApiKey?: string }).filesVcApiKey ? true : undefined,
+      filesVcAccountId: (userSettings as unknown as { filesVcAccountId?: string }).filesVcAccountId
     };
     
     console.log('GET settings: Returning existing settings from database');
@@ -191,6 +192,11 @@ export async function PUT(request: NextRequest) {
       if (data.filesVcApiKey) {
         updateData.filesVcApiKey = data.filesVcApiKey;
       }
+    }
+    
+    // Handle Account ID
+    if ('filesVcAccountId' in data && typeof data.filesVcAccountId === 'string') {
+      updateData.filesVcAccountId = data.filesVcAccountId;
     }
     
     console.log('Processed update data (without sensitive values):', 

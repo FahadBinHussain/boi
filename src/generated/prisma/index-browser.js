@@ -162,6 +162,7 @@ exports.Prisma.UserSettingsScalarFieldEnum = {
   userId: 'userId',
   preferYearOnlyDateFormat: 'preferYearOnlyDateFormat',
   filesVcApiKey: 'filesVcApiKey',
+  filesVcAccountId: 'filesVcAccountId',
   updatedAt: 'updatedAt'
 };
 

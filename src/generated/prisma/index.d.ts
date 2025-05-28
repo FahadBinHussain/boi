@@ -6092,6 +6092,7 @@ export namespace Prisma {
     userId: string | null
     preferYearOnlyDateFormat: boolean | null
     filesVcApiKey: string | null
+    filesVcAccountId: string | null
     updatedAt: Date | null
   }
 
@@ -6100,6 +6101,7 @@ export namespace Prisma {
     userId: string | null
     preferYearOnlyDateFormat: boolean | null
     filesVcApiKey: string | null
+    filesVcAccountId: string | null
     updatedAt: Date | null
   }
 
@@ -6108,6 +6110,7 @@ export namespace Prisma {
     userId: number
     preferYearOnlyDateFormat: number
     filesVcApiKey: number
+    filesVcAccountId: number
     updatedAt: number
     _all: number
   }
@@ -6118,6 +6121,7 @@ export namespace Prisma {
     userId?: true
     preferYearOnlyDateFormat?: true
     filesVcApiKey?: true
+    filesVcAccountId?: true
     updatedAt?: true
   }
 
@@ -6126,6 +6130,7 @@ export namespace Prisma {
     userId?: true
     preferYearOnlyDateFormat?: true
     filesVcApiKey?: true
+    filesVcAccountId?: true
     updatedAt?: true
   }
 
@@ -6134,6 +6139,7 @@ export namespace Prisma {
     userId?: true
     preferYearOnlyDateFormat?: true
     filesVcApiKey?: true
+    filesVcAccountId?: true
     updatedAt?: true
     _all?: true
   }
@@ -6215,6 +6221,7 @@ export namespace Prisma {
     userId: string
     preferYearOnlyDateFormat: boolean
     filesVcApiKey: string | null
+    filesVcAccountId: string | null
     updatedAt: Date
     _count: UserSettingsCountAggregateOutputType | null
     _min: UserSettingsMinAggregateOutputType | null
@@ -6240,6 +6247,7 @@ export namespace Prisma {
     userId?: boolean
     preferYearOnlyDateFormat?: boolean
     filesVcApiKey?: boolean
+    filesVcAccountId?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["userSettings"]>
@@ -6249,6 +6257,7 @@ export namespace Prisma {
     userId?: boolean
     preferYearOnlyDateFormat?: boolean
     filesVcApiKey?: boolean
+    filesVcAccountId?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["userSettings"]>
@@ -6258,6 +6267,7 @@ export namespace Prisma {
     userId?: boolean
     preferYearOnlyDateFormat?: boolean
     filesVcApiKey?: boolean
+    filesVcAccountId?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["userSettings"]>
@@ -6267,10 +6277,11 @@ export namespace Prisma {
     userId?: boolean
     preferYearOnlyDateFormat?: boolean
     filesVcApiKey?: boolean
+    filesVcAccountId?: boolean
     updatedAt?: boolean
   }
 
-  export type UserSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "preferYearOnlyDateFormat" | "filesVcApiKey" | "updatedAt", ExtArgs["result"]["userSettings"]>
+  export type UserSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "preferYearOnlyDateFormat" | "filesVcApiKey" | "filesVcAccountId" | "updatedAt", ExtArgs["result"]["userSettings"]>
   export type UserSettingsInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -6291,6 +6302,7 @@ export namespace Prisma {
       userId: string
       preferYearOnlyDateFormat: boolean
       filesVcApiKey: string | null
+      filesVcAccountId: string | null
       updatedAt: Date
     }, ExtArgs["result"]["userSettings"]>
     composites: {}
@@ -6720,6 +6732,7 @@ export namespace Prisma {
     readonly userId: FieldRef<"UserSettings", 'String'>
     readonly preferYearOnlyDateFormat: FieldRef<"UserSettings", 'Boolean'>
     readonly filesVcApiKey: FieldRef<"UserSettings", 'String'>
+    readonly filesVcAccountId: FieldRef<"UserSettings", 'String'>
     readonly updatedAt: FieldRef<"UserSettings", 'DateTime'>
   }
     
@@ -11587,6 +11600,7 @@ export namespace Prisma {
     userId: 'userId',
     preferYearOnlyDateFormat: 'preferYearOnlyDateFormat',
     filesVcApiKey: 'filesVcApiKey',
+    filesVcAccountId: 'filesVcAccountId',
     updatedAt: 'updatedAt'
   };
 
@@ -12014,6 +12028,7 @@ export namespace Prisma {
     userId?: StringFilter<"UserSettings"> | string
     preferYearOnlyDateFormat?: BoolFilter<"UserSettings"> | boolean
     filesVcApiKey?: StringNullableFilter<"UserSettings"> | string | null
+    filesVcAccountId?: StringNullableFilter<"UserSettings"> | string | null
     updatedAt?: DateTimeFilter<"UserSettings"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
@@ -12023,6 +12038,7 @@ export namespace Prisma {
     userId?: SortOrder
     preferYearOnlyDateFormat?: SortOrder
     filesVcApiKey?: SortOrderInput | SortOrder
+    filesVcAccountId?: SortOrderInput | SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
   }
@@ -12035,6 +12051,7 @@ export namespace Prisma {
     NOT?: UserSettingsWhereInput | UserSettingsWhereInput[]
     preferYearOnlyDateFormat?: BoolFilter<"UserSettings"> | boolean
     filesVcApiKey?: StringNullableFilter<"UserSettings"> | string | null
+    filesVcAccountId?: StringNullableFilter<"UserSettings"> | string | null
     updatedAt?: DateTimeFilter<"UserSettings"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id" | "userId">
@@ -12044,6 +12061,7 @@ export namespace Prisma {
     userId?: SortOrder
     preferYearOnlyDateFormat?: SortOrder
     filesVcApiKey?: SortOrderInput | SortOrder
+    filesVcAccountId?: SortOrderInput | SortOrder
     updatedAt?: SortOrder
     _count?: UserSettingsCountOrderByAggregateInput
     _max?: UserSettingsMaxOrderByAggregateInput
@@ -12058,6 +12076,7 @@ export namespace Prisma {
     userId?: StringWithAggregatesFilter<"UserSettings"> | string
     preferYearOnlyDateFormat?: BoolWithAggregatesFilter<"UserSettings"> | boolean
     filesVcApiKey?: StringNullableWithAggregatesFilter<"UserSettings"> | string | null
+    filesVcAccountId?: StringNullableWithAggregatesFilter<"UserSettings"> | string | null
     updatedAt?: DateTimeWithAggregatesFilter<"UserSettings"> | Date | string
   }
 
@@ -12597,6 +12616,7 @@ export namespace Prisma {
     id?: string
     preferYearOnlyDateFormat?: boolean
     filesVcApiKey?: string | null
+    filesVcAccountId?: string | null
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSettingsInput
   }
@@ -12606,6 +12626,7 @@ export namespace Prisma {
     userId: string
     preferYearOnlyDateFormat?: boolean
     filesVcApiKey?: string | null
+    filesVcAccountId?: string | null
     updatedAt?: Date | string
   }
 
@@ -12613,6 +12634,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     preferYearOnlyDateFormat?: BoolFieldUpdateOperationsInput | boolean
     filesVcApiKey?: NullableStringFieldUpdateOperationsInput | string | null
+    filesVcAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSettingsNestedInput
   }
@@ -12622,6 +12644,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     preferYearOnlyDateFormat?: BoolFieldUpdateOperationsInput | boolean
     filesVcApiKey?: NullableStringFieldUpdateOperationsInput | string | null
+    filesVcAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -12630,6 +12653,7 @@ export namespace Prisma {
     userId: string
     preferYearOnlyDateFormat?: boolean
     filesVcApiKey?: string | null
+    filesVcAccountId?: string | null
     updatedAt?: Date | string
   }
 
@@ -12637,6 +12661,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     preferYearOnlyDateFormat?: BoolFieldUpdateOperationsInput | boolean
     filesVcApiKey?: NullableStringFieldUpdateOperationsInput | string | null
+    filesVcAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -12645,6 +12670,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     preferYearOnlyDateFormat?: BoolFieldUpdateOperationsInput | boolean
     filesVcApiKey?: NullableStringFieldUpdateOperationsInput | string | null
+    filesVcAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -13273,6 +13299,7 @@ export namespace Prisma {
     userId?: SortOrder
     preferYearOnlyDateFormat?: SortOrder
     filesVcApiKey?: SortOrder
+    filesVcAccountId?: SortOrder
     updatedAt?: SortOrder
   }
 
@@ -13281,6 +13308,7 @@ export namespace Prisma {
     userId?: SortOrder
     preferYearOnlyDateFormat?: SortOrder
     filesVcApiKey?: SortOrder
+    filesVcAccountId?: SortOrder
     updatedAt?: SortOrder
   }
 
@@ -13289,6 +13317,7 @@ export namespace Prisma {
     userId?: SortOrder
     preferYearOnlyDateFormat?: SortOrder
     filesVcApiKey?: SortOrder
+    filesVcAccountId?: SortOrder
     updatedAt?: SortOrder
   }
 
@@ -14236,6 +14265,7 @@ export namespace Prisma {
     id?: string
     preferYearOnlyDateFormat?: boolean
     filesVcApiKey?: string | null
+    filesVcAccountId?: string | null
     updatedAt?: Date | string
   }
 
@@ -14243,6 +14273,7 @@ export namespace Prisma {
     id?: string
     preferYearOnlyDateFormat?: boolean
     filesVcApiKey?: string | null
+    filesVcAccountId?: string | null
     updatedAt?: Date | string
   }
 
@@ -14326,6 +14357,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     preferYearOnlyDateFormat?: BoolFieldUpdateOperationsInput | boolean
     filesVcApiKey?: NullableStringFieldUpdateOperationsInput | string | null
+    filesVcAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -14333,6 +14365,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     preferYearOnlyDateFormat?: BoolFieldUpdateOperationsInput | boolean
     filesVcApiKey?: NullableStringFieldUpdateOperationsInput | string | null
+    filesVcAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

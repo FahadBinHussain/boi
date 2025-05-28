@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 export interface UserSettings {
   preferYearOnlyDateFormat: boolean;
   filesVcApiKey?: string; // Add API key property (optional)
+  filesVcAccountId?: string; // Account ID for Files.vc
   // Add other user settings here as needed
 }
 

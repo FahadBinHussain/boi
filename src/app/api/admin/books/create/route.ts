@@ -5,50 +5,9 @@ import { prisma } from '@/lib/prisma';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import axios from 'axios';
-import FormData from 'form-data';
 
-// Define the uploadFilesVc function since it's not exported from the upload route
-const uploadFilesVc = async (filePath: string, apiKey: string, accountId: string | null = null) => {
-  try {
-    const form = new FormData();
-    form.append('file', fs.createReadStream(filePath));
-    
-    // Set headers with the API key
-    const headers: Record<string, any> = {
-      'X-API-Key': apiKey,
-      ...form.getHeaders()
-    };
-    
-    // Add account ID if provided
-    if (accountId) {
-      headers['X-Account-ID'] = accountId;
-    }
-    
-    const response = await axios.post('https://api.files.vc/upload', form, { headers });
-    
-    if (response.data && (response.data.file_url || response.data.page_url)) {
-      console.log('Upload successful!');
-      return {
-        success: true,
-        data: response.data
-      };
-    } else {
-      console.error('Upload failed: Unexpected response format');
-      return {
-        success: false,
-        error: 'Unexpected response format from Files.vc'
-      };
-    }
-  } catch (error: unknown) {
-    const errorResponse = error as { response?: { data?: unknown }, message?: string };
-    console.error('Upload failed:', errorResponse.response?.data || errorResponse.message);
-    return {
-      success: false,
-      error: errorResponse.response?.data || errorResponse.message
-    };
-  }
-};
+// Import the uploadFile function from the submodule
+const { uploadFile } = require('../../../../../../files.vc-Uploader/lib/uploader');
 
 export async function POST(req: NextRequest) {
   try {
@@ -129,36 +88,58 @@ export async function POST(req: NextRequest) {
           const buffer = Buffer.from(arrayBuffer);
           fs.writeFileSync(tempFilePath, buffer);
           
-          // Get API key from UserSettings
+          // Get API key from user settings
           const userSettings = await prisma.userSettings.findUnique({
             where: { userId: adminUser.id },
             select: { filesVcApiKey: true }
-          });
-
+          }) as { filesVcApiKey?: string; filesVcAccountId?: string } | null;
+          
           if (!userSettings?.filesVcApiKey) {
-            throw new Error('Files.vc API key not found in user settings');
+            return NextResponse.json(
+              { error: 'Files.vc API key not configured in settings' },
+              { status: 400 }
+            );
           }
-
+          
+          // Get account ID from a separate query to avoid schema type issues
+          const accountSettings = await prisma.$queryRaw`
+            SELECT "filesVcAccountId" FROM "UserSettings" WHERE "userId" = ${adminUser.id}
+          ` as { filesVcAccountId?: string }[];
+          
+          const accountId = accountSettings && accountSettings.length > 0 ? accountSettings[0].filesVcAccountId : '';
+          
+          if (!accountId) {
+            return NextResponse.json(
+              { error: 'Files.vc Account ID not configured in settings' },
+              { status: 400 }
+            );
+          }
+          
           const apiKey = userSettings.filesVcApiKey;
           
-          // Upload to Files.vc
-          const uploadResult = await uploadFilesVc(tempFilePath, apiKey);
+          // Create a custom logger for the upload process
+          const logger = (message: string) => {
+            console.log(`[Files.vc Upload] ${message}`);
+          };
+          
+          // Use the uploadFile function from the submodule
+          const uploadResult = await uploadFile(tempFilePath, {
+            apiKey,
+            accountId,
+            logger
+          });
           
           // Clean up the temporary file
           fs.unlinkSync(tempFilePath);
           fs.rmdirSync(tempDir);
           
-          if (!uploadResult.success) {
-            throw new Error(`Upload failed: ${uploadResult.error}`);
-          }
+          fileUrl = uploadResult.file_url || uploadResult.page_url;
           
-          fileUrl = uploadResult.data.file_url || uploadResult.data.page_url;
-          
-        } catch (error) {
+        } catch (error: any) {
           console.error('Error uploading PDF:', error);
           return NextResponse.json({
             error: 'Failed to upload PDF file',
-            details: error instanceof Error ? error.message : 'Unknown error'
+            details: error.message || 'Unknown error'
           }, { status: 500 });
         }
       }
@@ -297,36 +278,58 @@ export async function POST(req: NextRequest) {
               const buffer = Buffer.from(arrayBuffer);
               fs.writeFileSync(tempFilePath, buffer);
               
-              // Get API key from UserSettings
+              // Get API key from user settings
               const userSettings = await prisma.userSettings.findUnique({
                 where: { userId: adminUser.id },
                 select: { filesVcApiKey: true }
-              });
-
+              }) as { filesVcApiKey?: string; filesVcAccountId?: string } | null;
+              
               if (!userSettings?.filesVcApiKey) {
-                throw new Error('Files.vc API key not found in user settings');
+                return NextResponse.json(
+                  { error: 'Files.vc API key not configured in settings' },
+                  { status: 400 }
+                );
               }
-
+              
+              // Get account ID from a separate query to avoid schema type issues
+              const accountSettings = await prisma.$queryRaw`
+                SELECT "filesVcAccountId" FROM "UserSettings" WHERE "userId" = ${adminUser.id}
+              ` as { filesVcAccountId?: string }[];
+              
+              const accountId = accountSettings && accountSettings.length > 0 ? accountSettings[0].filesVcAccountId : '';
+              
+              if (!accountId) {
+                return NextResponse.json(
+                  { error: 'Files.vc Account ID not configured in settings' },
+                  { status: 400 }
+                );
+              }
+              
               const apiKey = userSettings.filesVcApiKey;
               
-              // Upload to Files.vc
-              const uploadResult = await uploadFilesVc(tempFilePath, apiKey);
+              // Create a custom logger for the upload process
+              const logger = (message: string) => {
+                console.log(`[Files.vc Upload] Book ${bookNumber}: ${message}`);
+              };
+              
+              // Use the uploadFile function from the submodule
+              const uploadResult = await uploadFile(tempFilePath, {
+                apiKey,
+                accountId,
+                logger
+              });
               
               // Clean up the temporary file
               fs.unlinkSync(tempFilePath);
               fs.rmdirSync(tempDir);
               
-              if (!uploadResult.success) {
-                throw new Error(`Upload failed: ${uploadResult.error}`);
-              }
+              fileUrl = uploadResult.file_url || uploadResult.page_url;
               
-              fileUrl = uploadResult.data.file_url || uploadResult.data.page_url;
-              
-            } catch (error) {
+            } catch (error: any) {
               console.error(`Error uploading PDF for book ${bookNumber}:`, error);
               return NextResponse.json({
                 error: `Failed to upload PDF file for book ${bookNumber}`,
-                details: error instanceof Error ? error.message : 'Unknown error'
+                details: error.message || 'Unknown error'
               }, { status: 500 });
             }
           }

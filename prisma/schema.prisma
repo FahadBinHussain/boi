@@ -59,6 +59,7 @@ model UserSettings {
   userId                  String   @unique
   preferYearOnlyDateFormat Boolean  @default(true)
   filesVcApiKey           String?  // Plain API key field
+  filesVcAccountId        String?  // Account ID for Files.vc
   updatedAt               DateTime @updatedAt
   user                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
