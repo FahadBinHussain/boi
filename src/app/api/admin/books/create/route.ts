@@ -91,8 +91,8 @@ export async function POST(req: NextRequest) {
           // Get API key from user settings
           const userSettings = await prisma.userSettings.findUnique({
             where: { userId: adminUser.id },
-            select: { filesVcApiKey: true }
-          }) as { filesVcApiKey?: string; filesVcAccountId?: string } | null;
+            select: { filesVcApiKey: true, filesVcAccountId: true }
+          });
           
           if (!userSettings?.filesVcApiKey) {
             return NextResponse.json(
@@ -101,14 +101,7 @@ export async function POST(req: NextRequest) {
             );
           }
           
-          // Get account ID from a separate query to avoid schema type issues
-          const accountSettings = await prisma.$queryRaw`
-            SELECT "filesVcAccountId" FROM "UserSettings" WHERE "userId" = ${adminUser.id}
-          ` as { filesVcAccountId?: string }[];
-          
-          const accountId = accountSettings && accountSettings.length > 0 ? accountSettings[0].filesVcAccountId : '';
-          
-          if (!accountId) {
+          if (!userSettings?.filesVcAccountId) {
             return NextResponse.json(
               { error: 'Files.vc Account ID not configured in settings' },
               { status: 400 }
@@ -116,6 +109,10 @@ export async function POST(req: NextRequest) {
           }
           
           const apiKey = userSettings.filesVcApiKey;
+          const accountId = userSettings.filesVcAccountId;
+          
+          console.log('Using API key:', apiKey.substring(0, 10) + '...');
+          console.log('Using Account ID:', accountId);
           
           // Create a custom logger for the upload process
           const logger = (message: string) => {
@@ -281,8 +278,8 @@ export async function POST(req: NextRequest) {
               // Get API key from user settings
               const userSettings = await prisma.userSettings.findUnique({
                 where: { userId: adminUser.id },
-                select: { filesVcApiKey: true }
-              }) as { filesVcApiKey?: string; filesVcAccountId?: string } | null;
+                select: { filesVcApiKey: true, filesVcAccountId: true }
+              });
               
               if (!userSettings?.filesVcApiKey) {
                 return NextResponse.json(
@@ -291,14 +288,7 @@ export async function POST(req: NextRequest) {
                 );
               }
               
-              // Get account ID from a separate query to avoid schema type issues
-              const accountSettings = await prisma.$queryRaw`
-                SELECT "filesVcAccountId" FROM "UserSettings" WHERE "userId" = ${adminUser.id}
-              ` as { filesVcAccountId?: string }[];
-              
-              const accountId = accountSettings && accountSettings.length > 0 ? accountSettings[0].filesVcAccountId : '';
-              
-              if (!accountId) {
+              if (!userSettings?.filesVcAccountId) {
                 return NextResponse.json(
                   { error: 'Files.vc Account ID not configured in settings' },
                   { status: 400 }
@@ -306,6 +296,10 @@ export async function POST(req: NextRequest) {
               }
               
               const apiKey = userSettings.filesVcApiKey;
+              const accountId = userSettings.filesVcAccountId;
+              
+              console.log('Using API key:', apiKey.substring(0, 10) + '...');
+              console.log('Using Account ID:', accountId);
               
               // Create a custom logger for the upload process
               const logger = (message: string) => {

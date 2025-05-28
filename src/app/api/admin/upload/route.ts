@@ -40,21 +40,14 @@ export async function POST(req: NextRequest) {
     // Get API key and Account ID from user settings
     const userSettings = await prisma.userSettings.findUnique({
       where: { userId: adminUser.id },
-      select: { filesVcApiKey: true }
-    }) as { filesVcApiKey?: string; filesVcAccountId?: string } | null;
+      select: { filesVcApiKey: true, filesVcAccountId: true }
+    });
     
     let apiKey = '';
     let accountId = '';
     if (userSettings) {
-      apiKey = userSettings?.filesVcApiKey || '';
-      // Get account ID from a separate query to avoid schema type issues
-      const accountSettings = await prisma.$queryRaw`
-        SELECT "filesVcAccountId" FROM "UserSettings" WHERE "userId" = ${adminUser.id}
-      ` as { filesVcAccountId?: string }[];
-      
-      if (accountSettings && accountSettings.length > 0) {
-        accountId = accountSettings[0].filesVcAccountId || '';
-      }
+      apiKey = userSettings.filesVcApiKey || '';
+      accountId = userSettings.filesVcAccountId || '';
     }
     
     if (!apiKey) {
@@ -113,6 +106,7 @@ export async function POST(req: NextRequest) {
     // Upload to Files.vc using the submodule
     console.log('Uploading file to Files.vc:', file.name, 'Size:', file.size);
     console.log('Using API key:', apiKey.substring(0, 10) + '...');
+    console.log('Using Account ID:', accountId);
     
     try {
       // Create a custom logger for the upload process
