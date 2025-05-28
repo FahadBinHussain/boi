@@ -90,6 +90,56 @@ interface ScrapedSeriesData {
   books?: ScrapedBookData[];
 }
 
+// Add this component at the top of the file, before the AddNewBook function
+const BookThumbnail = ({ 
+  src, 
+  alt, 
+  onError 
+}: { 
+  src: string; 
+  alt: string; 
+  onError?: () => void;
+}) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+  
+  const handleLoad = () => {
+    setIsLoading(false);
+    setHasError(false);
+  };
+  
+  const handleError = () => {
+    setIsLoading(false);
+    setHasError(true);
+    if (onError) onError();
+  };
+  
+  return (
+    <div className="relative h-40 w-28 overflow-hidden rounded border border-gray-200 bg-gray-50 flex items-center justify-center">
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent"></div>
+        </div>
+      )}
+      
+      {hasError && (
+        <div className="flex flex-col items-center justify-center text-center p-2">
+          <FiImage className="h-8 w-8 text-gray-400 mb-1" />
+          <span className="text-xs text-gray-500">Image not available</span>
+        </div>
+      )}
+      
+      <img 
+        src={src} 
+        alt={alt}
+        className={`max-h-full max-w-full object-contain transition-opacity duration-300 ${isLoading || hasError ? 'opacity-0' : 'opacity-100'}`}
+        onLoad={handleLoad}
+        onError={handleError}
+      />
+    </div>
+  );
+};
+
 export default function AddNewBook() {
   const router = useRouter();
   const { settings, isLoading: isSettingsLoading, syncStatus, lastSyncMessage } = useUserSettings();
@@ -248,11 +298,34 @@ export default function AddNewBook() {
   
   // Update individual series thumbnail preview
   const updateSeriesThumbnailPreview = (index: number, url: string) => {
-    setSeriesThumbnails(prev => 
-      prev.map((thumbnail, i) => 
-        i === index ? { ...thumbnail, url, preview: url.trim() !== "" ? url : "" } : thumbnail
-      )
-    );
+    setSeriesThumbnails(prev => {
+      const updated = [...prev];
+      if (index >= 0 && index < updated.length) {
+        // Only update preview if URL is valid
+        if (url.trim() !== "") {
+          // Create a temporary image to check if the URL is valid
+          const img = new Image();
+          img.src = url;
+          
+          // Update immediately with the URL, validation will happen on load/error
+          updated[index] = { 
+            ...updated[index], 
+            url, 
+            preview: url,
+            errorMessage: undefined
+          };
+        } else {
+          // Clear the preview if URL is empty
+          updated[index] = { 
+            ...updated[index], 
+            url: "", 
+            preview: "",
+            errorMessage: undefined
+          };
+        }
+      }
+      return updated;
+    });
   };
 
   // Add function to update publication date for a specific book in the series
@@ -1588,16 +1661,13 @@ export default function AddNewBook() {
                               
                               {thumbnailIndex !== -1 && seriesThumbnails[thumbnailIndex].preview && (
                                 <div className="mt-2">
-                                  <div className="h-24 w-18 overflow-hidden rounded border border-gray-200">
-                                    <img 
-                                      src={seriesThumbnails[thumbnailIndex].preview} 
-                                      alt={`Preview for book ${bookNumber}`}
-                                      className="h-full w-full object-cover"
-                                      onError={(e) => {
-                                        e.currentTarget.src = "https://via.placeholder.com/120x160?text=No Preview"; 
-                                      }}
-                                    />
-                                  </div>
+                                  <BookThumbnail 
+                                    src={seriesThumbnails[thumbnailIndex].preview} 
+                                    alt={`Preview for book ${bookNumber}`}
+                                    onError={() => {
+                                      updateSeriesThumbnailPreview(thumbnailIndex, "https://via.placeholder.com/120x160?text=No Preview");
+                                    }}
+                                  />
                                 </div>
                               )}
                             </div>
@@ -1956,16 +2026,13 @@ export default function AddNewBook() {
               
               {thumbnailPreview && (
                 <div className="mt-2 flex items-center">
-                  <div className="h-16 w-12 overflow-hidden rounded border border-gray-200">
-                    <img 
-                      src={thumbnailPreview} 
-                      alt="Thumbnail preview" 
-                      className="h-full w-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src = "https://via.placeholder.com/120x160?text=Error"; 
-                      }}
-                    />
-                  </div>
+                  <BookThumbnail 
+                    src={thumbnailPreview} 
+                    alt="Thumbnail preview" 
+                    onError={() => {
+                      setThumbnailPreview("https://via.placeholder.com/120x160?text=Error");
+                    }}
+                  />
                   <span className="ml-2 text-xs text-gray-500">Thumbnail preview</span>
                 </div>
               )}
