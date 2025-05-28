@@ -33,11 +33,6 @@ interface ScrapedBookData {
   language?: string;
 }
 
-interface ScrapedSeriesData {
-  seriesTitle: string;
-  books?: ScrapedBookData[];
-}
-
 // Helper function to detect URL type
 function detectUrlType(url: string): 'fandom' | 'goodreads' | null {
   try {
@@ -139,41 +134,21 @@ export async function POST(request: NextRequest) {
         };
       } else if (urlType === 'goodreads') {
         // Goodreads data is already in the expected format or needs different transformation
-        if (scrapedData.bookName) {
-          transformedData = {
-            title: scrapedData.bookName,
-            imageUrl: scrapedData.imageUrl,
-            summary: scrapedData.bookSummary,
-            publicationDate: scrapedData.publicationDate,
-            authors: scrapedData.authors,
-            publisher: scrapedData.publisher,
-            genres: scrapedData.genres,
-            ratings: scrapedData.ratings,
-            numberOfPages: scrapedData.numberOfPages,
-            characters: scrapedData.characters,
-            language: scrapedData.language
-          };
-        } else if (scrapedData.seriesName) {
-          // Handle series data if needed
-          transformedData = {
-            seriesTitle: scrapedData.seriesName,
-            books: scrapedData.books?.map((book: any) => ({
-              title: book.bookName,
-              imageUrl: book.imageUrl,
-              summary: book.bookSummary,
-              publicationDate: book.publicationDate,
-              authors: book.authors,
-              publisher: book.publisher,
-              genres: book.genres,
-              ratings: book.ratings,
-              numberOfPages: book.numberOfPages,
-              characters: book.characters,
-              language: book.language
-            }))
-          };
-        } else {
-          transformedData = scrapedData; // Use as-is if structure is unknown
-        }
+        transformedData = {
+          title: scrapedData.bookName,
+          imageUrl: scrapedData.imageUrl,
+          summary: scrapedData.bookSummary,
+          publicationDate: scrapedData.publicationDate,
+          authors: scrapedData.authors,
+          publisher: scrapedData.publisher,
+          genres: scrapedData.genres,
+          ratings: scrapedData.ratings,
+          numberOfPages: scrapedData.numberOfPages,
+          characters: scrapedData.characters,
+          language: scrapedData.language
+        };
+      } else {
+        transformedData = scrapedData; // Use as-is if structure is unknown
       }
       
       return NextResponse.json(transformedData, { status: 200 });

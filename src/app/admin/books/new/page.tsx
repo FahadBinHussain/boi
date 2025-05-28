@@ -155,11 +155,6 @@ export default function AddNewBook() {
     }
   }, [syncStatus, lastSyncMessage, showNotification]);
 
-  // Number conversion functions
-  const getFormattedSeriesNumber = (num: number): string => {
-    return num.toString();
-  };
-
   // Update thumbnail preview when URL changes
   useEffect(() => {
     if (thumbnailUrl && thumbnailUrl.trim() !== "") {
@@ -226,9 +221,6 @@ export default function AddNewBook() {
       for (const author of authors) {
         formData.append('authors', author.name);
       }
-      
-      // Add isSeries flag
-      formData.append('isSeries', 'false');
       
       // Single book data
         formData.append('bookName', bookName);

@@ -67,33 +67,22 @@ model UserSettings {
 }
 
 model Book {
-  id          String    @id @default(cuid())
-  title       String
-  imageUrl    String?
-  description String?
-  summary     String?
+  id              String    @id @default(cuid())
+  title           String
+  imageUrl        String?
   publicationDate String?
-  publisher   String?
-  genres      String[]
-  ratings     Float?
-  averageRating Float?
-  numberOfPages Int?
-  positionInSeries Int?
-  characters  String[]
-  language    String?
-  series      Series?   @relation(fields: [seriesId], references: [id])
-  seriesId    String?
-  authors     Author[]
-  updatedAt   DateTime  @updatedAt
-}
-
-model Series {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  books       Book[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  summary         String?
+  publisher       String?
+  genres          String[]
+  ratings         Float?
+  averageRating   Float?
+  numberOfPages   Int?
+  characters      String[]
+  language        String?
+  pdfUrl          String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  authors         Author[]
 }
 
 model Author {

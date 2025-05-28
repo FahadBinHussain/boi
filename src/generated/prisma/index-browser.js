@@ -170,25 +170,16 @@ exports.Prisma.BookScalarFieldEnum = {
   id: 'id',
   title: 'title',
   imageUrl: 'imageUrl',
-  description: 'description',
-  summary: 'summary',
   publicationDate: 'publicationDate',
+  summary: 'summary',
   publisher: 'publisher',
   genres: 'genres',
   ratings: 'ratings',
   averageRating: 'averageRating',
   numberOfPages: 'numberOfPages',
-  positionInSeries: 'positionInSeries',
   characters: 'characters',
   language: 'language',
-  seriesId: 'seriesId',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.SeriesScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  description: 'description',
+  pdfUrl: 'pdfUrl',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -232,7 +223,6 @@ exports.Prisma.ModelName = {
   VerificationToken: 'VerificationToken',
   UserSettings: 'UserSettings',
   Book: 'Book',
-  Series: 'Series',
   Author: 'Author',
   AdminApiKey: 'AdminApiKey'
 };

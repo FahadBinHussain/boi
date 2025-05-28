@@ -20,11 +20,6 @@ interface ScrapedBookData {
   language?: string;
 }
 
-interface ScrapedSeriesData {
-  seriesTitle: string;
-  books?: ScrapedBookData[];
-}
-
 // Helper function to detect URL type
 function detectUrlType(url: string): 'fandom' | 'goodreads' | null {
   try {
@@ -138,10 +133,7 @@ export async function POST(request: NextRequest) {
           averageRating: scrapedData.averageRating ? Number(scrapedData.averageRating) : undefined,
           numberOfPages: scrapedData.numberOfPages ? Number(scrapedData.numberOfPages) : undefined,
           language: scrapedData.language,
-          characters: scrapedData.characters,
-          // Handle series information if available
-          seriesName: scrapedData.seriesName,
-          positionInSeries: scrapedData.positionInSeries
+          characters: scrapedData.characters
         };
         
         console.log("Transformed Goodreads data:", transformedData);
