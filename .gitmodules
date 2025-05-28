@@ -1,3 +1,6 @@
 [submodule "src/lib/scrapers/Fandom-Scraper"]
 	path = src/lib/scrapers/Fandom-Scraper
 	url = https://github.com/FahadBinHussain/Fandom-Scraper.git
+[submodule "src/lib/scrapers/Goodreads-Scraper"]
+	path = src/lib/scrapers/Goodreads-Scraper
+	url = https://github.com/FahadBinHussain/Goodreads-Scraper.git
