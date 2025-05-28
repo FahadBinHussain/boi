@@ -14,6 +14,7 @@ interface ScrapedBookData {
   publisher?: string;
   genres?: string[];
   ratings?: number;
+  averageRating?: number;
   numberOfPages?: number;
   characters?: string[];
   language?: string;
@@ -100,222 +101,64 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Empty response from scraper' }, { status: 500 });
     }
 
+    console.log("Raw stdout before parsing:", stdout.substring(0, 200) + "...");
+    
     try {
-      console.log("Raw stdout before parsing:", stdout.substring(0, 200) + "...");
+      // Parse JSON output from the scraper - now both scrapers output valid JSON
+      const scrapedData = JSON.parse(stdout);
       
-      // For Goodreads scraper, use a different parsing approach
-      if (urlType === 'goodreads') {
-        // Extract data using regex patterns since the JSON might have formatting issues
-        const extractData = () => {
-          const bookData: Record<string, any> = {};
-          
-          // Helper functions to extract data with updated regex patterns for non-quoted keys
-          const extractField = (key: string, defaultValue: string | null = null): string | null => {
-            // Updated pattern to handle non-quoted keys and possible quotes around values
-            const pattern = new RegExp(`${key}\\s*:\\s*['"]([^'"]*)['"](,|\\s|$)`, 'i');
-            const match = stdout.match(pattern);
-            return match ? match[1] : defaultValue;
-          };
-          
-          const extractNumber = (key: string, defaultValue: number | null = null): number | null => {
-            // Updated pattern to handle non-quoted keys and numeric values without quotes
-            const pattern = new RegExp(`${key}\\s*:\\s*(\\d+)(,|\\s|$)`, 'i');
-            const match = stdout.match(pattern);
-            return match ? Number(match[1]) : defaultValue;
-          };
-          
-          const extractFloat = (key: string, defaultValue: number | null = null): number | null => {
-            // Updated pattern to handle non-quoted keys and possible quotes around float values
-            const pattern = new RegExp(`${key}\\s*:\\s*['"]?([0-9.]+)['"]?(,|\\s|$)`, 'i');
-            const match = stdout.match(pattern);
-            return match ? parseFloat(match[1]) : defaultValue;
-          };
-          
-          // Try to extract arrays using a more manual approach
-          const extractArray = (key: string): any[] => {
-            // Updated pattern to handle non-quoted keys
-            const startPattern = new RegExp(`${key}\\s*:\\s*\\[`, 'i');
-            const startMatch = stdout.match(startPattern);
-            
-            if (!startMatch) return [];
-            
-            // Find the starting position of the array
-            const startPos = startMatch.index! + startMatch[0].length;
-            
-            // Find the closing bracket
-            let bracketCount = 1;
-            let endPos = startPos;
-            
-            for (let i = startPos; i < stdout.length; i++) {
-              if (stdout[i] === '[') bracketCount++;
-              if (stdout[i] === ']') bracketCount--;
-              
-              if (bracketCount === 0) {
-                endPos = i;
-                break;
-              }
-            }
-            
-            if (bracketCount !== 0) return []; // Couldn't find matching bracket
-            
-            // Extract the array content
-            const arrayContent = stdout.substring(startPos, endPos);
-            
-            // Split by commas and clean up each item
-            return arrayContent
-              .split(',')
-              .map(item => item.trim())
-              .filter(Boolean)
-              .map(item => {
-                // Remove quotes if present
-                if ((item.startsWith("'") && item.endsWith("'")) || 
-                    (item.startsWith('"') && item.endsWith('"'))) {
-                  return item.substring(1, item.length - 1);
-                }
-                return item;
-              });
-          };
-          
-          // Special function to extract multi-line text fields like bookSummary
-          const extractMultilineField = (key: string, defaultValue: string | null = null): string | null => {
-            // First, find the key in the output
-            const keyPattern = new RegExp(`${key}\\s*:\\s*['"]`, 'i');
-            const keyMatch = stdout.match(keyPattern);
-            
-            if (!keyMatch) return defaultValue;
-            
-            // Find the starting position after the opening quote
-            const startPos = keyMatch.index! + keyMatch[0].length;
-            
-            // Find the ending position (closing quote followed by comma or newline)
-            let endPos = startPos;
-            let insideQuote = true;
-            
-            for (let i = startPos; i < stdout.length; i++) {
-              if (stdout[i] === '"' || stdout[i] === "'") {
-                // Check if this quote is escaped
-                if (i > 0 && stdout[i-1] === '\\') {
-                  continue; // Skip escaped quotes
-                }
-                
-                // Check if this is the end of the field (quote followed by comma or newline)
-                if (i + 1 < stdout.length && (stdout[i+1] === ',' || stdout[i+1] === '\n')) {
-                  endPos = i;
-                  break;
-                }
-              }
-            }
-            
-            if (endPos === startPos) {
-              // Fallback: try to find the next field key
-              const nextKeyPattern = new RegExp('\\s*,\\s*\\w+\\s*:', 'i');
-              const nextKeyMatch = stdout.substring(startPos).match(nextKeyPattern);
-              
-              if (nextKeyMatch) {
-                endPos = startPos + nextKeyMatch.index! - 1;
-              } else {
-                return defaultValue; // Couldn't find the end of the field
-              }
-            }
-            
-            // Extract the field content
-            return stdout.substring(startPos, endPos);
-          };
-          
-          // Extract book data with the correct field names from Goodreads output
-          bookData.title = extractField('bookName');
-          bookData.imageUrl = extractField('imageUrl');
-          
-          // Try to extract summary using a more specific approach for multi-line text
-          const summaryPattern = /bookSummary:\s*'([^']*(?:\\'[^']*)*)'|bookSummary:\s*"([^"]*(?:\\"[^"]*)*)"|\bbookSummary\b\s*:\s*['"]([^'"]+)['"]/i;
-          const summaryMatch = stdout.match(summaryPattern);
-          bookData.summary = summaryMatch ? (summaryMatch[1] || summaryMatch[2] || summaryMatch[3]) : null;
-          
-          bookData.publicationDate = extractField('publicationDate');
-          bookData.publisher = extractField('publisher');
-          bookData.language = extractField('language');
-          bookData.numberOfPages = extractNumber('numberOfPages');
-          
-          // Try to extract ratings using a more specific approach
-          const ratingsPattern = /\bratings\b\s*:\s*['"]?(\d+)['"]?/i;
-          const ratingsMatch = stdout.match(ratingsPattern);
-          bookData.ratings = ratingsMatch ? Number(ratingsMatch[1]) : null;
-          
-          bookData.averageRating = extractFloat('averageRating');
-          bookData.genres = extractArray('genres');
-          bookData.characters = extractArray('characters');
-          bookData.seriesName = extractField('seriesName');
-          bookData.positionInSeries = extractField('positionInSeries');
-          
-          console.log("Extracted field values:", {
-            title: bookData.title,
-            imageUrl: bookData.imageUrl ? bookData.imageUrl.substring(0, 30) + "..." : null,
-            summary: bookData.summary ? bookData.summary.substring(0, 30) + "..." : null,
-            ratings: bookData.ratings,
-            averageRating: bookData.averageRating
-          });
-          
-          return bookData;
+      // Transform the data based on which scraper was used
+      let transformedData;
+      
+      if (urlType === 'fandom') {
+        // Map the Fandom scraper output to our expected format
+        transformedData = {
+          title: scrapedData.title || 'Untitled Book',
+          imageUrl: scrapedData.cover_image_url,
+          summary: scrapedData.plot_summary,
+          publicationDate: scrapedData.publication_date,
+          authors: scrapedData.author ? [scrapedData.author] : undefined,
+          publisher: scrapedData.publisher,
+          genres: scrapedData.genres,
+          ratings: scrapedData.ratings,
+          numberOfPages: scrapedData.numberOfPages,
+          characters: scrapedData.characters,
+          language: scrapedData.language
+        };
+      } else if (urlType === 'goodreads') {
+        // Map the Goodreads scraper output to our expected format
+        transformedData = {
+          title: scrapedData.bookName,
+          imageUrl: scrapedData.imageUrl,
+          summary: scrapedData.bookSummary,
+          publicationDate: scrapedData.publicationDate,
+          publisher: scrapedData.publisher,
+          genres: scrapedData.genres,
+          ratings: scrapedData.ratings ? Number(scrapedData.ratings) : undefined,
+          averageRating: scrapedData.averageRating ? Number(scrapedData.averageRating) : undefined,
+          numberOfPages: scrapedData.numberOfPages ? Number(scrapedData.numberOfPages) : undefined,
+          language: scrapedData.language,
+          characters: scrapedData.characters,
+          // Handle series information if available
+          seriesName: scrapedData.seriesName,
+          positionInSeries: scrapedData.positionInSeries
         };
         
-        const goodreadsData = extractData();
-        console.log("Extracted Goodreads data:", goodreadsData);
-        
-        return NextResponse.json(goodreadsData, { status: 200 });
+        console.log("Transformed Goodreads data:", transformedData);
+      } else {
+        // If we get here, it's an unknown scraper type but the JSON parsed successfully
+        transformedData = scrapedData;
       }
       
-      // For other scrapers, try the standard JSON parsing approach
-      try {
-        const scrapedData = JSON.parse(stdout);
-        
-        // Transform the data based on which scraper was used
-        let transformedData;
-        
-        if (urlType === 'fandom') {
-          // Map the Fandom scraper output to our expected format
-          transformedData = {
-            title: scrapedData.title || 'Untitled Book',
-            imageUrl: scrapedData.cover_image_url,
-            summary: scrapedData.plot_summary,
-            publicationDate: scrapedData.publication_date,
-            authors: scrapedData.author ? [scrapedData.author] : undefined,
-            publisher: scrapedData.publisher,
-            genres: scrapedData.genres,
-            ratings: scrapedData.ratings,
-            numberOfPages: scrapedData.numberOfPages,
-            characters: scrapedData.characters,
-            language: scrapedData.language
-          };
-          
-          return NextResponse.json(transformedData, { status: 200 });
-        }
-        
-        // If we get here, it's an unknown scraper type but the JSON parsed successfully
-        return NextResponse.json(scrapedData, { status: 200 });
-      } catch (parseError) {
-        console.error('Failed to parse JSON directly:', parseError);
-        
-        // If it's not the Goodreads scraper, return an error
-        if (urlType === 'fandom') {
-          return NextResponse.json({ 
-            error: 'Failed to parse scraped data. The output format was unexpected.',
-            details: parseError instanceof Error ? parseError.message : String(parseError),
-            stdout: stdout.substring(0, 500) // Include part of the raw output for debugging
-          }, { status: 500 });
-        }
-        
-        // For Goodreads, we already handled it above
-        throw new Error('Unexpected code path - Goodreads scraper should have been handled earlier');
-      }
-    } catch (error) {
-      console.error('Error in scraper API:', error);
-      let errorMessage = 'Failed to scrape URL.';
-      if (error instanceof SyntaxError) {
-        errorMessage = 'Failed to parse scraped data (not valid JSON). Check scraper output.';
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-      return NextResponse.json({ error: errorMessage, details: String(error) }, { status: 500 });
+      return NextResponse.json(transformedData, { status: 200 });
+    } catch (parseError) {
+      console.error('Failed to parse JSON:', parseError);
+      console.error('Raw stdout:', stdout);
+      return NextResponse.json({ 
+        error: 'Failed to parse scraped data (not valid JSON). Check scraper output.',
+        details: parseError instanceof Error ? parseError.message : String(parseError),
+        stdout: stdout.substring(0, 500) // Include part of the raw output for debugging
+      }, { status: 500 });
     }
   } catch (error) {
     console.error('Error in scraper API:', error);
