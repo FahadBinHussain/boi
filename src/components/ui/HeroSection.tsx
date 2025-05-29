@@ -268,65 +268,65 @@ const HeroSection = () => {
           <div className="w-full lg:w-1/2 hidden lg:block h-full relative">
             <div className="hero-showcase absolute inset-0 perspective-[1200px]">
               {/* Central hovering display */}
-              <div className="hero-showcase-item absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
-                <div className="relative w-[280px]">
+              <div className="hero-showcase-item absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 transition-all duration-500 hover:z-50">
+                <div className="relative w-[280px] transition-transform duration-500 hover:scale-110 hover:translate-y-[-10px] group">
                   {/* Main featured book */}
-                  <div className="relative rounded-2xl overflow-hidden shadow-2xl transform -rotate-3 transition-transform duration-300 hover:rotate-0">
-                    <div className="aspect-[2/3] bg-gradient-to-br from-violet-600 to-indigo-700 flex items-center justify-center p-6">
+                  <div className="relative rounded-2xl overflow-hidden shadow-2xl transform -rotate-3 transition-all duration-500 hover:rotate-0 hover:shadow-[0_20px_50px_rgba(76,29,149,0.4)]">
+                    <div className="aspect-[2/3] bg-gradient-to-br from-violet-600 to-indigo-700 flex items-center justify-center p-6 group-hover:from-violet-500 group-hover:to-indigo-600 transition-all duration-500">
                       <div className="text-center text-white">
-                        <div className="w-20 h-20 rounded-full bg-white/20 mx-auto mb-5 flex items-center justify-center">
-                          <FiBook size={32} className="text-white" />
+                        <div className="w-20 h-20 rounded-full bg-white/20 mx-auto mb-5 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                          <FiBook size={32} className="text-white group-hover:rotate-12 transition-transform duration-500" />
                         </div>
                         <h3 className="text-2xl font-bold mb-3">Science Fiction</h3>
                         <p className="text-white/80">Explore futuristic worlds and mind-bending concepts</p>
                       </div>
                     </div>
                     {/* Book shine effect */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-50"></div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-50 group-hover:opacity-70 transition-opacity duration-500"></div>
                   </div>
                   {/* Book shadow */}
-                  <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-[80%] h-[20px] bg-black/40 blur-xl rounded-full"></div>
+                  <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-[80%] h-[20px] bg-black/40 blur-xl rounded-full transition-all duration-500 group-hover:w-[90%] group-hover:h-[25px] group-hover:bg-black/50"></div>
                 </div>
               </div>
               
               {/* Orbit elements - floating books and decorative items */}
-              <div className="hero-showcase-item hero-float absolute top-[20%] right-[15%] transform rotate-6 z-10">
-                <div className="relative w-[180px]">
-                  <div className="rounded-2xl overflow-hidden shadow-xl">
-                    <div className="aspect-[2/3] bg-gradient-to-br from-pink-600 to-purple-700 flex items-center justify-center p-5">
+              <div className="hero-showcase-item hero-float absolute top-[20%] right-[15%] transform rotate-6 z-10 transition-all duration-500 hover:z-50">
+                <div className="relative w-[180px] transition-transform duration-500 hover:scale-110 hover:translate-y-[-10px] group">
+                  <div className="rounded-2xl overflow-hidden shadow-xl transition-all duration-500 hover:shadow-[0_15px_40px_rgba(168,85,247,0.4)] hover:rotate-0">
+                    <div className="aspect-[2/3] bg-gradient-to-br from-pink-600 to-purple-700 flex items-center justify-center p-5 group-hover:from-pink-500 group-hover:to-purple-600 transition-all duration-500">
                       <div className="text-center text-white">
-                        <div className="w-14 h-14 rounded-full bg-white/20 mx-auto mb-4 flex items-center justify-center">
-                          <FiBook size={24} className="text-white" />
+                        <div className="w-14 h-14 rounded-full bg-white/20 mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                          <FiBook size={24} className="text-white group-hover:rotate-12 transition-transform duration-500" />
                         </div>
                         <h3 className="text-xl font-bold mb-2">Biography</h3>
                         <p className="text-sm text-white/80">Real stories of extraordinary people</p>
                       </div>
                     </div>
                   </div>
-                  <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-[80%] h-[15px] bg-black/30 blur-lg rounded-full"></div>
+                  <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-[80%] h-[15px] bg-black/30 blur-lg rounded-full transition-all duration-500 group-hover:w-[90%] group-hover:h-[20px] group-hover:bg-black/40"></div>
                 </div>
               </div>
               
-              <div className="hero-showcase-item hero-float absolute bottom-[25%] left-[20%] transform -rotate-6 z-10">
-                <div className="relative w-[200px]">
-                  <div className="rounded-2xl overflow-hidden shadow-xl">
-                    <div className="aspect-[2/3] bg-gradient-to-br from-blue-600 to-cyan-700 flex items-center justify-center p-5">
+              <div className="hero-showcase-item hero-float absolute bottom-[25%] left-[20%] transform -rotate-6 z-10 transition-all duration-500 hover:z-50">
+                <div className="relative w-[200px] transition-transform duration-500 hover:scale-110 hover:translate-y-[-10px] group">
+                  <div className="rounded-2xl overflow-hidden shadow-xl transition-all duration-500 hover:shadow-[0_15px_40px_rgba(37,99,235,0.4)] hover:rotate-0">
+                    <div className="aspect-[2/3] bg-gradient-to-br from-blue-600 to-cyan-700 flex items-center justify-center p-5 group-hover:from-blue-500 group-hover:to-cyan-600 transition-all duration-500">
                       <div className="text-center text-white">
-                        <div className="w-14 h-14 rounded-full bg-white/20 mx-auto mb-4 flex items-center justify-center">
-                          <FiBook size={24} className="text-white" />
+                        <div className="w-14 h-14 rounded-full bg-white/20 mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                          <FiBook size={24} className="text-white group-hover:rotate-12 transition-transform duration-500" />
                         </div>
                         <h3 className="text-xl font-bold mb-2">Psychology</h3>
                         <p className="text-sm text-white/80">Understand the human mind</p>
                       </div>
                     </div>
                   </div>
-                  <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-[80%] h-[15px] bg-black/30 blur-lg rounded-full"></div>
+                  <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-[80%] h-[15px] bg-black/30 blur-lg rounded-full transition-all duration-500 group-hover:w-[90%] group-hover:h-[20px] group-hover:bg-black/40"></div>
                 </div>
               </div>
               
               {/* Stats card */}
-              <div className="hero-showcase-item hero-float absolute bottom-[15%] right-[20%] z-10">
-                <div className="bg-white/10 backdrop-blur-lg rounded-xl border border-white/20 p-5 shadow-xl w-[200px]">
+              <div className="hero-showcase-item hero-float absolute bottom-[15%] right-[20%] z-10 transition-all duration-500 hover:z-50">
+                <div className="bg-white/10 backdrop-blur-lg rounded-xl border border-white/20 p-5 shadow-xl w-[200px] transition-all duration-500 hover:scale-110 hover:bg-white/15 hover:border-white/30 hover:shadow-[0_15px_30px_rgba(79,70,229,0.3)] hover:translate-y-[-10px]">
                   <div className="text-white">
                     <h4 className="text-lg font-medium mb-3">Library Stats</h4>
                     <div className="flex items-center justify-between mb-3">
@@ -346,8 +346,8 @@ const HeroSection = () => {
               </div>
               
               {/* Download label */}
-              <div className="hero-showcase-item hero-float absolute top-[40%] left-[30%] z-10">
-                <div className="bg-white/10 backdrop-blur-lg rounded-full border border-white/20 px-5 py-2.5 shadow-xl flex items-center gap-3">
+              <div className="hero-showcase-item hero-float absolute top-[40%] left-[30%] z-10 transition-all duration-500 hover:z-50">
+                <div className="bg-white/10 backdrop-blur-lg rounded-full border border-white/20 px-5 py-2.5 shadow-xl flex items-center gap-3 transition-all duration-500 hover:scale-110 hover:bg-white/15 hover:border-white/30 hover:shadow-[0_10px_25px_rgba(99,102,241,0.3)] hover:translate-y-[-5px]">
                   <div className="w-8 h-8 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center">
                     <FiDownload size={16} className="text-white" />
                   </div>
