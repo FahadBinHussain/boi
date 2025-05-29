@@ -40,7 +40,7 @@ interface ScrapedBookData {
   characters?: string[];
   language?: string;
   series?: string;
-  seriesPosition?: number;
+  seriesPosition?: number | number[] | string;
 }
 
 // Add this component at the top of the file, before the AddNewBook function
@@ -129,7 +129,7 @@ export default function AddNewBook() {
   const [characters, setCharacters] = useState<string[]>([]);
   const [language, setLanguage] = useState("");
   const [series, setSeries] = useState("");
-  const [seriesPosition, setSeriesPosition] = useState<number | undefined>(undefined);
+  const [seriesPosition, setSeriesPosition] = useState<number[]>([]);
   
   // Add new state variables for metadata URL functionality
   const [metadataUrl, setMetadataUrl] = useState("");
@@ -254,7 +254,7 @@ export default function AddNewBook() {
       if (characters.length > 0) formData.append('characters', JSON.stringify(characters));
       if (language) formData.append('language', language);
       if (series) formData.append('series', series);
-      if (seriesPosition !== undefined) formData.append('seriesPosition', seriesPosition.toString());
+      if (seriesPosition.length > 0) formData.append('seriesPosition', JSON.stringify(seriesPosition));
       
       // For single book mode, use the already uploaded PDF URL if available
       if (singleBookPdfUrl) {
@@ -590,8 +590,31 @@ export default function AddNewBook() {
         setSeries(data.series);
       }
       
+      // Handle series position - could be number, array, or string
       if (data.seriesPosition !== undefined) {
-        setSeriesPosition(data.seriesPosition);
+        console.log("Series position data:", data.seriesPosition, "type:", typeof data.seriesPosition);
+        
+        // If it's already an array of numbers
+        if (Array.isArray(data.seriesPosition)) {
+          console.log("Setting series position from array:", data.seriesPosition);
+          setSeriesPosition(data.seriesPosition);
+        }
+        // If it's a single number
+        else if (typeof data.seriesPosition === 'number') {
+          console.log("Setting series position from single number:", data.seriesPosition);
+          setSeriesPosition([data.seriesPosition]);
+        }
+        // If it's a string (e.g., "1,2,3")
+        else if (typeof data.seriesPosition === 'string') {
+          console.log("Parsing series position from string:", data.seriesPosition);
+          const positions = data.seriesPosition
+            .split(',')
+            .map(p => parseFloat(p.trim()))
+            .filter(p => !isNaN(p));
+          
+          console.log("Setting series position from parsed string:", positions);
+          setSeriesPosition(positions);
+        }
       }
     }
   };
@@ -831,7 +854,7 @@ export default function AddNewBook() {
             {scrapingError && (
               <div className="mt-3 flex items-center rounded-md bg-red-50 p-3 text-red-700">
                 <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  <path fillRule="evenodd" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" clipRule="evenodd" />
                 </svg>
                 <span>{scrapingError}</span>
               </div>
@@ -1205,14 +1228,19 @@ export default function AddNewBook() {
                 <label htmlFor="seriesPosition" className="block text-sm font-medium text-gray-700">Position in Series</label>
                 <div className="mt-1">
                   <input
-                    type="number"
+                    type="text"
                     id="seriesPosition"
-                    step="0.1"
-                    min="0"
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     placeholder="1, 2, 3.5, etc."
-                    value={seriesPosition || ""}
-                    onChange={(e) => setSeriesPosition(parseFloat(e.target.value) || undefined)}
+                    value={seriesPosition.join(", ")}
+                    onChange={(e) => {
+                      const input = e.target.value;
+                      // Parse comma-separated numbers, removing invalid entries
+                      const positions = input.split(",")
+                        .map(p => parseFloat(p.trim()))
+                        .filter(p => !isNaN(p));
+                      setSeriesPosition(positions);
+                    }}
                   />
                   <p className="mt-1 text-xs text-gray-500">Book's position in the series (can be decimal for in-between books)</p>
                 </div>

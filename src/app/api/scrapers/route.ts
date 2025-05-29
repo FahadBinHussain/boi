@@ -6,7 +6,7 @@ import { promisify } from 'util';
 const execAsync = promisify(exec);
 
 // Helper function to parse series position from various formats
-function parseSeriesPosition(positionStr: string | number | undefined): number | undefined {
+function parseSeriesPosition(positionStr: string | number | undefined): number | number[] | undefined {
   console.log("Parsing series position from:", positionStr, "type:", typeof positionStr);
   
   if (positionStr === undefined) return undefined;
@@ -18,7 +18,7 @@ function parseSeriesPosition(positionStr: string | number | undefined): number |
   if (typeof positionStr === 'string') {
     // Handle comma-separated values (e.g., "1,2,3")
     if (positionStr.includes(',')) {
-      // For multiple positions, use the first one or the lowest one
+      // Parse all positions and return the array
       const positions = positionStr.split(',')
         .map(p => parseFloat(p.trim()))
         .filter(p => !isNaN(p));
@@ -26,10 +26,8 @@ function parseSeriesPosition(positionStr: string | number | undefined): number |
       console.log("Parsed positions from comma-separated string:", positions);
       
       if (positions.length > 0) {
-        // Return the lowest position number
-        const minPosition = Math.min(...positions);
-        console.log("Using minimum position:", minPosition);
-        return minPosition;
+        // Return all positions instead of just the minimum
+        return positions;
       }
     }
     
@@ -67,7 +65,7 @@ interface ScrapedBookData {
   characters?: string[];
   language?: string;
   series?: string;
-  seriesPosition?: number;
+  seriesPosition?: number | number[];
 }
 
 // Helper function to detect URL type

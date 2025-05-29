@@ -80,7 +80,7 @@ model Book {
   language        String?
   pdfUrl          String?
   series          String?
-  seriesPosition  Float?
+  seriesPosition  Float[]
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   authors         Author[]

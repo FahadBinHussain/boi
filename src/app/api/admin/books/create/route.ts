@@ -136,7 +136,24 @@ export async function POST(req: NextRequest) {
     // Get series information
     const series = formData.get('series') as string || undefined;
     const seriesPositionStr = formData.get('seriesPosition') as string;
-    const seriesPosition = seriesPositionStr ? parseFloat(seriesPositionStr) : undefined;
+    
+    // Parse series position as an array for the updated schema
+    let seriesPosition: number[] = [];
+    if (seriesPositionStr) {
+      if (seriesPositionStr.includes(',')) {
+        // Handle comma-separated values
+        seriesPosition = seriesPositionStr
+          .split(',')
+          .map(p => parseFloat(p.trim()))
+          .filter(p => !isNaN(p));
+      } else {
+        // Handle single number - convert to array with one element
+        const parsed = parseFloat(seriesPositionStr);
+        if (!isNaN(parsed)) {
+          seriesPosition = [parsed];
+        }
+      }
+    }
     
     // Get the PDF file or URL
     const pdfFile = formData.get('pdf') as File | null;
