@@ -134,7 +134,7 @@ export async function POST(req: NextRequest) {
     const language = formData.get('language') as string || undefined;
     
     // Get series information
-    const series = formData.get('series') as string || undefined;
+    const seriesName = formData.get('series') as string || undefined;
     const seriesPositionStr = formData.get('seriesPosition') as string;
     console.log('Raw seriesPosition from form:', seriesPositionStr);
     
@@ -273,28 +273,93 @@ export async function POST(req: NextRequest) {
         return newAuthor.id;
       }));
       
+      // Create or find genres
+      const genreIds = await Promise.all(genres.map(async (name) => {
+        // Find existing genre by name
+        const existingGenre = await prisma.genre.findFirst({
+          where: { name }
+        });
+        
+        // If genre exists, return its ID
+        if (existingGenre) {
+          return existingGenre.id;
+        }
+        
+        // Otherwise create a new genre
+        const newGenre = await prisma.genre.create({
+          data: { name }
+        });
+        return newGenre.id;
+      }));
+      
+      // Create or find series if provided
+      let seriesId: string | undefined = undefined;
+      if (seriesName) {
+        // Find existing series by name
+        const existingSeries = await prisma.series.findFirst({
+          where: { name: seriesName }
+        });
+        
+        // If series exists, use its ID
+        if (existingSeries) {
+          seriesId = existingSeries.id;
+        } else {
+          // Otherwise create a new series
+          const newSeries = await prisma.series.create({
+            data: { name: seriesName }
+          });
+          seriesId = newSeries.id;
+        }
+      }
+      
+      // Create the book with appropriate data structure
+      const bookData: any = {
+        title: bookName,
+        imageUrl: thumbnailUrl,
+        publicationDate: publicationDate,
+        summary: summary,
+        publisher: publisher,
+        genres: genres, // Keep for backward compatibility
+        ratings: ratings,
+        averageRating: averageRating,
+        numberOfPages: numberOfPages,
+        characters: characters,
+        language: language,
+        series: seriesName, // Keep for backward compatibility
+        seriesPosition: seriesPosition,
+        pdfUrl: fileUrl,
+        // Author relation
+        authors: {
+          connect: authorIds.map(id => ({ id }))
+        }
+      };
+      
+      // Add series relation if exists
+      if (seriesId) {
+        bookData.seriesId = seriesId;
+      }
+      
       // Create the book
       const book = await prisma.book.create({
-        data: {
-          title: bookName,
-          imageUrl: thumbnailUrl,
-          publicationDate: publicationDate,
-          summary: summary,
-          publisher: publisher,
-          genres: genres,
-          ratings: ratings,
-          averageRating: averageRating,
-          numberOfPages: numberOfPages,
-          characters: characters,
-          language: language,
-          series: series,
-          seriesPosition: seriesPosition,
-          pdfUrl: fileUrl,
-          authors: {
-            connect: authorIds.map(id => ({ id }))
-          }
+        data: bookData,
+        include: {
+          authors: true
         }
       });
+      
+      // Connect book to genres in a separate step
+      if (genreIds.length > 0) {
+        await Promise.all(genreIds.map(async (genreId) => {
+          await prisma.book.update({
+            where: { id: book.id },
+            data: {
+              bookGenres: {
+                connect: { id: genreId }
+              }
+            }
+          });
+        }));
+      }
       
       return NextResponse.json({
         success: true,

@@ -3,10 +3,12 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(req: NextRequest) {
   try {
-    // Get books from the database with their authors
+    // Get books from the database with their authors, genres, and series
     const books = await prisma.book.findMany({
       include: {
-        authors: true
+        authors: true,
+        bookGenres: true,
+        bookSeries: true
       },
       orderBy: {
         createdAt: 'desc'
@@ -15,23 +17,36 @@ export async function GET(req: NextRequest) {
 
     // Transform the data to match the expected format for the frontend
     const transformedBooks = books.map(book => {
-      // Get the first author's name or empty string if no authors
-      const authorName = book.authors.length > 0 ? book.authors[0].name : '';
+      // Get all authors
+      const authors = book.authors || [];
       
-      // Get the genres
+      // Get the genres from both the array and relation
       const genres = book.genres || [];
+      const bookGenres = book.bookGenres?.map(genre => genre.name) || [];
+      const allGenres = [...new Set([...genres, ...bookGenres])];
+      
+      // Get series information
+      const seriesName = book.bookSeries?.name || book.series || '';
       
       return {
         id: book.id,
         title: book.title,
-        author: authorName,
+        authors: authors,
+        imageUrl: book.imageUrl || '',
+        summary: book.summary || '',
+        genres: allGenres,
+        pdfUrl: book.pdfUrl || '#',
+        publicationDate: book.publicationDate || '',
+        seriesId: book.seriesId || '',
+        seriesName: seriesName,
+        seriesPosition: book.seriesPosition || [],
+        // Legacy format support
+        author: authors.length > 0 ? authors[0].name : '',
         coverImage: book.imageUrl || '',
         description: book.summary || '',
-        genres: genres,
         downloadLink: book.pdfUrl || '#',
         fileSize: '2.5 MB', // This could be calculated from the actual file if needed
-        format: 'PDF',
-        publicationDate: book.publicationDate || ''
+        format: 'PDF'
       };
     });
 

@@ -75,24 +75,45 @@ model Book {
   publicationDate String?
   summary         String?
   publisher       String?
-  genres          String[]
+  genres          String[]  // Keep this for backward compatibility
   ratings         Float?
   averageRating   Float?
   numberOfPages   Int?
   characters      String[]
   language        String?
   pdfUrl          String?
-  series          String?
+  series          String?   // Keep this for backward compatibility
   seriesPosition  Float[]
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   authors         Author[]
+  bookGenres      Genre[]   @relation("BookToGenre")
+  bookSeries      Series?   @relation(fields: [seriesId], references: [id])
+  seriesId        String?
 }
 
 // Author model
 model Author {
   id          String   @id @default(cuid())
-  name        String
+  name        String   @unique
+  books       Book[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Genre model
+model Genre {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  books       Book[]   @relation("BookToGenre")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Series model
+model Series {
+  id          String   @id @default(cuid())
+  name        String   @unique
   books       Book[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

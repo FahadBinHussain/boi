@@ -8,11 +8,13 @@ export async function GET(
   try {
     const { id } = params;
 
-    // Get the book from the database with its authors
+    // Get the book from the database with its authors, genres, and series
     const book = await prisma.book.findUnique({
       where: { id },
       include: {
-        authors: true
+        authors: true,
+        bookGenres: true,
+        bookSeries: true
       }
     });
 
@@ -24,20 +26,37 @@ export async function GET(
     }
 
     // Transform the data to match the expected format for the frontend
-    const authorName = book.authors.length > 0 ? book.authors[0].name : '';
-    const categories = book.genres || [];
+    // Get all authors
+    const authors = book.authors || [];
+    
+    // Get the genres from both the array and relation
+    const genres = book.genres || [];
+    const bookGenres = book.bookGenres?.map(genre => genre.name) || [];
+    const allGenres = [...new Set([...genres, ...bookGenres])];
+    
+    // Get series information
+    const seriesName = book.bookSeries?.name || book.series || '';
     
     const transformedBook = {
       id: book.id,
       title: book.title,
-      author: authorName,
+      authors: authors,
+      imageUrl: book.imageUrl || '',
+      summary: book.summary || '',
+      genres: allGenres,
+      pdfUrl: book.pdfUrl || '#',
+      publicationDate: book.publicationDate || '',
+      seriesId: book.seriesId || '',
+      seriesName: seriesName,
+      seriesPosition: book.seriesPosition || [],
+      // Legacy format support
+      author: authors.length > 0 ? authors[0].name : '',
       coverImage: book.imageUrl || '',
       description: book.summary || '',
-      categories: categories,
+      categories: allGenres,
       downloadLink: book.pdfUrl || '#',
       fileSize: '2.5 MB', // This could be calculated from the actual file if needed
-      format: 'PDF',
-      publicationDate: book.publicationDate || ''
+      format: 'PDF'
     };
 
     return NextResponse.json(transformedBook);
