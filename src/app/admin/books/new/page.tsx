@@ -254,7 +254,14 @@ export default function AddNewBook() {
       if (characters.length > 0) formData.append('characters', JSON.stringify(characters));
       if (language) formData.append('language', language);
       if (series) formData.append('series', series);
-      if (seriesPosition.length > 0) formData.append('seriesPosition', JSON.stringify(seriesPosition));
+      
+      // Handle series position data
+      if (seriesPosition.length > 0) {
+        console.log("Series position data to send:", seriesPosition);
+        const seriesPositionJson = JSON.stringify(seriesPosition);
+        console.log("Series position JSON:", seriesPositionJson);
+        formData.append('seriesPosition', seriesPositionJson);
+      }
       
       // For single book mode, use the already uploaded PDF URL if available
       if (singleBookPdfUrl) {

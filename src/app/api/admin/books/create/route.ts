@@ -136,24 +136,43 @@ export async function POST(req: NextRequest) {
     // Get series information
     const series = formData.get('series') as string || undefined;
     const seriesPositionStr = formData.get('seriesPosition') as string;
+    console.log('Raw seriesPosition from form:', seriesPositionStr);
     
     // Parse series position as an array for the updated schema
     let seriesPosition: number[] = [];
     if (seriesPositionStr) {
-      if (seriesPositionStr.includes(',')) {
-        // Handle comma-separated values
-        seriesPosition = seriesPositionStr
-          .split(',')
-          .map(p => parseFloat(p.trim()))
-          .filter(p => !isNaN(p));
-      } else {
-        // Handle single number - convert to array with one element
-        const parsed = parseFloat(seriesPositionStr);
-        if (!isNaN(parsed)) {
-          seriesPosition = [parsed];
+      try {
+        // First try to parse as JSON if it's already formatted as such
+        if (seriesPositionStr.startsWith('[') && seriesPositionStr.endsWith(']')) {
+          console.log('Parsing seriesPosition as JSON array');
+          seriesPosition = JSON.parse(seriesPositionStr);
+          console.log('Parsed JSON array:', seriesPosition);
+        } 
+        // Otherwise handle as comma-separated string
+        else if (seriesPositionStr.includes(',')) {
+          console.log('Parsing seriesPosition as comma-separated string');
+          seriesPosition = seriesPositionStr
+            .split(',')
+            .map(p => parseFloat(p.trim()))
+            .filter(p => !isNaN(p));
+          console.log('Parsed comma-separated values:', seriesPosition);
+        } else {
+          // Handle single number - convert to array with one element
+          console.log('Parsing seriesPosition as single number');
+          const parsed = parseFloat(seriesPositionStr);
+          if (!isNaN(parsed)) {
+            seriesPosition = [parsed];
+            console.log('Parsed single number:', seriesPosition);
+          }
         }
+      } catch (error) {
+        console.error('Error parsing seriesPosition:', error);
+        // Fallback to empty array if parsing fails
+        seriesPosition = [];
       }
     }
+    
+    console.log('Final seriesPosition array to save:', seriesPosition);
     
     // Get the PDF file or URL
     const pdfFile = formData.get('pdf') as File | null;

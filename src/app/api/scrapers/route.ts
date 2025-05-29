@@ -9,25 +9,43 @@ const execAsync = promisify(exec);
 function parseSeriesPosition(positionStr: string | number | undefined): number | number[] | undefined {
   console.log("Parsing series position from:", positionStr, "type:", typeof positionStr);
   
-  if (positionStr === undefined) return undefined;
+  if (positionStr === undefined) {
+    console.log("Series position is undefined, returning undefined");
+    return undefined;
+  }
   
   // If it's already a number, return it
-  if (typeof positionStr === 'number') return positionStr;
+  if (typeof positionStr === 'number') {
+    console.log("Series position is a number, returning:", positionStr);
+    return positionStr;
+  }
   
   // If it's a string, try to parse it
   if (typeof positionStr === 'string') {
     // Handle comma-separated values (e.g., "1,2,3")
     if (positionStr.includes(',')) {
+      console.log("Series position contains commas, parsing as list");
       // Parse all positions and return the array
       const positions = positionStr.split(',')
-        .map(p => parseFloat(p.trim()))
-        .filter(p => !isNaN(p));
+        .map(p => {
+          const trimmed = p.trim();
+          console.log(`Parsing position part: "${trimmed}"`);
+          return parseFloat(trimmed);
+        })
+        .filter(p => {
+          const isValid = !isNaN(p);
+          if (!isValid) console.log(`Filtered out invalid position: ${p}`);
+          return isValid;
+        });
       
       console.log("Parsed positions from comma-separated string:", positions);
       
       if (positions.length > 0) {
         // Return all positions instead of just the minimum
+        console.log("Returning array of positions:", positions);
         return positions;
+      } else {
+        console.log("No valid positions found in comma-separated string");
       }
     }
     
@@ -36,6 +54,8 @@ function parseSeriesPosition(positionStr: string | number | undefined): number |
     if (!isNaN(parsed)) {
       console.log("Parsed as single number:", parsed);
       return parsed;
+    } else {
+      console.log(`Failed to parse "${positionStr}" as a number`);
     }
     
     // Handle "#X" format (e.g., "#1", "#2")
@@ -44,6 +64,8 @@ function parseSeriesPosition(positionStr: string | number | undefined): number |
       const hashParsed = parseFloat(hashMatch[1]);
       console.log("Parsed from hash format:", hashParsed);
       return hashParsed;
+    } else if (positionStr.includes('#')) {
+      console.log(`String contains # but couldn't extract number: "${positionStr}"`);
     }
   }
   
@@ -176,8 +198,12 @@ export async function POST(request: NextRequest) {
         console.log("Authors data from Goodreads:", scrapedData.authors);
         console.log("Author data from Goodreads:", scrapedData.author);
         console.log("Publication date from Goodreads:", scrapedData.publicationDate);
-        console.log("Series name from Goodreads:", scrapedData.seriesName);
-        console.log("Position in series from Goodreads:", scrapedData.positionInSeries);
+        
+        // Enhanced logging for series information
+        console.log("Series name from Goodreads (seriesName):", scrapedData.seriesName);
+        console.log("Series name from Goodreads (series):", scrapedData.series);
+        console.log("Position in series from Goodreads (positionInSeries):", scrapedData.positionInSeries);
+        console.log("Position in series from Goodreads (seriesPosition):", scrapedData.seriesPosition);
         
         // Handle author data appropriately
         let authorsList = [];
@@ -310,6 +336,10 @@ export async function POST(request: NextRequest) {
           series: scrapedData.seriesName || scrapedData.series,
           seriesPosition: parseSeriesPosition(scrapedData.positionInSeries || scrapedData.seriesPosition)
         };
+        
+        // Enhanced logging for transformed series data
+        console.log("Series in transformed data:", transformedData.series);
+        console.log("Series position in transformed data:", transformedData.seriesPosition, "type:", typeof transformedData.seriesPosition);
         
         console.log("Transformed Goodreads data:", transformedData);
       } else {
