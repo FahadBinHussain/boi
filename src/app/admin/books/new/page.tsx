@@ -360,44 +360,72 @@ export default function AddNewBook() {
       // Add debugging logs
       console.log("Fetched raw metadata:", data);
       console.log("Authors data:", data.authors);
-      
+
+      // Process Goodreads dates properly
       if (urlType === 'goodreads' && data.publicationDate) {
         console.log("Original Goodreads publication date:", data.publicationDate);
         
-        // Goodreads specific date format handling
-        // Common format: "Month Day, Year" (e.g., "January 1, 1998")
-        const goodreadsDateMatch = /([A-Za-z]+)\s+(\d{1,2}),\s+(\d{4})/.exec(data.publicationDate);
-        
-        if (goodreadsDateMatch) {
-          const [_, month, day, year] = goodreadsDateMatch;
+        // Check if it's already in a standard format we can use
+        if (/^\d{4}-\d{2}-\d{2}$/.test(data.publicationDate)) {
+          console.log("Already in YYYY-MM-DD format:", data.publicationDate);
+        } 
+        else if (/^\d{4}$/.test(data.publicationDate)) {
+          console.log("Already in YYYY format:", data.publicationDate);
+        }
+        // Process "Month Day, Year" format (e.g., "January 1, 1998")
+        else {
+          // Map of month names to their numeric values
+          const monthMap: Record<string, string> = {
+            "january": "01", "february": "02", "march": "03", "april": "04",
+            "may": "05", "june": "06", "july": "07", "august": "08",
+            "september": "09", "october": "10", "november": "11", "december": "12"
+          };
           
-          // Convert month name to month number
-          const monthNames = ["January", "February", "March", "April", "May", "June", 
-                             "July", "August", "September", "October", "November", "December"];
-          const monthIndex = monthNames.findIndex(m => 
-            m.toLowerCase().startsWith(month.toLowerCase().substring(0, 3))
-          );
+          // This regex handles "Month Day, Year" format
+          const goodreadsDateRegex = /\b(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{1,2})(?:,|\s+|st|nd|rd|th)\s+(\d{4})\b/i;
           
-          if (monthIndex !== -1) {
-            // Format month number with leading zero if needed
-            const monthNum = String(monthIndex + 1).padStart(2, '0');
-            // Format day with leading zero if needed
-            const dayNum = String(parseInt(day)).padStart(2, '0');
+          const match = data.publicationDate.toLowerCase().match(goodreadsDateRegex);
+          
+          if (match) {
+            const monthName = match[1].toLowerCase();
+            const day = String(parseInt(match[2])).padStart(2, '0');
+            const year = match[3];
+            const month = monthMap[monthName];
             
-            // Create YYYY-MM-DD format
-            const formattedDate = `${year}-${monthNum}-${dayNum}`;
-            console.log("Pre-processed Goodreads date format to:", formattedDate);
-            data.publicationDate = formattedDate;
-          } else {
-            console.log("Could not parse Goodreads month name, using year only:", year);
-            data.publicationDate = year;
-          }
-        } else {
-          // Try to extract year from other formats if not matching the common format
-          const yearMatch = data.publicationDate.match(/\b(19|20)\d{2}\b/);
-          if (yearMatch && yearMatch[0]) {
-            console.log("Extracted year from Goodreads date:", yearMatch[0]);
-            data.publicationDate = yearMatch[0];
+            if (month) {
+              data.publicationDate = `${year}-${month}-${day}`;
+              console.log("Successfully converted Goodreads date to:", data.publicationDate);
+            } else {
+              console.log("Could not map month name to number, using year only:", year);
+              data.publicationDate = year;
+            }
+          } 
+          // Handle "Month Year" format (e.g., "January 1998")
+          else {
+            const monthYearRegex = /\b(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{4})\b/i;
+            const monthYearMatch = data.publicationDate.toLowerCase().match(monthYearRegex);
+            
+            if (monthYearMatch) {
+              const monthName = monthYearMatch[1].toLowerCase();
+              const year = monthYearMatch[2];
+              const month = monthMap[monthName];
+              
+              if (month) {
+                data.publicationDate = `${year}-${month}-01`; // Default to 1st of month
+                console.log("Converted Month Year format to:", data.publicationDate);
+              } else {
+                console.log("Could not map month name in Month Year format, using year only:", year);
+                data.publicationDate = year;
+              }
+            } 
+            // Fallback: Just try to extract a year if all else fails
+            else {
+              const yearMatch = data.publicationDate.match(/(19|20)\d{2}/);
+              if (yearMatch) {
+                data.publicationDate = yearMatch[0];
+                console.log("Falling back to year only:", data.publicationDate);
+              }
+            }
           }
         }
       }
@@ -445,88 +473,50 @@ export default function AddNewBook() {
         setSummary(data.summary);
       }
       
-      // Set publication date if available
+      // Set publication date if available - simplified approach
       if (data.publicationDate) {
-        console.log("Populating publication date with (potentially pre-processed) value:", data.publicationDate);
-        let finalDateToSet = "";
-
-        const fullDatePattern = /^\d{4}-\d{2}-\d{2}$/;
-        const yearOnlyPattern = /^\d{4}$/;
-
-        if (fullDatePattern.test(data.publicationDate)) {
-          // Already in YYYY-MM-DD, try to validate it as a real date
-          try {
-            const d = new Date(data.publicationDate);
-            // Check if the date is valid and the year is reasonable
-            if (!isNaN(d.getTime()) && d.getFullYear() > 1000 && d.getFullYear() < 3000) {
-              finalDateToSet = data.publicationDate;
-              console.log("Using pre-formatted YYYY-MM-DD:", finalDateToSet);
-            } else {
-              // It's YYYY-MM-DD format but not a valid date (e.g., 2023-13-01) or year is suspect
-              // Try to extract year
-              const yearMatch = data.publicationDate.match(/^(\d{4})/);
-              if (yearMatch) {
-                finalDateToSet = yearMatch[0];
-                console.log("Invalid YYYY-MM-DD or suspect year, extracted year:", finalDateToSet);
-              }
-            }
-          } catch (e) {
-             // Error during date validation, try to extract year
-             const yearMatch = data.publicationDate.match(/^(\d{4})/);
-              if (yearMatch) {
-                finalDateToSet = yearMatch[0];
-                console.log("Error validating YYYY-MM-DD, extracted year:", finalDateToSet);
-              }
-          }
-        } else if (yearOnlyPattern.test(data.publicationDate)) {
-          // Validate year range
-          const year = parseInt(data.publicationDate, 10);
-          if (year > 1000 && year < 3000) {
-            finalDateToSet = data.publicationDate;
-            console.log("Using pre-formatted YYYY:", finalDateToSet);
-          } else {
-            console.warn("Year-only format, but year out of reasonable range:", data.publicationDate);
-          }
-        } else {
-          // Not in YYYY-MM-DD or YYYY. This means fetchMetadata might not have fully converted it,
-          // or it's from a non-Goodreads source with an odd format.
-          console.log("Publication date not in YYYY-MM-DD or YYYY. Original value:", data.publicationDate);
-
-          // Fallback 1: Try to extract a common year pattern (e.g., 19xx or 20xx)
-          const yearMatch = data.publicationDate.match(/\\b(19|20)\\d{2}\\b/);
-          if (yearMatch && yearMatch[0]) {
-            finalDateToSet = yearMatch[0];
-            console.log("Extracted year using regex fallback:", finalDateToSet);
-          } else {
-            // Fallback 2: Try to parse with new Date() and format to YYYY-MM-DD
-            // This can be risky as new Date() is very lenient.
-            try {
-              const dateObj = new Date(data.publicationDate);
-              if (!isNaN(dateObj.getTime())) {
-                const year = dateObj.getFullYear();
-                // Basic sanity check for the year
-                if (year > 1000 && year < 3000) {
-                    finalDateToSet = dateObj.toISOString().split('T')[0];
-                    console.log("Parsed with new Date() and formatted to YYYY-MM-DD:", finalDateToSet);
-                } else {
-                    console.warn("Parsed with new Date() but resulting year is suspect:", year, ". Original value:", data.publicationDate);
-                }
-              } else {
-                console.warn("Failed to parse with new Date() for value:", data.publicationDate);
-              }
-            } catch (error) {
-              console.warn("Error parsing with new Date() for value:", data.publicationDate, error);
-            }
-          }
+        console.log("Setting publication date:", data.publicationDate);
+        
+        // Already in YYYY-MM-DD format
+        if (/^\d{4}-\d{2}-\d{2}$/.test(data.publicationDate)) {
+          console.log("Using YYYY-MM-DD format directly");
+          setPublicationDate(data.publicationDate);
         }
-
-        if (finalDateToSet) {
-          setPublicationDate(finalDateToSet);
-        } else {
-          console.warn("Could not determine a valid publication date from:", data.publicationDate, ". Leaving field blank or with previously set value.");
-          // To ensure the field doesn't retain a malformed value, explicitly clear or set to a safe default.
-          // For now, we'll let it be, relying on validation messages if it remains empty.
-          // Or, set it to empty: setPublicationDate(""); 
+        // Already in YYYY format
+        else if (/^\d{4}$/.test(data.publicationDate)) {
+          console.log("Using YYYY format directly");
+          setPublicationDate(data.publicationDate);
+        }
+        // Try to parse it as a date object - handle other formats
+        else {
+          try {
+            const date = new Date(data.publicationDate);
+            if (!isNaN(date.getTime())) {
+              const formattedDate = date.toISOString().split('T')[0]; // YYYY-MM-DD
+              console.log("Parsed as Date object and formatted:", formattedDate);
+              setPublicationDate(formattedDate);
+            } else {
+              // Fallback to year extraction
+              const yearMatch = data.publicationDate.match(/(19|20)\d{2}/);
+              if (yearMatch) {
+                console.log("Extracted year as fallback:", yearMatch[0]);
+                setPublicationDate(yearMatch[0]);
+              } else {
+                console.log("Could not extract date, using as-is:", data.publicationDate);
+                setPublicationDate(data.publicationDate);
+              }
+            }
+          } catch (error) {
+            // Fallback to year extraction on error
+            const yearMatch = data.publicationDate.match(/(19|20)\d{2}/);
+            if (yearMatch) {
+              console.log("Error parsing date, extracted year as fallback:", yearMatch[0]);
+              setPublicationDate(yearMatch[0]);
+            } else {
+              console.log("Could not extract date, using as-is:", data.publicationDate);
+              setPublicationDate(data.publicationDate);
+            }
+          }
         }
       }
       

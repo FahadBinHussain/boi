@@ -154,27 +154,88 @@ export async function POST(request: NextRequest) {
         if (publicationDate) {
           console.log("Original publication date:", publicationDate);
           
-          // Check if it's a year-only format
+          // Check if it's already in a standard format
           const yearOnlyMatch = /^\d{4}$/.test(publicationDate);
-          // Check if it's already in YYYY-MM-DD format
           const fullDateMatch = /^\d{4}-\d{2}-\d{2}$/.test(publicationDate);
           
           if (!yearOnlyMatch && !fullDateMatch) {
-            // Try to extract year
-            const yearMatch = publicationDate.match(/\b(19|20)\d{2}\b/);
-            if (yearMatch && yearMatch[0]) {
-              publicationDate = yearMatch[0];
-              console.log("Normalized publication date to year:", publicationDate);
-            } else {
-              // Try to parse as a date
-              try {
-                const date = new Date(publicationDate);
-                if (!isNaN(date.getTime())) {
-                  publicationDate = date.toISOString().split('T')[0]; // YYYY-MM-DD format
-                  console.log("Normalized publication date to ISO format:", publicationDate);
+            // First try to parse the date with JavaScript Date
+            try {
+              const date = new Date(publicationDate);
+              if (!isNaN(date.getTime())) {
+                // Use local date components instead of ISO string to avoid timezone issues
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                publicationDate = `${year}-${month}-${day}`;
+                console.log("Normalized publication date to local date format:", publicationDate);
+              } else {
+                // If JavaScript Date parsing fails, try with regex patterns
+                
+                // Map of month names to their numeric values
+                const monthMap: Record<string, string> = {
+                  "january": "01", "february": "02", "march": "03", "april": "04",
+                  "may": "05", "june": "06", "july": "07", "august": "08",
+                  "september": "09", "october": "10", "november": "11", "december": "12"
+                };
+                
+                // Check for "Month Day, Year" format (e.g., "January 1, 1998")
+                const goodreadsDateRegex = /\b(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{1,2})(?:,|\s+|st|nd|rd|th)\s+(\d{4})\b/i;
+                const match = publicationDate.toLowerCase().match(goodreadsDateRegex);
+                
+                if (match) {
+                  const monthName = match[1].toLowerCase();
+                  const day = String(parseInt(match[2])).padStart(2, '0');
+                  const year = match[3];
+                  const month = monthMap[monthName];
+                  
+                  if (month) {
+                    publicationDate = `${year}-${month}-${day}`;
+                    console.log("Converted Goodreads date format to YYYY-MM-DD:", publicationDate);
+                  } else {
+                    // Try to extract year only if we can't parse the full date
+                    const yearMatch = publicationDate.match(/\b(19|20)\d{2}\b/);
+                    if (yearMatch && yearMatch[0]) {
+                      publicationDate = yearMatch[0];
+                      console.log("Normalized publication date to year as fallback:", publicationDate);
+                    }
+                  }
+                } else {
+                  // Try "Month Year" format
+                  const monthYearRegex = /\b(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{4})\b/i;
+                  const monthYearMatch = publicationDate.toLowerCase().match(monthYearRegex);
+                  
+                  if (monthYearMatch) {
+                    const monthName = monthYearMatch[1].toLowerCase();
+                    const year = monthYearMatch[2];
+                    const month = monthMap[monthName];
+                    
+                    if (month) {
+                      publicationDate = `${year}-${month}-01`; // Default to 1st of month
+                      console.log("Converted Month Year format to YYYY-MM-DD:", publicationDate);
+                    } else {
+                      // Fallback to year extraction
+                      publicationDate = year;
+                      console.log("Normalized Month Year to just year as fallback:", publicationDate);
+                    }
+                  } else {
+                    // Last resort: extract year if nothing else works
+                    const yearMatch = publicationDate.match(/\b(19|20)\d{2}\b/);
+                    if (yearMatch && yearMatch[0]) {
+                      publicationDate = yearMatch[0];
+                      console.log("Normalized publication date to year as last resort:", publicationDate);
+                    }
+                  }
                 }
-              } catch (error) {
-                console.warn("Failed to normalize publication date:", error);
+              }
+            } catch (error) {
+              console.warn("Error during date parsing:", error);
+              
+              // Fallback to extracting year if Date parsing fails
+              const yearMatch = publicationDate.match(/\b(19|20)\d{2}\b/);
+              if (yearMatch && yearMatch[0]) {
+                publicationDate = yearMatch[0];
+                console.log("Normalized to year after Date parsing error:", publicationDate);
               }
             }
           }
