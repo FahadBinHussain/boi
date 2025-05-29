@@ -17,11 +17,6 @@ if (typeof window !== 'undefined') {
 }
 
 export default function Home() {
-  // State for page loading animation
-  const [pageLoaded, setPageLoaded] = useState(false);
-  const pageWrapperRef = useRef<HTMLDivElement>(null);
-  const pageOverlayRef = useRef<HTMLDivElement>(null);
-  
   // State for books
   const [books, setBooks] = useState<Book[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -62,44 +57,7 @@ export default function Home() {
   const categoryHeaderRef = useRef<HTMLDivElement>(null);
   const categoriesRef = useRef<HTMLDivElement>(null);
   
-  // Page load animation
   useEffect(() => {
-    // Initial page animation
-    if (pageWrapperRef.current && pageOverlayRef.current) {
-      // Hide page content initially
-      gsap.set(pageWrapperRef.current, { opacity: 0 });
-      
-      // Create a timeline for page reveal
-      const pageTl = gsap.timeline({
-        onComplete: () => setPageLoaded(true)
-      });
-      
-      // Animate the overlay and then page content
-      pageTl
-        .fromTo(pageOverlayRef.current, 
-          { 
-            clipPath: "circle(100% at center)",
-            opacity: 1 
-          },
-          { 
-            clipPath: "circle(0% at center)",
-            opacity: 0,
-            duration: 1.2,
-            ease: "power3.inOut"
-          }
-        )
-        .fromTo(pageWrapperRef.current, 
-          { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" },
-          "-=0.4"
-        );
-    }
-  }, []);
-
-  useEffect(() => {
-    // Only run these animations after page load animation
-    if (!pageLoaded) return;
-    
     // Features section animations with timeline
     if (featuresHeaderRef.current) {
       const featuresTl = gsap.timeline({
@@ -460,163 +418,144 @@ export default function Home() {
       // Kill all GSAP animations
       gsap.killTweensOf('*');
     };
-  }, [pageLoaded]);
+  }, []);
 
   return (
-    <>
-      {/* Page loading overlay */}
-      <div 
-        ref={pageOverlayRef} 
-        className="fixed inset-0 bg-gradient-to-br from-indigo-600 to-purple-700 z-50 flex items-center justify-center"
-      >
-        <div className="relative">
-          <div className="w-24 h-24 border-t-4 border-b-4 border-white rounded-full animate-spin"></div>
-          <div className="w-20 h-20 border-t-4 border-b-4 border-indigo-300 rounded-full animate-spin absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style={{ animationDirection: 'reverse', animationDuration: '1s' }}></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-xl font-light">বই</div>
-        </div>
-        
-        <div className="absolute bottom-12 left-0 right-0 flex justify-center">
-          <div className="text-white/80 text-sm font-light tracking-widest uppercase">Loading Experience</div>
-        </div>
-      </div>
-      
-      {/* Main content */}
-      <div ref={pageWrapperRef} className="flex flex-col min-h-screen">
-        {/* Hero Section */}
-        <HeroSection />
+    <div className="flex flex-col min-h-screen">
+      {/* Hero Section */}
+      <HeroSection />
 
-        {/* Features Section */}
-        <section className="py-16 bg-white">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div 
-              className="text-center mb-12"
-              ref={featuresHeaderRef}
-            >
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Why বই?</h2>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                We provide a simple, fast, and user-friendly platform to discover and download free books.
+      {/* Features Section */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div 
+            className="text-center mb-12"
+            ref={featuresHeaderRef}
+          >
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Why বই?</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              We provide a simple, fast, and user-friendly platform to discover and download free books.
+            </p>
+          </div>
+
+          <div 
+            className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10"
+            ref={featureBoxesRef}
+          >
+            {/* Feature 1 */}
+            <div className="feature-box bg-gray-50 p-6 rounded-lg text-center transform transition-all duration-300 relative z-10">
+              <div className="w-16 h-16 mx-auto bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 mb-4">
+                <FiBookOpen size={28} />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Wide Selection</h3>
+              <p className="text-gray-600">
+                Access thousands of books across various genres and categories.
               </p>
             </div>
 
-            <div 
-              className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10"
-              ref={featureBoxesRef}
-            >
-              {/* Feature 1 */}
-              <div className="feature-box bg-gray-50 p-6 rounded-lg text-center transform transition-all duration-300 relative z-10">
-                <div className="w-16 h-16 mx-auto bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 mb-4">
-                  <FiBookOpen size={28} />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Wide Selection</h3>
-                <p className="text-gray-600">
-                  Access thousands of books across various genres and categories.
-                </p>
+            {/* Feature 2 */}
+            <div className="feature-box bg-gray-50 p-6 rounded-lg text-center transform transition-all duration-300 relative z-10">
+              <div className="w-16 h-16 mx-auto bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 mb-4">
+                <FiDownload size={28} />
               </div>
-
-              {/* Feature 2 */}
-              <div className="feature-box bg-gray-50 p-6 rounded-lg text-center transform transition-all duration-300 relative z-10">
-                <div className="w-16 h-16 mx-auto bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 mb-4">
-                  <FiDownload size={28} />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Easy Downloads</h3>
-                <p className="text-gray-600">
-                  Simple one-click downloads in multiple formats including PDF, EPUB, and MOBI.
-                </p>
-              </div>
-
-              {/* Feature 3 */}
-              <div className="feature-box bg-gray-50 p-6 rounded-lg text-center transform transition-all duration-300 relative z-10">
-                <div className="w-16 h-16 mx-auto bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 mb-4">
-                  <FiUsers size={28} />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Community Driven</h3>
-                <p className="text-gray-600">
-                  Join a community of book lovers who share and review their favorite reads.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Featured Books Section */}
-        <section className="py-16 bg-gray-50" ref={featuredSectionRef}>
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12">
-              <div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">Featured Books</h2>
-                <p className="text-lg text-gray-600">
-                  Check out our most popular books this week
-                </p>
-              </div>
-              <Link 
-                href="/books" 
-                className="inline-block mt-4 md:mt-0 text-indigo-600 font-medium hover:text-indigo-700 transition-colors"
-              >
-                View all books →
-              </Link>
-            </div>
-
-            {isLoading ? (
-              <div className="flex justify-center items-center py-12">
-                <FiLoader className="animate-spin h-8 w-8 text-indigo-600" />
-                <span className="ml-2 text-lg text-gray-600">Loading featured books...</span>
-              </div>
-            ) : error ? (
-              <div className="bg-red-50 p-4 rounded-lg border border-red-200 text-red-700">
-                <p className="font-medium">{error}</p>
-                <p className="mt-1 text-sm">Please try refreshing the page or contact support if the problem persists.</p>
-              </div>
-            ) : (
-              <BookGrid books={featuredBooks} selectedCategories={[]} compact={true} />
-            )}
-          </div>
-        </section>
-
-        {/* Categories Preview */}
-        <section className="py-16 bg-white">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div 
-              className="text-center mb-12"
-              ref={categoryHeaderRef}
-            >
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Explore Categories</h2>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                Find your next read by browsing our collection by category
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Easy Downloads</h3>
+              <p className="text-gray-600">
+                Simple one-click downloads in multiple formats including PDF, EPUB, and MOBI.
               </p>
             </div>
 
-            <div 
-              className="grid grid-cols-2 md:grid-cols-4 gap-4"
-              ref={categoriesRef}
-            >
-              {categories.slice(0, 8).map((category) => (
-                <Link 
-                  key={category} 
-                  href={`/categories?selected=${category}`}
-                  className="bg-gray-50 hover:bg-indigo-50 border border-gray-200 rounded-lg p-6 text-center transition-colors group"
-                >
-                  <h3 className="font-medium text-gray-900 group-hover:text-indigo-600 transition-colors">
-                    {category}
-                  </h3>
-                </Link>
-              ))}
-            </div>
-
-            <div className="text-center mt-8">
-              <Link 
-                href="/categories" 
-                className="inline-block px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium rounded-lg transition-colors"
-              >
-                See All Categories
-              </Link>
+            {/* Feature 3 */}
+            <div className="feature-box bg-gray-50 p-6 rounded-lg text-center transform transition-all duration-300 relative z-10">
+              <div className="w-16 h-16 mx-auto bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 mb-4">
+                <FiUsers size={28} />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Community Driven</h3>
+              <p className="text-gray-600">
+                Join a community of book lovers who share and review their favorite reads.
+              </p>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* CTA Section with Authentication */}
-        <AuthCTA />
-      </div>
-    </>
+      {/* Featured Books Section */}
+      <section className="py-16 bg-gray-50" ref={featuredSectionRef}>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Featured Books</h2>
+              <p className="text-lg text-gray-600">
+                Check out our most popular books this week
+              </p>
+            </div>
+            <Link 
+              href="/books" 
+              className="inline-block mt-4 md:mt-0 text-indigo-600 font-medium hover:text-indigo-700 transition-colors"
+            >
+              View all books →
+            </Link>
+          </div>
+
+          {isLoading ? (
+            <div className="flex justify-center items-center py-12">
+              <FiLoader className="animate-spin h-8 w-8 text-indigo-600" />
+              <span className="ml-2 text-lg text-gray-600">Loading featured books...</span>
+            </div>
+          ) : error ? (
+            <div className="bg-red-50 p-4 rounded-lg border border-red-200 text-red-700">
+              <p className="font-medium">{error}</p>
+              <p className="mt-1 text-sm">Please try refreshing the page or contact support if the problem persists.</p>
+            </div>
+          ) : (
+            <BookGrid books={featuredBooks} selectedCategories={[]} compact={true} />
+          )}
+        </div>
+      </section>
+
+      {/* Categories Preview */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div 
+            className="text-center mb-12"
+            ref={categoryHeaderRef}
+          >
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Explore Categories</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Find your next read by browsing our collection by category
+            </p>
+          </div>
+
+          <div 
+            className="grid grid-cols-2 md:grid-cols-4 gap-4"
+            ref={categoriesRef}
+          >
+            {categories.slice(0, 8).map((category) => (
+              <Link 
+                key={category} 
+                href={`/categories?selected=${category}`}
+                className="bg-gray-50 hover:bg-indigo-50 border border-gray-200 rounded-lg p-6 text-center transition-colors group"
+              >
+                <h3 className="font-medium text-gray-900 group-hover:text-indigo-600 transition-colors">
+                  {category}
+                </h3>
+              </Link>
+            ))}
+          </div>
+          
+          <div className="text-center mt-8">
+            <Link 
+              href="/categories" 
+              className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition-colors"
+            >
+              View All Categories
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Auth CTA Section */}
+      <AuthCTA />
+    </div>
   );
 }
 
