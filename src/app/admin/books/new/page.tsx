@@ -96,63 +96,6 @@ const BookThumbnail = ({
   );
 };
 
-// Add this component for the step indicator
-const StepIndicator = ({ 
-  currentStep,
-  totalSteps,
-  stepsCompleted,
-  onStepClick
-}: { 
-  currentStep: number;
-  totalSteps: number;
-  stepsCompleted: {[key: number]: boolean};
-  onStepClick: (step: number) => void;
-}) => {
-  const stepTitles = {
-    1: "Basic Info",
-    2: "Media",
-    3: "Publication",
-    4: "Additional Details"
-  };
-
-  return (
-    <div className="py-4">
-      <div className="flex items-center justify-between">
-        {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step) => (
-          <div key={step} className="flex items-center">
-            <button
-              type="button"
-              onClick={() => onStepClick(step)}
-              disabled={!stepsCompleted[step - 1] && step !== 1 && step > currentStep}
-              className={`relative flex h-8 w-8 items-center justify-center rounded-full border-2 text-xs font-medium 
-                ${currentStep === step 
-                  ? 'border-indigo-600 bg-indigo-600 text-white' 
-                  : stepsCompleted[step] 
-                    ? 'border-indigo-600 bg-white text-indigo-600' 
-                    : 'border-gray-300 bg-white text-gray-500'
-                } ${(step <= currentStep || stepsCompleted[step - 1]) ? 'cursor-pointer' : 'cursor-not-allowed'}`}
-            >
-              {stepsCompleted[step] ? (
-                <svg className="h-5 w-5 text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-              ) : (
-                step
-              )}
-            </button>
-            <div className={`ml-2 text-sm font-medium ${currentStep === step ? 'text-indigo-600' : 'text-gray-500'}`}>
-              {stepTitles[step as keyof typeof stepTitles]}
-            </div>
-            {step < totalSteps && (
-              <div className="ml-4 flex-1 border-t border-gray-300" style={{ width: '50px' }}></div>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
 export default function AddNewBook() {
   const router = useRouter();
   const { settings, isLoading: isSettingsLoading, syncStatus, lastSyncMessage } = useUserSettings();
@@ -196,16 +139,6 @@ export default function AddNewBook() {
   const [singleBookPdfUrl, setSingleBookPdfUrl] = useState<string | null>(null);
   const [singleBookUploadError, setSingleBookUploadError] = useState<string | null>(null);
 
-  // Add state variables for multi-step form
-  const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 4;
-  const [stepsCompleted, setStepsCompleted] = useState<{[key: number]: boolean}>({
-    1: false,
-    2: false,
-    3: false,
-    4: false
-  });
-
   // Load user settings when component mounts
   useEffect(() => {
     if (!isSettingsLoading && settings) {
@@ -232,58 +165,52 @@ export default function AddNewBook() {
     }
   }, [thumbnailUrl]);
 
-  // Function to validate current step
-  const validateCurrentStep = () => {
-    const newStepsCompleted = {...stepsCompleted};
+  // Modify validation function to validate all fields at once
+  const validateForm = () => {
     let errors: {[key: string]: string} = {};
     
-    if (currentStep === 1) {
-      // Basic info validation
-      if (!bookName.trim()) {
-        errors.bookName = "Book name is required";
-      }
+    // Basic info validation
+    if (!bookName.trim()) {
+      errors.bookName = "Book name is required";
+    }
+    
+    if (authors.length === 0 || authors.some(author => !author.name.trim())) {
+      errors.authors = "Please add at least one author with a name";
+    }
+    
+    // Media validation
+    if (!thumbnailUrl.trim()) {
+      errors.thumbnailUrl = "Thumbnail URL is required";
+    }
+    
+    if (!bookPdfFile && !singleBookPdfUrl) {
+      errors.bookPdf = "Please select a PDF file for the book";
+    }
+    
+    // Details validation
+    if (!publicationDate.trim()) {
+      errors.publicationDate = "Publication date is required";
+    } else {
+      // Validate date format - either YYYY or YYYY-MM-DD
+      const yearOnlyPattern = /^\d{4}$/;
+      const fullDatePattern = /^\d{4}-\d{2}-\d{2}$/;
       
-      if (authors.length === 0 || authors.some(author => !author.name.trim())) {
-        errors.authors = "Please add at least one author with a name";
-      }
-      
-      newStepsCompleted[1] = Object.keys(errors).length === 0;
-    } 
-    else if (currentStep === 2) {
-      // Media validation
-      if (!thumbnailUrl.trim()) {
-        errors.thumbnailUrl = "Thumbnail URL is required";
-      }
-      
-      if (!bookPdfFile && !singleBookPdfUrl) {
-        errors.bookPdf = "Please select a PDF file for the book";
-      }
-      
-      newStepsCompleted[2] = Object.keys(errors).length === 0;
-    } 
-    else if (currentStep === 3) {
-      // Details validation
-      if (!publicationDate.trim()) {
-        errors.publicationDate = "Publication date is required";
-      } else {
-        // Validate date format - either YYYY or YYYY-MM-DD
-        const yearOnlyPattern = /^\d{4}$/;
-        const fullDatePattern = /^\d{4}-\d{2}-\d{2}$/;
-        
-        if (!yearOnlyPattern.test(publicationDate) && !fullDatePattern.test(publicationDate)) {
-          errors.publicationDate = "Please enter a valid year (YYYY) or date (YYYY-MM-DD)";
+      if (!yearOnlyPattern.test(publicationDate) && !fullDatePattern.test(publicationDate)) {
+        errors.publicationDate = "Please enter a valid year (YYYY) or date (YYYY-MM-DD)";
+      } else if (fullDatePattern.test(publicationDate)) {
+        // If full date format, validate that it's a reasonable date
+        try {
+          const date = new Date(publicationDate);
+          if (isNaN(date.getTime())) {
+            errors.publicationDate = "Please enter a valid date";
+          }
+        } catch (error) {
+          errors.publicationDate = "Please enter a valid date";
         }
       }
-      
-      newStepsCompleted[3] = Object.keys(errors).length === 0;
-    } 
-    else if (currentStep === 4) {
-      // Additional info - always mark as completed as these are optional
-      newStepsCompleted[4] = true;
     }
     
     setFormErrors(errors);
-    setStepsCompleted(newStepsCompleted);
     return Object.keys(errors).length === 0;
   };
 
@@ -291,8 +218,8 @@ export default function AddNewBook() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate all steps before submission
-    if (!validateCurrentStep()) {
+    // Validate all fields before submission
+    if (!validateForm()) {
       // Show error notification
       showNotification('error', 'Please fill in all required fields');
       return;
@@ -431,8 +358,49 @@ export default function AddNewBook() {
       const data = await response.json();
       
       // Add debugging logs
-      console.log("Fetched metadata:", data);
+      console.log("Fetched raw metadata:", data);
       console.log("Authors data:", data.authors);
+      
+      if (urlType === 'goodreads' && data.publicationDate) {
+        console.log("Original Goodreads publication date:", data.publicationDate);
+        
+        // Goodreads specific date format handling
+        // Common format: "Month Day, Year" (e.g., "January 1, 1998")
+        const goodreadsDateMatch = /([A-Za-z]+)\s+(\d{1,2}),\s+(\d{4})/.exec(data.publicationDate);
+        
+        if (goodreadsDateMatch) {
+          const [_, month, day, year] = goodreadsDateMatch;
+          
+          // Convert month name to month number
+          const monthNames = ["January", "February", "March", "April", "May", "June", 
+                             "July", "August", "September", "October", "November", "December"];
+          const monthIndex = monthNames.findIndex(m => 
+            m.toLowerCase().startsWith(month.toLowerCase().substring(0, 3))
+          );
+          
+          if (monthIndex !== -1) {
+            // Format month number with leading zero if needed
+            const monthNum = String(monthIndex + 1).padStart(2, '0');
+            // Format day with leading zero if needed
+            const dayNum = String(parseInt(day)).padStart(2, '0');
+            
+            // Create YYYY-MM-DD format
+            const formattedDate = `${year}-${monthNum}-${dayNum}`;
+            console.log("Pre-processed Goodreads date format to:", formattedDate);
+            data.publicationDate = formattedDate;
+          } else {
+            console.log("Could not parse Goodreads month name, using year only:", year);
+            data.publicationDate = year;
+          }
+        } else {
+          // Try to extract year from other formats if not matching the common format
+          const yearMatch = data.publicationDate.match(/\b(19|20)\d{2}\b/);
+          if (yearMatch && yearMatch[0]) {
+            console.log("Extracted year from Goodreads date:", yearMatch[0]);
+            data.publicationDate = yearMatch[0];
+          }
+        }
+      }
       
       // Populate form fields with the scraped data
       populateFormFields(data);
@@ -479,53 +447,86 @@ export default function AddNewBook() {
       
       // Set publication date if available
       if (data.publicationDate) {
-        console.log("Setting publication date from data:", data.publicationDate);
-        
-        // Try to extract a year or parse the date using multiple approaches
-        const yearOnlyMatch = /^\d{4}$/.test(data.publicationDate);
-        const fullDateMatch = /^\d{4}-\d{2}-\d{2}$/.test(data.publicationDate);
-        
-        if (yearOnlyMatch) {
-          // Already in correct year format (e.g., "2023")
-          console.log("Using year-only format directly:", data.publicationDate);
-          setPublicationDate(data.publicationDate);
-        } else if (fullDateMatch) {
-          // Already in correct date format (e.g., "2023-01-15")
-          console.log("Using full date format directly:", data.publicationDate);
-          setPublicationDate(data.publicationDate);
-        } else {
-          // Try to extract year from various formats
-          const yearMatch = data.publicationDate.match(/\b(19|20)\d{2}\b/);
-          if (yearMatch && yearMatch[0]) {
-            const year = yearMatch[0];
-            console.log("Extracted year from publication date:", year);
-            setPublicationDate(year);
+        console.log("Populating publication date with (potentially pre-processed) value:", data.publicationDate);
+        let finalDateToSet = "";
+
+        const fullDatePattern = /^\d{4}-\d{2}-\d{2}$/;
+        const yearOnlyPattern = /^\d{4}$/;
+
+        if (fullDatePattern.test(data.publicationDate)) {
+          // Already in YYYY-MM-DD, try to validate it as a real date
+          try {
+            const d = new Date(data.publicationDate);
+            // Check if the date is valid and the year is reasonable
+            if (!isNaN(d.getTime()) && d.getFullYear() > 1000 && d.getFullYear() < 3000) {
+              finalDateToSet = data.publicationDate;
+              console.log("Using pre-formatted YYYY-MM-DD:", finalDateToSet);
+            } else {
+              // It's YYYY-MM-DD format but not a valid date (e.g., 2023-13-01) or year is suspect
+              // Try to extract year
+              const yearMatch = data.publicationDate.match(/^(\d{4})/);
+              if (yearMatch) {
+                finalDateToSet = yearMatch[0];
+                console.log("Invalid YYYY-MM-DD or suspect year, extracted year:", finalDateToSet);
+              }
+            }
+          } catch (e) {
+             // Error during date validation, try to extract year
+             const yearMatch = data.publicationDate.match(/^(\d{4})/);
+              if (yearMatch) {
+                finalDateToSet = yearMatch[0];
+                console.log("Error validating YYYY-MM-DD, extracted year:", finalDateToSet);
+              }
+          }
+        } else if (yearOnlyPattern.test(data.publicationDate)) {
+          // Validate year range
+          const year = parseInt(data.publicationDate, 10);
+          if (year > 1000 && year < 3000) {
+            finalDateToSet = data.publicationDate;
+            console.log("Using pre-formatted YYYY:", finalDateToSet);
           } else {
-            // Try to parse other date formats like "January 2023", "Jan 15, 2023", etc.
+            console.warn("Year-only format, but year out of reasonable range:", data.publicationDate);
+          }
+        } else {
+          // Not in YYYY-MM-DD or YYYY. This means fetchMetadata might not have fully converted it,
+          // or it's from a non-Goodreads source with an odd format.
+          console.log("Publication date not in YYYY-MM-DD or YYYY. Original value:", data.publicationDate);
+
+          // Fallback 1: Try to extract a common year pattern (e.g., 19xx or 20xx)
+          const yearMatch = data.publicationDate.match(/\\b(19|20)\\d{2}\\b/);
+          if (yearMatch && yearMatch[0]) {
+            finalDateToSet = yearMatch[0];
+            console.log("Extracted year using regex fallback:", finalDateToSet);
+          } else {
+            // Fallback 2: Try to parse with new Date() and format to YYYY-MM-DD
+            // This can be risky as new Date() is very lenient.
             try {
               const dateObj = new Date(data.publicationDate);
               if (!isNaN(dateObj.getTime())) {
-                // Valid date, format as YYYY-MM-DD
-                const formattedDate = dateObj.toISOString().split('T')[0];
-                console.log("Parsed date and formatted as YYYY-MM-DD:", formattedDate);
-                setPublicationDate(formattedDate);
+                const year = dateObj.getFullYear();
+                // Basic sanity check for the year
+                if (year > 1000 && year < 3000) {
+                    finalDateToSet = dateObj.toISOString().split('T')[0];
+                    console.log("Parsed with new Date() and formatted to YYYY-MM-DD:", finalDateToSet);
+                } else {
+                    console.warn("Parsed with new Date() but resulting year is suspect:", year, ". Original value:", data.publicationDate);
+                }
               } else {
-                console.warn("Failed to parse publication date:", data.publicationDate);
-                // If all parsing fails, just use the raw string but limit to 20 chars
-                const safeValue = data.publicationDate.substring(0, 20);
-                console.log("Using original value with truncation:", safeValue);
-                setPublicationDate(safeValue);
+                console.warn("Failed to parse with new Date() for value:", data.publicationDate);
               }
             } catch (error) {
-              console.warn("Error parsing publication date:", error);
-              // Try to set just the first 4 digits if they look like a year
-              const possibleYear = data.publicationDate.replace(/\D/g, '').substring(0, 4);
-              if (possibleYear.length === 4 && parseInt(possibleYear) > 1500 && parseInt(possibleYear) < 2100) {
-                console.log("Extracted possible year digits:", possibleYear);
-                setPublicationDate(possibleYear);
-              }
+              console.warn("Error parsing with new Date() for value:", data.publicationDate, error);
             }
           }
+        }
+
+        if (finalDateToSet) {
+          setPublicationDate(finalDateToSet);
+        } else {
+          console.warn("Could not determine a valid publication date from:", data.publicationDate, ". Leaving field blank or with previously set value.");
+          // To ensure the field doesn't retain a malformed value, explicitly clear or set to a safe default.
+          // For now, we'll let it be, relying on validation messages if it remains empty.
+          // Or, set it to empty: setPublicationDate(""); 
         }
       }
       
@@ -693,43 +694,6 @@ export default function AddNewBook() {
     showNotification('error', `Upload failed: ${errorMessage}`);
   };
 
-  // Function to go to next step
-  const goToNextStep = () => {
-    if (currentStep < totalSteps) {
-      const isValid = validateCurrentStep();
-      if (isValid) {
-        setCurrentStep(prev => prev + 1);
-        window.scrollTo(0, 0);
-      }
-    }
-  };
-
-  // Function to go to previous step
-  const goToPreviousStep = () => {
-    if (currentStep > 1) {
-      // When going back, we don't need validation
-      setCurrentStep(prev => prev - 1);
-      window.scrollTo(0, 0);
-    }
-  };
-
-  // Function to handle step click in the step indicator
-  const handleStepClick = (step: number) => {
-    // Only allow clicking on previously completed steps or the current step
-    if (step < currentStep) {
-      setCurrentStep(step);
-      window.scrollTo(0, 0);
-    } else if (step === currentStep) {
-      // Just scroll to top if clicking current step
-      window.scrollTo(0, 0);
-    } else if (stepsCompleted[currentStep]) {
-      // If current step is complete, allow moving forward
-      validateCurrentStep();
-      setCurrentStep(step);
-      window.scrollTo(0, 0);
-    }
-  };
-
   return (
     <div className="max-w-5xl mx-auto">
       <div className="mb-6 flex items-center justify-between">
@@ -770,88 +734,79 @@ export default function AddNewBook() {
         <div className="border-b border-gray-200 bg-gray-50 p-4 sm:p-6">
           <h2 className="text-lg font-medium text-gray-900">Book Information</h2>
           <p className="mt-1 text-sm text-gray-600">
-            Enter the details of the book you want to add to the library.
+            Enter all details of the book you want to add to the library. Required fields are marked with an asterisk (*).
           </p>
-          
-          {/* Step indicator */}
-          <div className="mt-4">
-            <StepIndicator 
-              currentStep={currentStep} 
-              totalSteps={totalSteps} 
-              stepsCompleted={stepsCompleted}
-              onStepClick={handleStepClick}
-            />
-          </div>
         </div>
         
-        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-6">
-          {/* Step 1: Basic Info */}
-          {currentStep === 1 && (
-            <div className="space-y-6">
-              {/* Auto-fill from web section at the top for better UX */}
-              <div className="form-group bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <h3 className="text-base font-medium text-gray-900">Quick Fill from Web</h3>
-                <p className="mt-1 text-sm text-gray-500">
-                  Save time by automatically populating book details from Fandom or Goodreads.
-                </p>
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-8">
+          {/* Auto-fill from web section at the top for better UX */}
+          <div className="form-group bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <h3 className="text-base font-medium text-gray-900">Quick Fill from Web</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              Save time by automatically populating book details from Fandom or Goodreads.
+            </p>
 
-                <div className="mt-3">
-                  <div className="flex rounded-md shadow-sm">
-                    <div className="relative flex flex-grow items-stretch focus-within:z-10">
-                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <FiLink className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                      </div>
-                      <input
-                        type="text"
-                        id="metadataUrl"
-                        className={`block w-full rounded-none rounded-l-md border-gray-300 pl-10 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                          scrapingError ? "border-red-300 text-red-900 placeholder-red-300" : ""
-                        }`}
-                        placeholder="Paste a Fandom or Goodreads URL to auto-fill book details"
-                        value={metadataUrl}
-                        onChange={handleMetadataUrlChange}
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      onClick={handleFetchMetadata}
-                      disabled={isScrapingMetadata || !metadataUrl.trim()}
-                      className={`relative -ml-px inline-flex items-center rounded-r-md border border-gray-300 bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
-                        (isScrapingMetadata || !metadataUrl.trim()) ? "cursor-not-allowed opacity-75" : ""
-                      }`}
-                    >
-                      {isScrapingMetadata ? (
-                        <>
-                          <FiLoader className="mr-2 h-4 w-4 animate-spin" />
-                          Fetching...
-                        </>
-                      ) : (
-                        <>
-                          <FiDownload className="mr-2 h-4 w-4" />
-                          Fetch Data
-                        </>
-                      )}
-                    </button>
+            <div className="mt-3">
+              <div className="flex rounded-md shadow-sm">
+                <div className="relative flex flex-grow items-stretch focus-within:z-10">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                    <FiLink className="h-5 w-5 text-gray-400" aria-hidden="true" />
                   </div>
+                  <input
+                    type="text"
+                    id="metadataUrl"
+                    className={`block w-full rounded-none rounded-l-md border-gray-300 pl-10 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                      scrapingError ? "border-red-300 text-red-900 placeholder-red-300" : ""
+                    }`}
+                    placeholder="Paste a Fandom or Goodreads URL to auto-fill book details"
+                    value={metadataUrl}
+                    onChange={handleMetadataUrlChange}
+                  />
                 </div>
-                
-                {scrapingError && (
-                  <div className="mt-3 flex items-center rounded-md bg-red-50 p-3 text-red-700">
-                    <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                    </svg>
-                    <span>{scrapingError}</span>
-                  </div>
-                )}
-                
-                {metadataSuccess && !scrapingError && (
-                  <div className="mt-3 flex items-center rounded-md bg-green-50 p-3 text-green-700">
-                    <FiCheckCircle className="mr-2 h-5 w-5" />
-                    <span>{metadataSuccess}</span>
-                  </div>
-                )}
+                <button
+                  type="button"
+                  onClick={handleFetchMetadata}
+                  disabled={isScrapingMetadata || !metadataUrl.trim()}
+                  className={`relative -ml-px inline-flex items-center rounded-r-md border border-gray-300 bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+                    (isScrapingMetadata || !metadataUrl.trim()) ? "cursor-not-allowed opacity-75" : ""
+                  }`}
+                >
+                  {isScrapingMetadata ? (
+                    <>
+                      <FiLoader className="mr-2 h-4 w-4 animate-spin" />
+                      Fetching...
+                    </>
+                  ) : (
+                    <>
+                      <FiDownload className="mr-2 h-4 w-4" />
+                      Fetch Data
+                    </>
+                  )}
+                </button>
               </div>
+            </div>
+            
+            {scrapingError && (
+              <div className="mt-3 flex items-center rounded-md bg-red-50 p-3 text-red-700">
+                <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+                <span>{scrapingError}</span>
+              </div>
+            )}
+            
+            {metadataSuccess && !scrapingError && (
+              <div className="mt-3 flex items-center rounded-md bg-green-50 p-3 text-green-700">
+                <FiCheckCircle className="mr-2 h-5 w-5" />
+                <span>{metadataSuccess}</span>
+              </div>
+            )}
+          </div>
 
+          {/* Section 1: Basic Information */}
+          <div className="border-t border-gray-200 pt-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Basic Information</h3>
+            <div className="space-y-6">
               {/* Book Name */}
               <div className="form-group">
                 <label htmlFor="bookName" className="block text-sm font-medium text-gray-700 mb-2">
@@ -936,7 +891,7 @@ export default function AddNewBook() {
                   rows={4}
                   className={`block w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm
                     ${formErrors.summary ? "border-red-300 text-red-900 placeholder-red-300" : "border-gray-300"}`}
-                  placeholder="Enter a brief summary of the book..."
+                  placeholder="Enter a brief summary of the book's content"
                   value={summary}
                   onChange={(e) => setSummary(e.target.value)}
                 />
@@ -946,10 +901,11 @@ export default function AddNewBook() {
                 <p className="mt-1 text-xs text-gray-500">Provide a concise summary or description of the book's content</p>
               </div>
             </div>
-          )}
+          </div>
           
-          {/* Step 2: Media (Thumbnail and PDF) */}
-          {currentStep === 2 && (
+          {/* Section 2: Media */}
+          <div className="border-t border-gray-200 pt-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Media</h3>
             <div className="space-y-6">
               {/* Single Book Thumbnail Input */}
               <div className="form-group">
@@ -1112,10 +1068,11 @@ export default function AddNewBook() {
                 )}
               </div>
             </div>
-          )}
+          </div>
           
-          {/* Step 3: Publication */}
-          {currentStep === 3 && (
+          {/* Section 3: Publication */}
+          <div className="border-t border-gray-200 pt-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Publication Details</h3>
             <div className="space-y-6">
               {/* Publication Date */}
               <div className="form-group">
@@ -1140,7 +1097,7 @@ export default function AddNewBook() {
                       onChange={(e) => setPublicationDate(e.target.value)}
                     />
                   </div>
-                  <p className="mt-1 text-xs text-gray-500">Enter year (YYYY) or full date (YYYY-MM-DD)</p>
+                  <p className="mt-1 text-xs text-gray-500">Enter year (YYYY) or full date (YYYY-MM-DD). Auto-filled dates will be formatted automatically.</p>
                 </div>
                 
                 {formErrors.publicationDate && (
@@ -1180,198 +1137,154 @@ export default function AddNewBook() {
                 <p className="mt-1 text-xs text-gray-500">Enter the language of the book (e.g. English, Spanish)</p>
               </div>
             </div>
-          )}
+          </div>
           
-          {/* Step 4: Additional Details */}
-          {currentStep === 4 && (
-            <div className="space-y-6">
-              <div className="form-group">
-                <h3 className="text-base font-medium text-gray-900">Additional Book Details</h3>
-                <p className="mt-1 text-sm text-gray-500">These details are optional but can enhance the book's metadata.</p>
+          {/* Section 4: Additional Details */}
+          <div className="border-t border-gray-200 pt-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Additional Book Details (Optional)</h3>
+            <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+              {/* Number of Pages */}
+              <div className="sm:col-span-2">
+                <label htmlFor="numberOfPages" className="block text-sm font-medium text-gray-700">Number of Pages</label>
+                <div className="mt-1">
+                  <div className="relative rounded-md shadow-sm">
+                    <input
+                      type="number"
+                      id="numberOfPages"
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      placeholder="Number of pages"
+                      value={numberOfPages || ""}
+                      onChange={(e) => setNumberOfPages(parseInt(e.target.value) || undefined)}
+                    />
+                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
               </div>
               
-              <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-                {/* Number of Pages */}
-                <div className="sm:col-span-2">
-                  <label htmlFor="numberOfPages" className="block text-sm font-medium text-gray-700">Number of Pages</label>
-                  <div className="mt-1">
-                    <div className="relative rounded-md shadow-sm">
-                      <input
-                        type="number"
-                        id="numberOfPages"
-                        className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                        placeholder="Number of pages"
-                        value={numberOfPages || ""}
-                        onChange={(e) => setNumberOfPages(parseInt(e.target.value) || undefined)}
-                      />
-                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                          <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Ratings */}
-                <div className="sm:col-span-2">
-                  <label htmlFor="ratings" className="block text-sm font-medium text-gray-700">Ratings</label>
-                  <div className="mt-1">
-                    <div className="relative rounded-md shadow-sm">
-                      <input
-                        type="number"
-                        id="ratings"
-                        className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                        placeholder="Number of ratings"
-                        value={ratings || ""}
-                        onChange={(e) => setRatings(parseInt(e.target.value) || undefined)}
-                      />
-                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Average Rating */}
-                <div className="sm:col-span-2">
-                  <label htmlFor="averageRating" className="block text-sm font-medium text-gray-700">Average Rating</label>
-                  <div className="mt-1">
-                    <div className="relative rounded-md shadow-sm">
-                      <input
-                        type="number"
-                        id="averageRating"
-                        step="0.01"
-                        min="0"
-                        max="5"
-                        className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                        placeholder="Average Rating (0-5)"
-                        value={averageRating || ""}
-                        onChange={(e) => setAverageRating(parseFloat(e.target.value) || undefined)}
-                      />
-                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      </div>
-                    </div>
-                    <p className="mt-1 text-xs text-gray-500">Average rating out of 5</p>
-                  </div>
-                </div>
-                
-                {/* Genres - as a comma-separated input */}
-                <div className="sm:col-span-6">
-                  <label htmlFor="genres" className="block text-sm font-medium text-gray-700">Genres</label>
-                  <div className="mt-1">
+              {/* Ratings */}
+              <div className="sm:col-span-2">
+                <label htmlFor="ratings" className="block text-sm font-medium text-gray-700">Ratings</label>
+                <div className="mt-1">
+                  <div className="relative rounded-md shadow-sm">
                     <input
-                      type="text"
-                      id="genres"
+                      type="number"
+                      id="ratings"
                       className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      placeholder="Fantasy, Adventure, Mystery"
-                      value={genres.join(", ")}
-                      onChange={(e) => {
-                        const genresArray = e.target.value.split(",").map(genre => genre.trim()).filter(genre => genre !== "");
-                        setGenres(genresArray);
-                      }}
+                      placeholder="Number of ratings"
+                      value={ratings || ""}
+                      onChange={(e) => setRatings(parseInt(e.target.value) || undefined)}
                     />
-                    <p className="mt-1 text-xs text-gray-500">Separate genres with commas</p>
-                  </div>
-                </div>
-                
-                {/* Characters - as a comma-separated input */}
-                <div className="sm:col-span-6">
-                  <label htmlFor="characters" className="block text-sm font-medium text-gray-700">Characters</label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      id="characters"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      placeholder="Harry Potter, Hermione Granger, Ron Weasley"
-                      value={characters.join(", ")}
-                      onChange={(e) => {
-                        const charactersArray = e.target.value.split(",").map(character => character.trim()).filter(character => character !== "");
-                        setCharacters(charactersArray);
-                      }}
-                    />
-                    <p className="mt-1 text-xs text-gray-500">Separate character names with commas</p>
+                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    </div>
                   </div>
                 </div>
               </div>
-
-              <div className="form-group bg-green-50 p-4 rounded-lg border border-green-200 mt-6">
-                <div className="flex items-start">
-                  <div className="flex-shrink-0">
-                    <FiCheckCircle className="h-5 w-5 text-green-600" />
-                  </div>
-                  <div className="ml-3">
-                    <h3 className="text-sm font-medium text-green-800">Ready to submit</h3>
-                    <div className="mt-2 text-sm text-green-700">
-                      <p>You've completed all required fields! Click "Save Book" to add this book to your library.</p>
+              
+              {/* Average Rating */}
+              <div className="sm:col-span-2">
+                <label htmlFor="averageRating" className="block text-sm font-medium text-gray-700">Average Rating</label>
+                <div className="mt-1">
+                  <div className="relative rounded-md shadow-sm">
+                    <input
+                      type="number"
+                      id="averageRating"
+                      step="0.01"
+                      min="0"
+                      max="5"
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      placeholder="Average Rating (0-5)"
+                      value={averageRating || ""}
+                      onChange={(e) => setAverageRating(parseFloat(e.target.value) || undefined)}
+                    />
+                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
                     </div>
                   </div>
+                  <p className="mt-1 text-xs text-gray-500">Average rating out of 5</p>
+                </div>
+              </div>
+              
+              {/* Genres - as a comma-separated input */}
+              <div className="sm:col-span-6">
+                <label htmlFor="genres" className="block text-sm font-medium text-gray-700">Genres</label>
+                <div className="mt-1">
+                  <input
+                    type="text"
+                    id="genres"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    placeholder="Fantasy, Adventure, Mystery"
+                    value={genres.join(", ")}
+                    onChange={(e) => {
+                      const genresArray = e.target.value.split(",").map(genre => genre.trim()).filter(genre => genre !== "");
+                      setGenres(genresArray);
+                    }}
+                  />
+                  <p className="mt-1 text-xs text-gray-500">Separate genres with commas</p>
+                </div>
+              </div>
+              
+              {/* Characters - as a comma-separated input */}
+              <div className="sm:col-span-6">
+                <label htmlFor="characters" className="block text-sm font-medium text-gray-700">Characters</label>
+                <div className="mt-1">
+                  <input
+                    type="text"
+                    id="characters"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    placeholder="Harry Potter, Hermione Granger, Ron Weasley"
+                    value={characters.join(", ")}
+                    onChange={(e) => {
+                      const charactersArray = e.target.value.split(",").map(character => character.trim()).filter(character => character !== "");
+                      setCharacters(charactersArray);
+                    }}
+                  />
+                  <p className="mt-1 text-xs text-gray-500">Separate character names with commas</p>
                 </div>
               </div>
             </div>
-          )}
+          </div>
           
-          {/* Step navigation buttons */}
-          <div className="form-group border-t border-gray-200 pt-6">
-            <div className="flex justify-between">
+          {/* Submit Button */}
+          <div className="form-group border-t border-gray-200 pt-6 mt-6">
+            <div className="flex justify-end">
               <button
-                type="button"
-                onClick={goToPreviousStep}
-                className={`inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors ${
-                  currentStep === 1 ? 'invisible' : ''
+                type="submit"
+                disabled={isSubmitting}
+                className={`inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors ${
+                  isSubmitting ? "cursor-not-allowed opacity-75" : ""
                 }`}
               >
-                <FiChevronLeft className="mr-2 h-4 w-4" />
-                Previous
+                {isSubmitting ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <FiSave className="mr-2 h-4 w-4" />
+                    Save Book
+                  </>
+                )}
               </button>
               
-              <div>
-                {currentStep === totalSteps ? (
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className={`inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors ${
-                      isSubmitting ? "cursor-not-allowed opacity-75" : ""
-                    }`}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Saving...
-                      </>
-                    ) : (
-                      <>
-                        <FiSave className="mr-2 h-4 w-4" />
-                        Save Book
-                      </>
-                    )}
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={goToNextStep}
-                    className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
-                  >
-                    Next
-                    <FiChevronRight className="ml-2 h-4 w-4" />
-                  </button>
-                )}
-                
-                <Link
-                  href="/admin/books"
-                  className="ml-4 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
-                >
-                  Cancel
-                </Link>
-              </div>
+              <Link
+                href="/admin/books"
+                className="ml-4 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
+              >
+                Cancel
+              </Link>
             </div>
           </div>
         </form>

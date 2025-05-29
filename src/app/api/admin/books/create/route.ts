@@ -55,9 +55,49 @@ export async function POST(req: NextRequest) {
       } 
       // Check if it's a valid full date format (YYYY-MM-DD)
       else if (/^\d{4}-\d{2}-\d{2}$/.test(publicationDate)) {
-        // Valid full date format, keep as is
-        console.log('Valid full date format:', publicationDate);
+        // Valid full date format, check if it's a valid date
+        try {
+          const date = new Date(publicationDate);
+          if (!isNaN(date.getTime())) {
+            // Valid date, keep as is
+            console.log('Valid full date format:', publicationDate);
+          } else {
+            // Invalid date despite correct format, extract year
+            const year = publicationDate.substring(0, 4);
+            publicationDate = year;
+            console.log('Invalid date despite correct format, using year:', publicationDate);
+          }
+        } catch (error) {
+          // If date parsing fails, just use the year part
+          const year = publicationDate.substring(0, 4);
+          publicationDate = year;
+          console.log('Error parsing date despite correct format, using year:', publicationDate);
+        }
       } 
+      // Check for Goodreads format: Month Day, Year (e.g., "January 1, 1998")
+      else if (/([A-Za-z]+)\s+(\d{1,2}),\s+(\d{4})/.test(publicationDate)) {
+        const match = /([A-Za-z]+)\s+(\d{1,2}),\s+(\d{4})/.exec(publicationDate);
+        if (match) {
+          const [_, month, day, year] = match;
+          
+          // Try to convert to YYYY-MM-DD format for database storage
+          try {
+            const date = new Date(`${month} ${day}, ${year}`);
+            if (!isNaN(date.getTime())) {
+              publicationDate = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+              console.log('Converted Goodreads date format to:', publicationDate);
+            } else {
+              // If date parsing fails, just use the year
+              publicationDate = year;
+              console.log('Failed to parse Goodreads date format, using year:', year);
+            }
+          } catch (error) {
+            // If conversion fails, just use the year
+            publicationDate = year;
+            console.log('Error parsing Goodreads date, using year:', year);
+          }
+        }
+      }
       // Try to extract a year if not in a standard format
       else {
         console.log('Non-standard date format:', publicationDate);
@@ -65,6 +105,48 @@ export async function POST(req: NextRequest) {
         if (yearMatch) {
           publicationDate = yearMatch[0];
           console.log('Extracted year from non-standard format:', publicationDate);
+        } else {
+          // Try one more approach - use Date object
+          try {
+            const date = new Date(publicationDate);
+            if (!isNaN(date.getTime())) {
+              publicationDate = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+              console.log('Parsed date with Date object:', publicationDate);
+            } else {
+              console.log('Failed to parse date with Date object');
+              // Try alternative formats like "Month YYYY" or "Month Day YYYY"
+              const altDateMatch = /([A-Za-z]+)\s+(\d{1,2})?\s+(\d{4})/.exec(publicationDate);
+              if (altDateMatch) {
+                const [_, altMonth, altDay, altYear] = altDateMatch;
+                if (altDay) {
+                  // Try to create a valid date
+                  try {
+                    const date = new Date(`${altMonth} ${altDay}, ${altYear}`);
+                    if (!isNaN(date.getTime())) {
+                      publicationDate = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+                      console.log('Parsed alternative date format to:', publicationDate);
+                    } else {
+                      // If parsing fails, use the year
+                      publicationDate = altYear;
+                      console.log('Failed to parse alternative date format, using year:', altYear);
+                    }
+                  } catch (error) {
+                    // If parsing fails, use the year
+                    publicationDate = altYear;
+                    console.log('Error parsing alternative date format, using year:', altYear);
+                  }
+                } else {
+                  // No day specified, use the year
+                  publicationDate = altYear;
+                  console.log('No day in alternative date format, using year:', altYear);
+                }
+              } else {
+                console.log('Failed to parse date with all methods');
+              }
+            }
+          } catch (error) {
+            console.log('Failed to parse date with all methods');
+          }
         }
       }
     }
