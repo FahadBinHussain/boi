@@ -4,7 +4,6 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { books } from '@/lib/books';
 import { FiDownload, FiArrowLeft, FiCalendar, FiFileText, FiTag } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import type { Book } from '@/lib/books';
@@ -16,26 +15,34 @@ export default function BookDetailPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // Simulate loading from API
-    const loadBook = async () => {
+    const fetchBookDetails = async () => {
       setIsLoading(true);
       try {
-        // In a real app, this would be an API call
-        const foundBook = books.find(b => b.id === id);
+        // Fetch book details from the API using the book ID
+        const response = await fetch(`/api/books/${id}`);
         
-        if (foundBook) {
-          setBook(foundBook);
-        } else {
-          setError('Book not found');
+        if (!response.ok) {
+          if (response.status === 404) {
+            setError('Book not found');
+          } else {
+            throw new Error(`Failed to fetch book: ${response.statusText}`);
+          }
+          return;
         }
+        
+        const bookData = await response.json();
+        setBook(bookData);
       } catch (err) {
+        console.error('Error fetching book details:', err);
         setError('Failed to load book details');
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadBook();
+    if (id) {
+      fetchBookDetails();
+    }
   }, [id]);
 
   if (isLoading) {

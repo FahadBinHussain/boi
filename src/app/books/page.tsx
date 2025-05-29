@@ -1,14 +1,57 @@
 'use client';
 
-import { useState } from 'react';
-import { books, categories } from '@/lib/books';
+import { useState, useEffect } from 'react';
+import { categories } from '@/lib/books';
 import BookGrid from '@/components/ui/BookGrid';
 import CategoryFilter from '@/components/ui/CategoryFilter';
-import { FiSearch } from 'react-icons/fi';
+import { FiSearch, FiLoader } from 'react-icons/fi';
+
+// Define book type to match what comes from the API
+interface Book {
+  id: string;
+  title: string;
+  author: string;
+  coverImage: string;
+  description: string;
+  categories: string[];
+  downloadLink: string;
+  fileSize: string;
+  format: string;
+  publicationDate: string;
+}
 
 export default function BooksPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [books, setBooks] = useState<Book[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch books from the API
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        const response = await fetch('/api/books');
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch books: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        setBooks(data);
+      } catch (err) {
+        console.error('Error fetching books:', err);
+        setError('Failed to load books. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchBooks();
+  }, []);
 
   // Function to toggle a category selection
   const handleCategoryChange = (category: string) => {
@@ -67,10 +110,22 @@ export default function BooksPage() {
 
           {/* Main Content - Book Grid */}
           <div className="lg:col-span-3">
-            <BookGrid 
-              books={filteredBooks} 
-              selectedCategories={selectedCategories} 
-            />
+            {isLoading ? (
+              <div className="flex justify-center items-center h-64">
+                <FiLoader className="animate-spin h-8 w-8 text-indigo-600" />
+                <span className="ml-2 text-lg text-gray-600">Loading books...</span>
+              </div>
+            ) : error ? (
+              <div className="bg-red-50 p-4 rounded-lg border border-red-200 text-red-700">
+                <p className="font-medium">{error}</p>
+                <p className="mt-1 text-sm">Please try refreshing the page or contact support if the problem persists.</p>
+              </div>
+            ) : (
+              <BookGrid 
+                books={filteredBooks} 
+                selectedCategories={selectedCategories} 
+              />
+            )}
           </div>
         </div>
       </div>

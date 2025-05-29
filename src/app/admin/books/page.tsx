@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { FiPlusCircle, FiSearch, FiEdit2, FiTrash2, FiFilter, FiDownload, FiChevronLeft, FiChevronRight, FiBook } from "react-icons/fi";
+import { FiPlusCircle, FiSearch, FiEdit2, FiTrash2, FiFilter, FiDownload, FiChevronLeft, FiChevronRight, FiBook, FiLoader } from "react-icons/fi";
 import gsap from "gsap";
+import { useNotification } from "@/contexts/NotificationContext";
 
 // Define book type
 interface Book {
-  id: number;
+  id: string;
   title: string;
   author: string;
   category: string;
@@ -16,16 +17,42 @@ interface Book {
   createdAt: string;
 }
 
-// Empty array instead of mock data
-const mockBooks: Book[] = [];
-
 export default function BooksManagement() {
-  const [books, setBooks] = useState<Book[]>(mockBooks);
+  const [books, setBooks] = useState<Book[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedBooks, setSelectedBooks] = useState<number[]>([]);
+  const [selectedBooks, setSelectedBooks] = useState<string[]>([]);
   const [filter, setFilter] = useState<"all" | "active" | "pending">("all");
   const [sort, setSort] = useState<{ field: string; direction: "asc" | "desc" }>({ field: "createdAt", direction: "desc" });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { showNotification } = useNotification();
+  
+  // Fetch books from the API
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        const response = await fetch('/api/admin/books');
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch books: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        setBooks(data);
+      } catch (err) {
+        console.error('Error fetching books:', err);
+        setError('Failed to load books. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchBooks();
+  }, []);
   
   const booksPerPage = 8;
   
@@ -68,7 +95,7 @@ export default function BooksManagement() {
   };
   
   // Toggle select one book
-  const toggleSelectBook = (id: number) => {
+  const toggleSelectBook = (id: string) => {
     if (selectedBooks.includes(id)) {
       setSelectedBooks(selectedBooks.filter(bookId => bookId !== id));
     } else {
@@ -88,8 +115,11 @@ export default function BooksManagement() {
   // Delete selected books
   const deleteSelected = () => {
     if (window.confirm(`Are you sure you want to delete ${selectedBooks.length} selected book(s)?`)) {
+      // In a real application, you'd make an API call to delete books here
+      // For now, we'll just update the local state
       setBooks(books.filter(book => !selectedBooks.includes(book.id)));
       setSelectedBooks([]);
+      showNotification('success', `${selectedBooks.length} book(s) deleted successfully.`);
     }
   };
   
@@ -174,115 +204,117 @@ export default function BooksManagement() {
         </div>
       </div>
       
+      {/* Loading State */}
+      {isLoading && (
+        <div className="flex justify-center items-center h-64">
+          <FiLoader className="animate-spin h-8 w-8 text-indigo-600" />
+          <span className="ml-2 text-lg text-gray-600">Loading books...</span>
+        </div>
+      )}
+      
+      {/* Error State */}
+      {error && (
+        <div className="bg-red-50 p-4 rounded-lg border border-red-200 text-red-700">
+          <p className="font-medium">{error}</p>
+          <p className="mt-1 text-sm">Please try refreshing the page or contact support if the problem persists.</p>
+        </div>
+      )}
+      
       {/* Books Table or Empty State */}
-      {books.length > 0 ? (
-        <div className="overflow-hidden rounded-lg bg-white shadow">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                      checked={selectedBooks.length === currentBooks.length && currentBooks.length > 0}
-                      onChange={toggleSelectAll}
-                    />
-                  </th>
-                  <th 
-                    scope="col" 
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer"
-                    onClick={() => handleSort("title")}
-                  >
-                    <div className="group inline-flex">
-                      Title
-                      <span className="ml-2 flex-none rounded text-gray-400 group-hover:visible group-hover:text-gray-500">
-                        {sort.field === "title" && (
-                          sort.direction === "desc" ? "↓" : "↑"
-                        )}
-                      </span>
-                    </div>
-                  </th>
-                  <th 
-                    scope="col" 
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer"
-                    onClick={() => handleSort("author")}
-                  >
-                    <div className="group inline-flex">
-                      Author
-                      <span className="ml-2 flex-none rounded text-gray-400 group-hover:visible group-hover:text-gray-500">
-                        {sort.field === "author" && (
-                          sort.direction === "desc" ? "↓" : "↑"
-                        )}
-                      </span>
-                    </div>
-                  </th>
-                  <th 
-                    scope="col" 
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer"
-                    onClick={() => handleSort("category")}
-                  >
-                    <div className="group inline-flex">
-                      Category
-                      <span className="ml-2 flex-none rounded text-gray-400 group-hover:visible group-hover:text-gray-500">
-                        {sort.field === "category" && (
-                          sort.direction === "desc" ? "↓" : "↑"
-                        )}
-                      </span>
-                    </div>
-                  </th>
-                  <th 
-                    scope="col" 
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer"
-                    onClick={() => handleSort("downloads")}
-                  >
-                    <div className="group inline-flex">
-                      Downloads
-                      <span className="ml-2 flex-none rounded text-gray-400 group-hover:visible group-hover:text-gray-500">
-                        {sort.field === "downloads" && (
-                          sort.direction === "desc" ? "↓" : "↑"
-                        )}
-                      </span>
-                    </div>
-                  </th>
-                  <th 
-                    scope="col" 
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer"
-                    onClick={() => handleSort("status")}
-                  >
-                    <div className="group inline-flex">
-                      Status
-                      <span className="ml-2 flex-none rounded text-gray-400 group-hover:visible group-hover:text-gray-500">
-                        {sort.field === "status" && (
-                          sort.direction === "desc" ? "↓" : "↑"
-                        )}
-                      </span>
-                    </div>
-                  </th>
-                  <th 
-                    scope="col" 
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer"
-                    onClick={() => handleSort("createdAt")}
-                  >
-                    <div className="group inline-flex">
-                      Created At
-                      <span className="ml-2 flex-none rounded text-gray-400 group-hover:visible group-hover:text-gray-500">
-                        {sort.field === "createdAt" && (
-                          sort.direction === "desc" ? "↓" : "↑"
-                        )}
-                      </span>
-                    </div>
-                  </th>
-                  <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                    <span className="sr-only">Actions</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 bg-white">
-                {currentBooks.length > 0 ? (
-                  currentBooks.map((book, index) => (
-                    <tr key={book.id} className={`book-table-row ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-100`}>
-                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+      {!isLoading && !error && (
+        books.length > 0 ? (
+          <div className="overflow-hidden rounded-lg bg-white shadow">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                        checked={selectedBooks.length === currentBooks.length && currentBooks.length > 0}
+                        onChange={toggleSelectAll}
+                      />
+                    </th>
+                    <th 
+                      scope="col" 
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer"
+                      onClick={() => handleSort("title")}
+                    >
+                      <div className="group inline-flex">
+                        Title
+                        <span className="ml-2 flex-none rounded text-gray-400 group-hover:visible group-hover:text-gray-500">
+                          {sort.field === "title" && (
+                            sort.direction === "desc" ? "↓" : "↑"
+                          )}
+                        </span>
+                      </div>
+                    </th>
+                    <th 
+                      scope="col" 
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer"
+                      onClick={() => handleSort("author")}
+                    >
+                      <div className="group inline-flex">
+                        Author
+                        <span className="ml-2 flex-none rounded text-gray-400 group-hover:visible group-hover:text-gray-500">
+                          {sort.field === "author" && (
+                            sort.direction === "desc" ? "↓" : "↑"
+                          )}
+                        </span>
+                      </div>
+                    </th>
+                    <th 
+                      scope="col" 
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer"
+                      onClick={() => handleSort("category")}
+                    >
+                      <div className="group inline-flex">
+                        Category
+                        <span className="ml-2 flex-none rounded text-gray-400 group-hover:visible group-hover:text-gray-500">
+                          {sort.field === "category" && (
+                            sort.direction === "desc" ? "↓" : "↑"
+                          )}
+                        </span>
+                      </div>
+                    </th>
+                    <th 
+                      scope="col" 
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer"
+                      onClick={() => handleSort("downloads")}
+                    >
+                      <div className="group inline-flex">
+                        Downloads
+                        <span className="ml-2 flex-none rounded text-gray-400 group-hover:visible group-hover:text-gray-500">
+                          {sort.field === "downloads" && (
+                            sort.direction === "desc" ? "↓" : "↑"
+                          )}
+                        </span>
+                      </div>
+                    </th>
+                    <th 
+                      scope="col" 
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer"
+                      onClick={() => handleSort("status")}
+                    >
+                      <div className="group inline-flex">
+                        Status
+                        <span className="ml-2 flex-none rounded text-gray-400 group-hover:visible group-hover:text-gray-500">
+                          {sort.field === "status" && (
+                            sort.direction === "desc" ? "↓" : "↑"
+                          )}
+                        </span>
+                      </div>
+                    </th>
+                    <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                      <span className="sr-only">Actions</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 bg-white">
+                  {currentBooks.map((book) => (
+                    <tr key={book.id} className="book-table-row">
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         <input
                           type="checkbox"
                           className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
@@ -290,18 +322,13 @@ export default function BooksManagement() {
                           onChange={() => toggleSelectBook(book.id)}
                         />
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm">
-                        <div className="font-medium text-gray-900">{book.title}</div>
+                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                        {book.title}
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{book.author}</td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{book.category}</td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{book.downloads}</td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        <div className="flex items-center">
-                          <FiDownload className="mr-1 h-4 w-4 text-gray-400" />
-                          {book.downloads}
-                        </div>
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm">
                         <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
                           book.status === "active" 
                             ? "bg-green-100 text-green-800" 
@@ -310,115 +337,110 @@ export default function BooksManagement() {
                           {book.status}
                         </span>
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        {new Date(book.createdAt).toLocaleDateString()}
-                      </td>
                       <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                         <div className="flex items-center justify-end space-x-2">
                           <Link
                             href={`/admin/books/edit/${book.id}`}
                             className="text-indigo-600 hover:text-indigo-900"
                           >
-                            <FiEdit2 className="h-4 w-4" />
+                            <FiEdit2 className="h-4 w-4" aria-hidden="true" />
                             <span className="sr-only">Edit {book.title}</span>
                           </Link>
                           <button
                             onClick={() => {
                               if (window.confirm(`Are you sure you want to delete "${book.title}"?`)) {
                                 setBooks(books.filter(b => b.id !== book.id));
+                                showNotification('success', `"${book.title}" deleted successfully.`);
                               }
                             }}
                             className="text-red-600 hover:text-red-900"
                           >
-                            <FiTrash2 className="h-4 w-4" />
+                            <FiTrash2 className="h-4 w-4" aria-hidden="true" />
                             <span className="sr-only">Delete {book.title}</span>
                           </button>
                         </div>
                       </td>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={8} className="px-6 py-12 text-center text-sm text-gray-500">
-                      No books found matching your criteria.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-          
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
-              <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm text-gray-700">
-                    Showing <span className="font-medium">{indexOfFirstBook + 1}</span> to{" "}
-                    <span className="font-medium">
-                      {indexOfLastBook > filteredBooks.length ? filteredBooks.length : indexOfLastBook}
-                    </span>{" "}
-                    of <span className="font-medium">{filteredBooks.length}</span> results
-                  </p>
-                </div>
-                <div>
-                  <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-                    <button
-                      onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                      disabled={currentPage === 1}
-                      className={`relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${
-                        currentPage === 1 ? "cursor-not-allowed" : "hover:text-gray-500"
-                      }`}
-                    >
-                      <span className="sr-only">Previous</span>
-                      <FiChevronLeft className="h-5 w-5" aria-hidden="true" />
-                    </button>
-                    
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+                <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm text-gray-700">
+                      Showing <span className="font-medium">{indexOfFirstBook + 1}</span> to{" "}
+                      <span className="font-medium">
+                        {indexOfLastBook > filteredBooks.length
+                          ? filteredBooks.length
+                          : indexOfLastBook}
+                      </span>{" "}
+                      of <span className="font-medium">{filteredBooks.length}</span> results
+                    </p>
+                  </div>
+                  <div>
+                    <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
                       <button
-                        key={page}
-                        onClick={() => setCurrentPage(page)}
-                        className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
-                          page === currentPage
-                            ? "z-10 bg-indigo-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                            : "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        className={`relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${
+                          currentPage === 1 ? "cursor-not-allowed" : ""
                         }`}
                       >
-                        {page}
+                        <span className="sr-only">Previous</span>
+                        <FiChevronLeft className="h-5 w-5" aria-hidden="true" />
                       </button>
-                    ))}
-                    
-                    <button
-                      onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                      disabled={currentPage === totalPages}
-                      className={`relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${
-                        currentPage === totalPages ? "cursor-not-allowed" : "hover:text-gray-500"
-                      }`}
-                    >
-                      <span className="sr-only">Next</span>
-                      <FiChevronRight className="h-5 w-5" aria-hidden="true" />
-                    </button>
-                  </nav>
+                      
+                      {/* Page numbers */}
+                      {[...Array(totalPages)].map((_, index) => (
+                        <button
+                          key={index + 1}
+                          onClick={() => setCurrentPage(index + 1)}
+                          className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
+                            currentPage === index + 1
+                              ? "z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                              : "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                          }`}
+                        >
+                          {index + 1}
+                        </button>
+                      ))}
+                      
+                      <button
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                        className={`relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${
+                          currentPage === totalPages ? "cursor-not-allowed" : ""
+                        }`}
+                      >
+                        <span className="sr-only">Next</span>
+                        <FiChevronRight className="h-5 w-5" aria-hidden="true" />
+                      </button>
+                    </nav>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="py-12 text-center bg-white rounded-lg shadow-md">
-          <FiBook className="mx-auto h-12 w-12 text-gray-300" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No books yet</h3>
-          <p className="mt-1 text-sm text-gray-500">Get started by adding your first book to your collection.</p>
-          <div className="mt-6">
-            <Link
-              href="/admin/books/new"
-              className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700"
-            >
-              <FiPlusCircle className="-ml-0.5 mr-1.5 h-4 w-4" aria-hidden="true" />
-              Add New Book
-            </Link>
+            )}
           </div>
-        </div>
+        ) : (
+          <div className="py-12 text-center bg-white rounded-lg shadow-md">
+            <FiBook className="mx-auto h-12 w-12 text-gray-300" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No books yet</h3>
+            <p className="mt-1 text-sm text-gray-500">Get started by adding your first book to your collection.</p>
+            <div className="mt-6">
+              <Link
+                href="/admin/books/new"
+                className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700"
+              >
+                <FiPlusCircle className="-ml-0.5 mr-1.5 h-4 w-4" aria-hidden="true" />
+                Add New Book
+              </Link>
+            </div>
+          </div>
+        )
       )}
     </div>
   );

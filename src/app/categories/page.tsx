@@ -2,15 +2,45 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { books, categories } from '@/lib/books';
+import { categories } from '@/lib/books';
 import Link from 'next/link';
-import { FiGrid, FiBookOpen } from 'react-icons/fi';
+import { FiGrid, FiBookOpen, FiLoader } from 'react-icons/fi';
 import { motion } from 'framer-motion';
+import type { Book } from '@/lib/books';
 
 export default function CategoriesPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [books, setBooks] = useState<Book[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch books from the API
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        const response = await fetch('/api/books');
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch books: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        setBooks(data);
+      } catch (err) {
+        console.error('Error fetching books:', err);
+        setError('Failed to load books. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchBooks();
+  }, []);
 
   // Check if a category is selected from URL params
   useEffect(() => {
@@ -85,8 +115,24 @@ export default function CategoriesPage() {
           ))}
         </div>
 
+        {/* Loading State */}
+        {isLoading && (
+          <div className="flex justify-center items-center py-12">
+            <FiLoader className="animate-spin h-8 w-8 text-indigo-600" />
+            <span className="ml-2 text-lg text-gray-600">Loading books...</span>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="bg-red-50 p-4 rounded-lg border border-red-200 text-red-700">
+            <p className="font-medium">{error}</p>
+            <p className="mt-1 text-sm">Please try refreshing the page or contact support if the problem persists.</p>
+          </div>
+        )}
+
         {/* Selected Category Books */}
-        {activeCategory && (
+        {!isLoading && !error && activeCategory && (
           <div className="mt-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">
@@ -144,7 +190,7 @@ export default function CategoriesPage() {
         )}
 
         {/* No Category Selected */}
-        {!activeCategory && (
+        {!isLoading && !error && !activeCategory && (
           <div className="bg-white rounded-lg shadow-sm p-8 text-center">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Select a category</h2>
             <p className="text-gray-600">Click on a category above to view related books.</p>
