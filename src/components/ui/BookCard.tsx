@@ -32,7 +32,7 @@ const BookCard = ({ book }: BookCardProps) => {
           alt={`${book.title} cover`}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          className="object-cover transform group-hover:scale-105 transition-transform duration-300"
+          className="object-contain transform group-hover:scale-105 transition-transform duration-300"
           priority={false}
         />
         

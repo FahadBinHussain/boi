@@ -6,6 +6,7 @@ import { categories } from '@/lib/books';
 import Link from 'next/link';
 import { FiGrid, FiBookOpen, FiLoader } from 'react-icons/fi';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import type { Book } from '@/lib/books';
 
 export default function CategoriesPage() {
@@ -162,7 +163,15 @@ export default function CategoriesPage() {
                     <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200 transition-all hover:shadow-md h-full flex flex-col">
                       {/* Cover Image with Aspect Ratio */}
                       <div className="relative w-full pt-[140%]">
-                        <div className="absolute inset-0 bg-center bg-cover" style={{ backgroundImage: `url(${book.coverImage})` }} />
+                        <div className="absolute inset-0">
+                          <Image
+                            src={book.coverImage}
+                            alt={`${book.title} cover`}
+                            fill
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                            className="object-contain"
+                          />
+                        </div>
                       </div>
                       
                       {/* Book Info */}

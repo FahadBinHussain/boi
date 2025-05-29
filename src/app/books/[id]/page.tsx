@@ -99,7 +99,7 @@ export default function BookDetailPage() {
                   src={book.coverImage}
                   alt={`${book.title} cover`}
                   fill
-                  className="object-cover"
+                  className="object-contain"
                   sizes="(max-width: 768px) 100vw, 300px"
                   priority
                 />
