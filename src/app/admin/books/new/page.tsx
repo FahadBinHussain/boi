@@ -184,9 +184,6 @@ export default function AddNewBook() {
   const [characters, setCharacters] = useState<string[]>([]);
   const [language, setLanguage] = useState("");
   
-  // Use user's preferred date format from settings or default to year-only
-  const [isYearOnly, setIsYearOnly] = useState(true);
-
   // Add new state variables for metadata URL functionality
   const [metadataUrl, setMetadataUrl] = useState("");
   const [isScrapingMetadata, setIsScrapingMetadata] = useState(false);
@@ -212,8 +209,7 @@ export default function AddNewBook() {
   // Load user settings when component mounts
   useEffect(() => {
     if (!isSettingsLoading && settings) {
-      // Apply the user's publication date format preference
-      setIsYearOnly(settings.preferYearOnlyDateFormat ?? true);
+      console.log('Settings loaded:', settings);
       
       // No need to show notification for initial settings load
     }
@@ -308,7 +304,6 @@ export default function AddNewBook() {
       formData.append('bookName', bookName);
       formData.append('thumbnailUrl', thumbnailUrl);
       formData.append('publicationDate', publicationDate);
-      formData.append('isYearOnly', isYearOnly.toString());
       formData.append('summary', summary);
       
       // Add publisher and other metadata if available
@@ -453,121 +448,125 @@ export default function AddNewBook() {
   
   // Function to populate form fields with scraped data
   const populateFormFields = (data: ScrapedBookData) => {
-    // Single book mode - check if it has title
-    if ('title' in data) {
-        if (data.title) {
-          setBookName(data.title);
-        }
+    console.log("Data to populate:", data);
+    
+    if (data) {
+      // Set book name if available
+      if (data.title) {
+        console.log("Setting book name:", data.title);
+        setBookName(data.title);
+      }
+      
+      // Set thumbnail URL if available
+      if (data.imageUrl) {
+        console.log("Setting thumbnail URL:", data.imageUrl);
+        setThumbnailUrl(data.imageUrl);
+      }
+      
+      // Set summary if available
+      if (data.summary) {
+        console.log("Setting summary:", data.summary);
+        setSummary(data.summary);
+      }
+      
+      // Set publication date if available
+      if (data.publicationDate) {
+        console.log("Setting publication date:", data.publicationDate);
         
-        if (data.imageUrl) {
-          setThumbnailUrl(data.imageUrl);
-        }
+        // Try to extract a year or parse the date
+        const yearOnlyMatch = /^\d{4}$/.test(data.publicationDate);
+        const fullDateMatch = /^\d{4}-\d{2}-\d{2}$/.test(data.publicationDate);
         
-        if (data.summary) {
-          setSummary(data.summary);
-        }
-        
-        if (data.publicationDate) {
-          console.log("Raw publication date from scraper:", data.publicationDate);
-          
-          // Check if it's a full date or just a year
-          const yearOnlyMatch = /^\d{4}$/.test(data.publicationDate);
-          const fullDateMatch = /^\d{4}-\d{2}-\d{2}$/.test(data.publicationDate);
-          
-          if (yearOnlyMatch) {
-            // It's already a year-only format (e.g., "2023")
-            setPublicationDate(data.publicationDate);
-            setIsYearOnly(true);
-          } else if (fullDateMatch) {
-            // It's already a full date format (e.g., "2023-01-15")
-            setPublicationDate(data.publicationDate);
-            setIsYearOnly(false);
+        if (yearOnlyMatch) {
+          // It's already a year-only format (e.g., "2023")
+          setPublicationDate(data.publicationDate);
+        } else if (fullDateMatch) {
+          // It's already a full date format (e.g., "2023-01-15")
+          setPublicationDate(data.publicationDate);
+        } else {
+          // Handle other formats like "January 2023" or "January 10, 2023"
+          // Try to extract a year
+          const yearMatch = data.publicationDate.match(/\b(19|20)\d{2}\b/);
+          if (yearMatch && yearMatch[0]) {
+            const year = yearMatch[0];
+            console.log("Extracted year from publication date:", year);
+            setPublicationDate(year);
           } else {
-            // Handle other formats like "January 2023" or "January 10, 2023"
-            // Try to extract a year
-            const yearMatch = data.publicationDate.match(/\b(19|20)\d{2}\b/);
-            if (yearMatch && yearMatch[0]) {
-              const year = yearMatch[0];
-              console.log("Extracted year from publication date:", year);
-              setPublicationDate(year);
-              setIsYearOnly(true);
-            } else {
-              // If no year found, try to parse the date
-              try {
-                const date = new Date(data.publicationDate);
-                if (!isNaN(date.getTime())) {
-                  // Valid date, format as YYYY-MM-DD
-                  const formattedDate = date.toISOString().split('T')[0];
-                  console.log("Parsed date from publication date:", formattedDate);
-                  setPublicationDate(formattedDate);
-                  setIsYearOnly(false);
-                } else {
-                  console.warn("Failed to parse publication date:", data.publicationDate);
-                }
-              } catch (error) {
-                console.warn("Error parsing publication date:", error);
+            // If no year found, try to parse the date
+            try {
+              const date = new Date(data.publicationDate);
+              if (!isNaN(date.getTime())) {
+                // Valid date, format as YYYY-MM-DD
+                const formattedDate = date.toISOString().split('T')[0];
+                console.log("Parsed date from publication date:", formattedDate);
+                setPublicationDate(formattedDate);
+              } else {
+                console.warn("Failed to parse publication date:", data.publicationDate);
               }
+            } catch (error) {
+              console.warn("Error parsing publication date:", error);
             }
           }
         }
+      }
+      
+      // If authors are available
+      if (data.authors) {
+        console.log("Authors data type:", typeof data.authors);
         
-        // If authors are available
-        if (data.authors) {
-          console.log("Authors data type:", typeof data.authors);
-          
-          // Handle different formats of author data
-          let authorsList: string[] = [];
-          
-          if (Array.isArray(data.authors)) {
-            // It's already an array
-            authorsList = data.authors;
-          } else if (typeof data.authors === 'string') {
-            // If it's a string, split by commas
-            authorsList = (data.authors as string).split(',').map((a: string) => a.trim());
-          } else if (typeof data.authors === 'object') {
-            // If it's an object, try to extract values
-            authorsList = Object.values(data.authors as Record<string, unknown>).map((a: unknown) => String(a));
-          }
-          
-          console.log("Processed authors list:", authorsList);
-          
-          if (authorsList.length > 0) {
-            const newAuthors = authorsList.map((authorName: string) => {
-              console.log("Creating author object for:", authorName);
-              return { id: crypto.randomUUID(), name: authorName };
-            });
-            console.log("New authors array:", newAuthors);
-            setAuthors(newAuthors);
-          }
+        // Handle different formats of author data
+        let authorsList: string[] = [];
+        
+        if (Array.isArray(data.authors)) {
+          // It's already an array
+          authorsList = data.authors;
+        } else if (typeof data.authors === 'string') {
+          // If it's a string, split by commas
+          authorsList = (data.authors as string).split(',').map((a: string) => a.trim());
+        } else if (typeof data.authors === 'object') {
+          // If it's an object, try to extract values
+          authorsList = Object.values(data.authors as Record<string, unknown>).map((a: unknown) => String(a));
         }
         
-        // Populate additional fields
-        if (data.publisher) {
-          setPublisher(data.publisher);
-        }
+        console.log("Processed authors list:", authorsList);
         
-        if (data.genres && Array.isArray(data.genres)) {
-          setGenres(data.genres);
+        if (authorsList.length > 0) {
+          const newAuthors = authorsList.map((authorName: string) => {
+            console.log("Creating author object for:", authorName);
+            return { id: crypto.randomUUID(), name: authorName };
+          });
+          console.log("New authors array:", newAuthors);
+          setAuthors(newAuthors);
         }
-        
-        if (data.ratings !== undefined) {
-          setRatings(data.ratings);
-        }
-        
-        if (data.averageRating !== undefined) {
-          setAverageRating(data.averageRating);
-        }
-        
-        if (data.numberOfPages !== undefined) {
-          setNumberOfPages(data.numberOfPages);
-        }
-        
-        if (data.characters && Array.isArray(data.characters)) {
-          setCharacters(data.characters);
-        }
-        
-        if (data.language) {
-          setLanguage(data.language);
+      }
+      
+      // Populate additional fields
+      if (data.publisher) {
+        setPublisher(data.publisher);
+      }
+      
+      if (data.genres && Array.isArray(data.genres)) {
+        setGenres(data.genres);
+      }
+      
+      if (data.ratings !== undefined) {
+        setRatings(data.ratings);
+      }
+      
+      if (data.averageRating !== undefined) {
+        setAverageRating(data.averageRating);
+      }
+      
+      if (data.numberOfPages !== undefined) {
+        setNumberOfPages(data.numberOfPages);
+      }
+      
+      if (data.characters && Array.isArray(data.characters)) {
+        setCharacters(data.characters);
+      }
+      
+      if (data.language) {
+        setLanguage(data.language);
       }
     }
   };
@@ -602,24 +601,6 @@ export default function AddNewBook() {
     setAuthors(authors.map(author => 
       author.id === id ? { ...author, name } : author
     ));
-  };
-
-  // Update handleYearToggle to just handle the format conversion but not save to settings
-  const handleYearToggle = () => {
-    const newIsYearOnly = !isYearOnly;
-    
-    if (newIsYearOnly && publicationDate) {
-      // Extract year from full date
-      const yearMatch = publicationDate.match(/^\d{4}/);
-      const year = yearMatch ? yearMatch[0] : new Date().getFullYear().toString();
-      setPublicationDate(year);
-    } else if (!newIsYearOnly && publicationDate) {
-      // Convert year to full date
-      setPublicationDate(`${publicationDate}-01-01`);
-    }
-    
-    // Update local state only
-    setIsYearOnly(newIsYearOnly);
   };
 
   const handleSingleBookPdfChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -1125,55 +1106,21 @@ export default function AddNewBook() {
                       <FiCalendar className="mr-2 h-4 w-4 text-indigo-500" />
                       Publication Date <span className="text-red-500 ml-1">*</span>
                     </div>
-                    <div className="flex items-center">
-                      <span className="mr-2 text-xs text-gray-500">
-                        {isYearOnly ? "Year only" : "Full date"}
-                      </span>
-                      <button 
-                        type="button"
-                        onClick={handleYearToggle}
-                        className="text-xs text-indigo-600 hover:text-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded-md px-2 py-1"
-                      >
-                        Toggle format
-                      </button>
-                    </div>
                   </div>
                 </label>
                 
-                {isYearOnly ? (
-                  <div className="mt-1">
-                    <div className="relative rounded-md shadow-sm">
-                      <input
-                        type="text"
-                        id="publicationDate"
-                        placeholder="YYYY"
-                        pattern="\d{4}"
-                        className={`block w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm
-                          ${formErrors.publicationDate ? "border-red-300 text-red-900 placeholder-red-300" : "border-gray-300"}`}
-                        value={publicationDate}
-                        onChange={(e) => setPublicationDate(e.target.value)}
-                      />
-                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                        <FiCalendar className="h-5 w-5 text-gray-400" />
-                      </div>
-                    </div>
-                    <p className="mt-1 text-xs text-gray-500">Enter the year of publication (e.g. 2023)</p>
+                <div className="mt-1">
+                  <div className="relative rounded-md shadow-sm">
+                    <input
+                      type="date"
+                      id="publicationDate"
+                      className={`block w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm
+                        ${formErrors.publicationDate ? "border-red-300 text-red-900 placeholder-red-300" : "border-gray-300"}`}
+                      value={publicationDate}
+                      onChange={(e) => setPublicationDate(e.target.value)}
+                    />
                   </div>
-                ) : (
-                  <div className="mt-1">
-                    <div className="relative rounded-md shadow-sm">
-                      <input
-                        type="date"
-                        id="publicationDate"
-                        className={`block w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm
-                          ${formErrors.publicationDate ? "border-red-300 text-red-900 placeholder-red-300" : "border-gray-300"}`}
-                        value={publicationDate}
-                        onChange={(e) => setPublicationDate(e.target.value)}
-                      />
-                    </div>
-                    <p className="mt-1 text-xs text-gray-500">Select the exact publication date</p>
-                  </div>
-                )}
+                </div>
                 
                 {formErrors.publicationDate && (
                   <p className="mt-2 text-sm text-red-600">{formErrors.publicationDate}</p>

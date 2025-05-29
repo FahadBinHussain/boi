@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { FiSave, FiSettings, FiCalendar, FiLock, FiCheck, FiLoader, FiRefreshCw } from "react-icons/fi";
+import { FiSave, FiSettings, FiLock, FiCheck, FiLoader, FiRefreshCw } from "react-icons/fi";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import { useNotification } from "@/contexts/NotificationContext";
 import { useSession } from "next-auth/react";
@@ -15,7 +15,6 @@ export default function AdminSettings() {
   const notificationShownRef = useRef<boolean>(false);
   
   // Local state for form controls
-  const [preferYearOnlyDateFormat, setPreferYearOnlyDateFormat] = useState(true);
   const [filesVcApiKey, setFilesVcApiKey] = useState("");
   const [filesVcAccountId, setFilesVcAccountId] = useState("");
   const [isApiKeyModified, setIsApiKeyModified] = useState(false);
@@ -24,8 +23,6 @@ export default function AdminSettings() {
   // Load settings when component mounts
   useEffect(() => {
     if (!isLoading && settings) {
-      setPreferYearOnlyDateFormat(settings.preferYearOnlyDateFormat ?? true);
-      
       // If API key exists in settings, show masked version
       if (settings.filesVcApiKey) {
         setFilesVcApiKey("••••••••••••••••");
@@ -76,9 +73,7 @@ export default function AdminSettings() {
     setIsSaving(true);
     
     try {
-      const updatedSettings: Record<string, any> = {
-        preferYearOnlyDateFormat,
-      };
+      const updatedSettings: Record<string, any> = {};
       
       // Only update API key if it was modified
       if (isApiKeyModified && filesVcApiKey) {
@@ -169,44 +164,6 @@ export default function AdminSettings() {
         <div className="rounded-md bg-gray-50 p-4 text-gray-600">Loading settings...</div>
       ) : (
         <div className="space-y-8">
-          {/* Publication Date Format */}
-          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-            <h2 className="mb-4 flex items-center text-lg font-medium text-gray-900">
-              <FiCalendar className="mr-2 h-5 w-5 text-gray-700" />
-              Publication Date Format
-            </h2>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="flex items-center justify-between text-sm font-medium text-gray-700">
-                  <span>Default Publication Date Format</span>
-                  <div 
-                    className="relative inline-block h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    onClick={() => {
-                      const newValue = !preferYearOnlyDateFormat;
-                      setPreferYearOnlyDateFormat(newValue);
-                      
-                      // Just update local state, don't auto-save
-                      updateSettings({ preferYearOnlyDateFormat: newValue });
-                    }}
-                  >
-                    <span
-                      className={`${
-                        preferYearOnlyDateFormat ? "translate-x-5" : "translate-x-0"
-                      } pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
-                    />
-                  </div>
-                </label>
-                <p className="mt-1 text-sm text-gray-500">
-                  {preferYearOnlyDateFormat ? "Year Only (YYYY)" : "Full Date (YYYY-MM-DD)"}
-                </p>
-                <p className="mt-1 text-xs text-gray-400">
-                  This setting affects how publication dates are displayed and entered in book forms.
-                </p>
-              </div>
-            </div>
-          </div>
-          
           {/* Files.vc API Key */}
           <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="mb-4 flex items-center text-lg font-medium text-gray-900">

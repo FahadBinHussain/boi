@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
 export interface UserSettings {
-  preferYearOnlyDateFormat: boolean;
   filesVcApiKey?: string; // Add API key property (optional)
   filesVcAccountId?: string; // Account ID for Files.vc
   // Add other user settings here as needed
@@ -92,7 +91,6 @@ export const useUserSettings = (): UseUserSettingsReturn => {
         const data = await response.json();
         console.log('useUserSettings: API data received:', { 
           hasData: !!data, 
-          preferYearOnlyDateFormat: data?.preferYearOnlyDateFormat,
           hasApiKey: !!data?.filesVcApiKey
         });
         
@@ -100,7 +98,8 @@ export const useUserSettings = (): UseUserSettingsReturn => {
         if (!data) {
           console.log('useUserSettings: No data from API, using defaults');
           setSettings({
-            preferYearOnlyDateFormat: true
+            filesVcApiKey: undefined,
+            filesVcAccountId: undefined
           });
           setSyncStatus('success');
           setLastSyncMessage('Using default settings (no saved preferences found)');
@@ -130,7 +129,8 @@ export const useUserSettings = (): UseUserSettingsReturn => {
         // Fallback to defaults on error
         console.log('useUserSettings: Falling back to defaults due to error');
         setSettings({
-          preferYearOnlyDateFormat: true
+          filesVcApiKey: undefined,
+          filesVcAccountId: undefined
         });
       } finally {
         console.log('useUserSettings: Finished loading settings, status =', syncStatus);

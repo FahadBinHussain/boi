@@ -87,8 +87,7 @@ export async function GET(request: NextRequest) {
         // Create default settings
         const defaultSettings = await prisma.userSettings.create({
           data: {
-            userId,
-            preferYearOnlyDateFormat: true
+            userId
           }
         });
         
@@ -96,22 +95,17 @@ export async function GET(request: NextRequest) {
         
         // Return the newly created settings
         console.log('GET settings: Returning newly created settings');
-        return NextResponse.json({
-          preferYearOnlyDateFormat: defaultSettings.preferYearOnlyDateFormat
-        }, { status: 200 });
+        return NextResponse.json({}, { status: 200 });
       } catch (error) {
         console.error('GET settings: Error creating default user settings:', error);
         // Still return default settings even if creation fails
         console.log('GET settings: Returning fallback default settings after error');
-        return NextResponse.json({
-          preferYearOnlyDateFormat: true
-        }, { status: 200 });
+        return NextResponse.json({}, { status: 200 });
       }
     }
     
     // Format the response
     const response = {
-      preferYearOnlyDateFormat: userSettings.preferYearOnlyDateFormat,
       // Don't expose the actual API key, just whether it exists
       filesVcApiKey: (userSettings as unknown as { filesVcApiKey?: string }).filesVcApiKey ? true : undefined,
       filesVcAccountId: (userSettings as unknown as { filesVcAccountId?: string }).filesVcAccountId
@@ -181,11 +175,6 @@ export async function PUT(request: NextRequest) {
     // Prepare the data for upsert
     const updateData: any = {};
     
-    // Process settings
-    if ('preferYearOnlyDateFormat' in data) {
-      updateData.preferYearOnlyDateFormat = data.preferYearOnlyDateFormat;
-    }
-    
     // For sensitive data like API keys, store as plain text
     if ('filesVcApiKey' in data && typeof data.filesVcApiKey === 'string') {
       // Only update if a new value is provided
@@ -254,17 +243,12 @@ export async function PUT(request: NextRequest) {
           update: updateData,
           create: {
             userId,
-            ...updateData,
-            // Set defaults for any missing fields
-            preferYearOnlyDateFormat: 'preferYearOnlyDateFormat' in updateData 
-              ? updateData.preferYearOnlyDateFormat 
-              : true
+            ...updateData
           }
         });
         console.log('PUT settings: Upsert succeeded, result:', { 
           id: result.id, 
           userId: result.userId,
-          hasPreferYearOnlyDateFormat: !!result.preferYearOnlyDateFormat,
           hasApiKey: !!(result as unknown as { filesVcApiKey?: string }).filesVcApiKey
         });
       } catch (upsertError) {

@@ -57,7 +57,6 @@ model VerificationToken {
 model UserSettings {
   id                      String   @id @default(cuid())
   userId                  String   @unique
-  preferYearOnlyDateFormat Boolean  @default(true)
   filesVcApiKey           String?  // Plain API key field
   filesVcAccountId        String?  // Account ID for Files.vc
   updatedAt               DateTime @updatedAt

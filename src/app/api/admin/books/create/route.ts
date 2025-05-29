@@ -44,7 +44,6 @@ export async function POST(req: NextRequest) {
     const bookName = formData.get('bookName') as string;
     const thumbnailUrl = formData.get('thumbnailUrl') as string;
     const publicationDate = formData.get('publicationDate') as string;
-    const isYearOnly = formData.get('isYearOnly') === 'true';
     const summary = formData.get('summary') as string;
     
     // Get optional metadata fields

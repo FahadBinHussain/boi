@@ -5968,7 +5968,6 @@ export namespace Prisma {
   export type UserSettingsMinAggregateOutputType = {
     id: string | null
     userId: string | null
-    preferYearOnlyDateFormat: boolean | null
     filesVcApiKey: string | null
     filesVcAccountId: string | null
     updatedAt: Date | null
@@ -5977,7 +5976,6 @@ export namespace Prisma {
   export type UserSettingsMaxAggregateOutputType = {
     id: string | null
     userId: string | null
-    preferYearOnlyDateFormat: boolean | null
     filesVcApiKey: string | null
     filesVcAccountId: string | null
     updatedAt: Date | null
@@ -5986,7 +5984,6 @@ export namespace Prisma {
   export type UserSettingsCountAggregateOutputType = {
     id: number
     userId: number
-    preferYearOnlyDateFormat: number
     filesVcApiKey: number
     filesVcAccountId: number
     updatedAt: number
@@ -5997,7 +5994,6 @@ export namespace Prisma {
   export type UserSettingsMinAggregateInputType = {
     id?: true
     userId?: true
-    preferYearOnlyDateFormat?: true
     filesVcApiKey?: true
     filesVcAccountId?: true
     updatedAt?: true
@@ -6006,7 +6002,6 @@ export namespace Prisma {
   export type UserSettingsMaxAggregateInputType = {
     id?: true
     userId?: true
-    preferYearOnlyDateFormat?: true
     filesVcApiKey?: true
     filesVcAccountId?: true
     updatedAt?: true
@@ -6015,7 +6010,6 @@ export namespace Prisma {
   export type UserSettingsCountAggregateInputType = {
     id?: true
     userId?: true
-    preferYearOnlyDateFormat?: true
     filesVcApiKey?: true
     filesVcAccountId?: true
     updatedAt?: true
@@ -6097,7 +6091,6 @@ export namespace Prisma {
   export type UserSettingsGroupByOutputType = {
     id: string
     userId: string
-    preferYearOnlyDateFormat: boolean
     filesVcApiKey: string | null
     filesVcAccountId: string | null
     updatedAt: Date
@@ -6123,7 +6116,6 @@ export namespace Prisma {
   export type UserSettingsSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
-    preferYearOnlyDateFormat?: boolean
     filesVcApiKey?: boolean
     filesVcAccountId?: boolean
     updatedAt?: boolean
@@ -6133,7 +6125,6 @@ export namespace Prisma {
   export type UserSettingsSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
-    preferYearOnlyDateFormat?: boolean
     filesVcApiKey?: boolean
     filesVcAccountId?: boolean
     updatedAt?: boolean
@@ -6143,7 +6134,6 @@ export namespace Prisma {
   export type UserSettingsSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
-    preferYearOnlyDateFormat?: boolean
     filesVcApiKey?: boolean
     filesVcAccountId?: boolean
     updatedAt?: boolean
@@ -6153,13 +6143,12 @@ export namespace Prisma {
   export type UserSettingsSelectScalar = {
     id?: boolean
     userId?: boolean
-    preferYearOnlyDateFormat?: boolean
     filesVcApiKey?: boolean
     filesVcAccountId?: boolean
     updatedAt?: boolean
   }
 
-  export type UserSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "preferYearOnlyDateFormat" | "filesVcApiKey" | "filesVcAccountId" | "updatedAt", ExtArgs["result"]["userSettings"]>
+  export type UserSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "filesVcApiKey" | "filesVcAccountId" | "updatedAt", ExtArgs["result"]["userSettings"]>
   export type UserSettingsInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -6178,7 +6167,6 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       userId: string
-      preferYearOnlyDateFormat: boolean
       filesVcApiKey: string | null
       filesVcAccountId: string | null
       updatedAt: Date
@@ -6608,7 +6596,6 @@ export namespace Prisma {
   interface UserSettingsFieldRefs {
     readonly id: FieldRef<"UserSettings", 'String'>
     readonly userId: FieldRef<"UserSettings", 'String'>
-    readonly preferYearOnlyDateFormat: FieldRef<"UserSettings", 'Boolean'>
     readonly filesVcApiKey: FieldRef<"UserSettings", 'String'>
     readonly filesVcAccountId: FieldRef<"UserSettings", 'String'>
     readonly updatedAt: FieldRef<"UserSettings", 'DateTime'>
@@ -10352,7 +10339,6 @@ export namespace Prisma {
   export const UserSettingsScalarFieldEnum: {
     id: 'id',
     userId: 'userId',
-    preferYearOnlyDateFormat: 'preferYearOnlyDateFormat',
     filesVcApiKey: 'filesVcApiKey',
     filesVcAccountId: 'filesVcAccountId',
     updatedAt: 'updatedAt'
@@ -10483,13 +10469,6 @@ export namespace Prisma {
    * Reference to a field of type 'UserRole[]'
    */
   export type ListEnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole[]'>
-    
-
-
-  /**
-   * Reference to a field of type 'Boolean'
-   */
-  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -10768,7 +10747,6 @@ export namespace Prisma {
     NOT?: UserSettingsWhereInput | UserSettingsWhereInput[]
     id?: StringFilter<"UserSettings"> | string
     userId?: StringFilter<"UserSettings"> | string
-    preferYearOnlyDateFormat?: BoolFilter<"UserSettings"> | boolean
     filesVcApiKey?: StringNullableFilter<"UserSettings"> | string | null
     filesVcAccountId?: StringNullableFilter<"UserSettings"> | string | null
     updatedAt?: DateTimeFilter<"UserSettings"> | Date | string
@@ -10778,7 +10756,6 @@ export namespace Prisma {
   export type UserSettingsOrderByWithRelationInput = {
     id?: SortOrder
     userId?: SortOrder
-    preferYearOnlyDateFormat?: SortOrder
     filesVcApiKey?: SortOrderInput | SortOrder
     filesVcAccountId?: SortOrderInput | SortOrder
     updatedAt?: SortOrder
@@ -10791,7 +10768,6 @@ export namespace Prisma {
     AND?: UserSettingsWhereInput | UserSettingsWhereInput[]
     OR?: UserSettingsWhereInput[]
     NOT?: UserSettingsWhereInput | UserSettingsWhereInput[]
-    preferYearOnlyDateFormat?: BoolFilter<"UserSettings"> | boolean
     filesVcApiKey?: StringNullableFilter<"UserSettings"> | string | null
     filesVcAccountId?: StringNullableFilter<"UserSettings"> | string | null
     updatedAt?: DateTimeFilter<"UserSettings"> | Date | string
@@ -10801,7 +10777,6 @@ export namespace Prisma {
   export type UserSettingsOrderByWithAggregationInput = {
     id?: SortOrder
     userId?: SortOrder
-    preferYearOnlyDateFormat?: SortOrder
     filesVcApiKey?: SortOrderInput | SortOrder
     filesVcAccountId?: SortOrderInput | SortOrder
     updatedAt?: SortOrder
@@ -10816,7 +10791,6 @@ export namespace Prisma {
     NOT?: UserSettingsScalarWhereWithAggregatesInput | UserSettingsScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"UserSettings"> | string
     userId?: StringWithAggregatesFilter<"UserSettings"> | string
-    preferYearOnlyDateFormat?: BoolWithAggregatesFilter<"UserSettings"> | boolean
     filesVcApiKey?: StringNullableWithAggregatesFilter<"UserSettings"> | string | null
     filesVcAccountId?: StringNullableWithAggregatesFilter<"UserSettings"> | string | null
     updatedAt?: DateTimeWithAggregatesFilter<"UserSettings"> | Date | string
@@ -11293,7 +11267,6 @@ export namespace Prisma {
 
   export type UserSettingsCreateInput = {
     id?: string
-    preferYearOnlyDateFormat?: boolean
     filesVcApiKey?: string | null
     filesVcAccountId?: string | null
     updatedAt?: Date | string
@@ -11303,7 +11276,6 @@ export namespace Prisma {
   export type UserSettingsUncheckedCreateInput = {
     id?: string
     userId: string
-    preferYearOnlyDateFormat?: boolean
     filesVcApiKey?: string | null
     filesVcAccountId?: string | null
     updatedAt?: Date | string
@@ -11311,7 +11283,6 @@ export namespace Prisma {
 
   export type UserSettingsUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    preferYearOnlyDateFormat?: BoolFieldUpdateOperationsInput | boolean
     filesVcApiKey?: NullableStringFieldUpdateOperationsInput | string | null
     filesVcAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -11321,7 +11292,6 @@ export namespace Prisma {
   export type UserSettingsUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    preferYearOnlyDateFormat?: BoolFieldUpdateOperationsInput | boolean
     filesVcApiKey?: NullableStringFieldUpdateOperationsInput | string | null
     filesVcAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -11330,7 +11300,6 @@ export namespace Prisma {
   export type UserSettingsCreateManyInput = {
     id?: string
     userId: string
-    preferYearOnlyDateFormat?: boolean
     filesVcApiKey?: string | null
     filesVcAccountId?: string | null
     updatedAt?: Date | string
@@ -11338,7 +11307,6 @@ export namespace Prisma {
 
   export type UserSettingsUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    preferYearOnlyDateFormat?: BoolFieldUpdateOperationsInput | boolean
     filesVcApiKey?: NullableStringFieldUpdateOperationsInput | string | null
     filesVcAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -11347,7 +11315,6 @@ export namespace Prisma {
   export type UserSettingsUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    preferYearOnlyDateFormat?: BoolFieldUpdateOperationsInput | boolean
     filesVcApiKey?: NullableStringFieldUpdateOperationsInput | string | null
     filesVcAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -11902,15 +11869,9 @@ export namespace Prisma {
     expires?: SortOrder
   }
 
-  export type BoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
   export type UserSettingsCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
-    preferYearOnlyDateFormat?: SortOrder
     filesVcApiKey?: SortOrder
     filesVcAccountId?: SortOrder
     updatedAt?: SortOrder
@@ -11919,7 +11880,6 @@ export namespace Prisma {
   export type UserSettingsMaxOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
-    preferYearOnlyDateFormat?: SortOrder
     filesVcApiKey?: SortOrder
     filesVcAccountId?: SortOrder
     updatedAt?: SortOrder
@@ -11928,18 +11888,9 @@ export namespace Prisma {
   export type UserSettingsMinOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
-    preferYearOnlyDateFormat?: SortOrder
     filesVcApiKey?: SortOrder
     filesVcAccountId?: SortOrder
     updatedAt?: SortOrder
-  }
-
-  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type StringNullableListFilter<$PrismaModel = never> = {
@@ -12281,10 +12232,6 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
-  export type BoolFieldUpdateOperationsInput = {
-    set?: boolean
-  }
-
   export type UserUpdateOneRequiredWithoutSettingsNestedInput = {
     create?: XOR<UserCreateWithoutSettingsInput, UserUncheckedCreateWithoutSettingsInput>
     connectOrCreate?: UserCreateOrConnectWithoutSettingsInput
@@ -12573,19 +12520,6 @@ export namespace Prisma {
     _max?: NestedEnumUserRoleFilter<$PrismaModel>
   }
 
-  export type NestedBoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
-  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
-  }
-
   export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
     in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
@@ -12784,7 +12718,6 @@ export namespace Prisma {
 
   export type UserSettingsCreateWithoutUserInput = {
     id?: string
-    preferYearOnlyDateFormat?: boolean
     filesVcApiKey?: string | null
     filesVcAccountId?: string | null
     updatedAt?: Date | string
@@ -12792,7 +12725,6 @@ export namespace Prisma {
 
   export type UserSettingsUncheckedCreateWithoutUserInput = {
     id?: string
-    preferYearOnlyDateFormat?: boolean
     filesVcApiKey?: string | null
     filesVcAccountId?: string | null
     updatedAt?: Date | string
@@ -12876,7 +12808,6 @@ export namespace Prisma {
 
   export type UserSettingsUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    preferYearOnlyDateFormat?: BoolFieldUpdateOperationsInput | boolean
     filesVcApiKey?: NullableStringFieldUpdateOperationsInput | string | null
     filesVcAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -12884,7 +12815,6 @@ export namespace Prisma {
 
   export type UserSettingsUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    preferYearOnlyDateFormat?: BoolFieldUpdateOperationsInput | boolean
     filesVcApiKey?: NullableStringFieldUpdateOperationsInput | string | null
     filesVcAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string

@@ -160,7 +160,6 @@ exports.Prisma.VerificationTokenScalarFieldEnum = {
 exports.Prisma.UserSettingsScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  preferYearOnlyDateFormat: 'preferYearOnlyDateFormat',
   filesVcApiKey: 'filesVcApiKey',
   filesVcAccountId: 'filesVcAccountId',
   updatedAt: 'updatedAt'
