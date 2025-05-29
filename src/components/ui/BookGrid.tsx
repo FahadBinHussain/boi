@@ -8,9 +8,10 @@ import type { Book } from '@/lib/books';
 interface BookGridProps {
   books: Book[];
   selectedCategories: string[];
+  compact?: boolean;
 }
 
-const BookGrid = ({ books, selectedCategories }: BookGridProps) => {
+const BookGrid = ({ books, selectedCategories, compact = false }: BookGridProps) => {
   const [filteredBooks, setFilteredBooks] = useState<Book[]>(books);
 
   // Filter books when selected categories change
@@ -57,14 +58,18 @@ const BookGrid = ({ books, selectedCategories }: BookGridProps) => {
 
   return (
     <motion.div 
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 xl:gap-8"
+      className={`grid gap-6 xl:gap-8 ${
+        compact 
+          ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'
+          : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+      }`}
       variants={container}
       initial="hidden"
       animate="show"
     >
       {filteredBooks.map((book) => (
         <motion.div key={book.id} variants={item}>
-          <BookCard book={book} />
+          <BookCard book={book} compact={compact} />
         </motion.div>
       ))}
     </motion.div>

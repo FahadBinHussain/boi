@@ -138,7 +138,7 @@ const HeroSection = () => {
   return (
     <div 
       ref={heroRef}
-      className="relative w-full h-screen overflow-hidden"
+      className="relative w-full min-h-[calc(100vh-4rem)] overflow-hidden z-0"
       onMouseMove={handleMouseMove}
     >
       {/* Animated background */}
@@ -194,9 +194,9 @@ const HeroSection = () => {
       
       {/* Main content */}
       <div className="container mx-auto h-full relative z-10 px-4 lg:px-8">
-        <div className="flex flex-col lg:flex-row h-full items-center">
+        <div className="flex flex-col lg:flex-row h-full items-center py-16">
           {/* Hero text content */}
-          <div ref={contentRef} className="hero-content w-full lg:w-1/2 pt-20 lg:pt-0">
+          <div ref={contentRef} className="hero-content w-full lg:w-1/2 pt-8 lg:pt-0">
             <motion.h1 
               className="hero-heading text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 tracking-tight"
             >

@@ -10,9 +10,10 @@ import gsap from 'gsap';
 
 interface BookCardProps {
   book: Book;
+  compact?: boolean; // Add new prop to allow for a smaller display mode
 }
 
-const BookCard = ({ book }: BookCardProps) => {
+const BookCard = ({ book, compact = false }: BookCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
@@ -88,7 +89,7 @@ const BookCard = ({ book }: BookCardProps) => {
   return (
     <motion.div
       ref={cardRef}
-      className="group bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200 transition-all duration-300 h-full flex flex-col"
+      className={`group bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200 transition-all duration-300 h-full flex flex-col ${compact ? 'max-w-[220px] mx-auto' : ''}`}
       whileHover={{ 
         y: -5,
         boxShadow: '0 15px 30px rgba(0, 0, 0, 0.15), 0 10px 15px rgba(99, 102, 241, 0.1)',
@@ -102,12 +103,15 @@ const BookCard = ({ book }: BookCardProps) => {
       }}
     >
       {/* Cover Image Container */}
-      <div ref={imageRef} className="relative aspect-[2/3] w-full overflow-hidden">
+      <div 
+        ref={imageRef} 
+        className={`relative overflow-hidden ${compact ? 'aspect-[2/3] w-full max-h-[250px]' : 'aspect-[2/3] w-full'}`}
+      >
         <Image
           src={book.coverImage}
           alt={`${book.title} cover`}
           fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          sizes={compact ? "(max-width: 640px) 33vw, 220px" : "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"}
           className="transform group-hover:scale-105 transition-transform duration-300"
           style={{ 
             width: '100%', 
@@ -132,7 +136,7 @@ const BookCard = ({ book }: BookCardProps) => {
           <div className="flex flex-col gap-3 transform">
             <Link href={`/books/${book.id}`}>
               <motion.button
-                className="flex items-center gap-2 bg-white text-gray-900 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors shadow-lg"
+                className={`flex items-center gap-2 bg-white text-gray-900 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors shadow-lg ${compact ? 'text-xs px-3 py-1.5' : ''}`}
                 whileHover={{ scale: 1.05, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
                 whileTap={{ scale: 0.95 }}
                 initial={{ y: 20, opacity: 0 }}
@@ -142,13 +146,13 @@ const BookCard = ({ book }: BookCardProps) => {
                   transition: { delay: 0.1, duration: 0.3 }
                 }}
               >
-                <FiInfo size={16} />
+                <FiInfo size={compact ? 14 : 16} />
                 Details
               </motion.button>
             </Link>
             <a href={book.downloadLink}>
               <motion.button
-                className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-indigo-700 transition-colors shadow-lg"
+                className={`flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-indigo-700 transition-colors shadow-lg ${compact ? 'text-xs px-3 py-1.5' : ''}`}
                 whileHover={{ scale: 1.05, boxShadow: "0 10px 15px -3px rgba(79, 70, 229, 0.4)" }}
                 whileTap={{ scale: 0.95 }}
                 initial={{ y: 20, opacity: 0 }}
@@ -158,7 +162,7 @@ const BookCard = ({ book }: BookCardProps) => {
                   transition: { delay: 0.2, duration: 0.3 }
                 }}
               >
-                <FiDownload size={16} />
+                <FiDownload size={compact ? 14 : 16} />
                 Download
               </motion.button>
             </a>
@@ -167,30 +171,30 @@ const BookCard = ({ book }: BookCardProps) => {
       </div>
 
       {/* Book Info */}
-      <div className="p-4 flex flex-col flex-grow relative" style={{ transform: 'translateZ(10px)' }}>
-        <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1 group-hover:text-indigo-600 transition-colors">{book.title}</h3>
-        <p className="text-sm text-gray-600 mb-2">{book.author}</p>
+      <div className={`p-4 flex flex-col flex-grow relative ${compact ? 'p-3' : ''}`} style={{ transform: 'translateZ(10px)' }}>
+        <h3 className={`font-semibold text-gray-900 mb-1 line-clamp-1 group-hover:text-indigo-600 transition-colors ${compact ? 'text-sm' : ''}`}>{book.title}</h3>
+        <p className={`text-sm text-gray-600 mb-2 ${compact ? 'text-xs' : ''}`}>{book.author}</p>
         
         {/* Categories */}
         <div className="flex flex-wrap gap-1 mt-auto pt-2">
-          {book.categories.slice(0, 2).map((category) => (
+          {book.categories.slice(0, compact ? 1 : 2).map((category) => (
             <span 
               key={category} 
-              className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-full group-hover:bg-indigo-100 group-hover:text-indigo-700 transition-colors"
+              className={`px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-full group-hover:bg-indigo-100 group-hover:text-indigo-700 transition-colors ${compact ? 'text-[10px] px-1.5 py-0.5' : ''}`}
             >
               {category}
             </span>
           ))}
-          {book.categories.length > 2 && (
-            <span className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-full group-hover:bg-indigo-100 group-hover:text-indigo-700 transition-colors">
-              +{book.categories.length - 2}
+          {book.categories.length > (compact ? 1 : 2) && (
+            <span className={`px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-full group-hover:bg-indigo-100 group-hover:text-indigo-700 transition-colors ${compact ? 'text-[10px] px-1.5 py-0.5' : ''}`}>
+              +{book.categories.length - (compact ? 1 : 2)}
             </span>
           )}
         </div>
       </div>
 
       {/* Footer Info */}
-      <div className="px-4 py-3 bg-gray-50 text-xs text-gray-500 flex items-center justify-between group-hover:bg-indigo-50 transition-colors" style={{ transform: 'translateZ(5px)' }}>
+      <div className={`px-4 py-3 bg-gray-50 text-xs text-gray-500 flex items-center justify-between group-hover:bg-indigo-50 transition-colors ${compact ? 'px-3 py-2 text-[10px]' : ''}`} style={{ transform: 'translateZ(5px)' }}>
         <span>{book.format}</span>
         <span>{book.fileSize}</span>
       </div>

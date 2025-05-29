@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { FiBook, FiMail, FiHeart } from 'react-icons/fi';
+import { FiBook, FiMail, FiHeart, FiInfo } from 'react-icons/fi';
 
 export default function AboutPage() {
   return (
@@ -68,6 +68,15 @@ export default function AboutPage() {
             <p className="text-gray-700 mb-6 leading-relaxed">
               If you believe that any content on our site infringes upon your copyright, please contact us immediately through our <Link href="/dmca" className="text-indigo-600 hover:underline">DMCA page</Link>, and we will promptly address your concerns.
             </p>
+            
+            <div className="bg-amber-50 border border-amber-100 rounded-lg p-6 my-8">
+              <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
+                <FiInfo className="mr-2 text-amber-700" /> Disclaimer
+              </h3>
+              <p className="text-gray-700 leading-relaxed">
+                বই does not own or scan any books hosted on this site. All content is provided by third parties or is in the public domain. We make our best effort to ensure that all materials comply with copyright laws, but we rely on the information provided by our sources.
+              </p>
+            </div>
           </div>
         </div>
 

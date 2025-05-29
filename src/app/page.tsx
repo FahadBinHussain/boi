@@ -567,7 +567,7 @@ export default function Home() {
                 <p className="mt-1 text-sm">Please try refreshing the page or contact support if the problem persists.</p>
               </div>
             ) : (
-              <BookGrid books={featuredBooks} selectedCategories={[]} />
+              <BookGrid books={featuredBooks} selectedCategories={[]} compact={true} />
             )}
           </div>
         </section>
