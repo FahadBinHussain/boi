@@ -121,13 +121,73 @@ export async function POST(request: NextRequest) {
           language: scrapedData.language
         };
       } else if (urlType === 'goodreads') {
+        // Log the raw scraped data structure from Goodreads
+        console.log("Raw Goodreads scraped data:", JSON.stringify(scrapedData, null, 2));
+        console.log("Authors data from Goodreads:", scrapedData.authors);
+        console.log("Author data from Goodreads:", scrapedData.author);
+        console.log("Publication date from Goodreads:", scrapedData.publicationDate);
+        
+        // Handle author data appropriately
+        let authorsList = [];
+        
+        // Check for author field first (this is what Goodreads scraper actually uses)
+        if (scrapedData.author) {
+          console.log("Found author field:", scrapedData.author);
+          authorsList = [scrapedData.author];
+        } 
+        // Then check for authors field as fallback
+        else if (scrapedData.authors) {
+          console.log("Found authors field:", scrapedData.authors);
+          if (Array.isArray(scrapedData.authors)) {
+            authorsList = scrapedData.authors;
+          } else if (typeof scrapedData.authors === 'string') {
+            authorsList = [scrapedData.authors];
+          }
+        }
+        
+        console.log("Final authors list:", authorsList);
+        
+        // Handle publication date
+        let publicationDate = scrapedData.publicationDate;
+        
+        // Check if the publication date is in a standardized format
+        if (publicationDate) {
+          console.log("Original publication date:", publicationDate);
+          
+          // Check if it's a year-only format
+          const yearOnlyMatch = /^\d{4}$/.test(publicationDate);
+          // Check if it's already in YYYY-MM-DD format
+          const fullDateMatch = /^\d{4}-\d{2}-\d{2}$/.test(publicationDate);
+          
+          if (!yearOnlyMatch && !fullDateMatch) {
+            // Try to extract year
+            const yearMatch = publicationDate.match(/\b(19|20)\d{2}\b/);
+            if (yearMatch && yearMatch[0]) {
+              publicationDate = yearMatch[0];
+              console.log("Normalized publication date to year:", publicationDate);
+            } else {
+              // Try to parse as a date
+              try {
+                const date = new Date(publicationDate);
+                if (!isNaN(date.getTime())) {
+                  publicationDate = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+                  console.log("Normalized publication date to ISO format:", publicationDate);
+                }
+              } catch (error) {
+                console.warn("Failed to normalize publication date:", error);
+              }
+            }
+          }
+        }
+        
         // Map the Goodreads scraper output to our expected format
         transformedData = {
           title: scrapedData.bookName,
           imageUrl: scrapedData.imageUrl,
           summary: scrapedData.bookSummary,
-          publicationDate: scrapedData.publicationDate,
+          publicationDate: publicationDate,
           publisher: scrapedData.publisher,
+          authors: authorsList,
           genres: scrapedData.genres,
           ratings: scrapedData.ratings ? Number(scrapedData.ratings) : undefined,
           averageRating: scrapedData.averageRating ? Number(scrapedData.averageRating) : undefined,

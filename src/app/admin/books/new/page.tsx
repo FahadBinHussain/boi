@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { FiArrowLeft, FiSave, FiImage, FiCalendar, FiUsers, FiBook, FiFileText, FiCheckCircle, FiLink, FiLoader, FiDownload } from "react-icons/fi";
+import { FiArrowLeft, FiSave, FiImage, FiCalendar, FiUsers, FiBook, FiFileText, FiCheckCircle, FiLink, FiLoader, FiDownload, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import gsap from "gsap";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import { useNotification } from "@/contexts/NotificationContext";
@@ -96,6 +96,63 @@ const BookThumbnail = ({
   );
 };
 
+// Add this component for the step indicator
+const StepIndicator = ({ 
+  currentStep,
+  totalSteps,
+  stepsCompleted,
+  onStepClick
+}: { 
+  currentStep: number;
+  totalSteps: number;
+  stepsCompleted: {[key: number]: boolean};
+  onStepClick: (step: number) => void;
+}) => {
+  const stepTitles = {
+    1: "Basic Info",
+    2: "Media",
+    3: "Publication",
+    4: "Additional Details"
+  };
+
+  return (
+    <div className="py-4">
+      <div className="flex items-center justify-between">
+        {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step) => (
+          <div key={step} className="flex items-center">
+            <button
+              type="button"
+              onClick={() => onStepClick(step)}
+              disabled={!stepsCompleted[step - 1] && step !== 1 && step > currentStep}
+              className={`relative flex h-8 w-8 items-center justify-center rounded-full border-2 text-xs font-medium 
+                ${currentStep === step 
+                  ? 'border-indigo-600 bg-indigo-600 text-white' 
+                  : stepsCompleted[step] 
+                    ? 'border-indigo-600 bg-white text-indigo-600' 
+                    : 'border-gray-300 bg-white text-gray-500'
+                } ${(step <= currentStep || stepsCompleted[step - 1]) ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+            >
+              {stepsCompleted[step] ? (
+                <svg className="h-5 w-5 text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              ) : (
+                step
+              )}
+            </button>
+            <div className={`ml-2 text-sm font-medium ${currentStep === step ? 'text-indigo-600' : 'text-gray-500'}`}>
+              {stepTitles[step as keyof typeof stepTitles]}
+            </div>
+            {step < totalSteps && (
+              <div className="ml-4 flex-1 border-t border-gray-300" style={{ width: '50px' }}></div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 export default function AddNewBook() {
   const router = useRouter();
   const { settings, isLoading: isSettingsLoading, syncStatus, lastSyncMessage } = useUserSettings();
@@ -142,6 +199,16 @@ export default function AddNewBook() {
   const [singleBookPdfUrl, setSingleBookPdfUrl] = useState<string | null>(null);
   const [singleBookUploadError, setSingleBookUploadError] = useState<string | null>(null);
 
+  // Add state variables for multi-step form
+  const [currentStep, setCurrentStep] = useState(1);
+  const totalSteps = 4;
+  const [stepsCompleted, setStepsCompleted] = useState<{[key: number]: boolean}>({
+    1: false,
+    2: false,
+    3: false,
+    4: false
+  });
+
   // Load user settings when component mounts
   useEffect(() => {
     if (!isSettingsLoading && settings) {
@@ -169,42 +236,50 @@ export default function AddNewBook() {
     }
   }, [thumbnailUrl]);
 
-  // Validate form including checking publication date based on format
-  const validateForm = () => {
-    const errors: {
-      bookName?: string;
-      authors?: string;
-      thumbnailUrl?: string;
-      publicationDate?: string;
-      bookPdf?: string; // For single book PDF error
-      summary?: string; // Add this for summary field errors
-      metadataUrl?: string;
-    } = {};
+  // Function to validate current step
+  const validateCurrentStep = () => {
+    const newStepsCompleted = {...stepsCompleted};
+    let errors: {[key: string]: string} = {};
     
-    // Validate authors
-    if (authors.length === 0 || authors.some(author => !author.name.trim())) {
-      errors.authors = "Please add at least one author with a name";
-    }
-    
-      // Single book validation
+    if (currentStep === 1) {
+      // Basic info validation
       if (!bookName.trim()) {
         errors.bookName = "Book name is required";
       }
       
+      if (authors.length === 0 || authors.some(author => !author.name.trim())) {
+        errors.authors = "Please add at least one author with a name";
+      }
+      
+      newStepsCompleted[1] = Object.keys(errors).length === 0;
+    } 
+    else if (currentStep === 2) {
+      // Media validation
       if (!thumbnailUrl.trim()) {
         errors.thumbnailUrl = "Thumbnail URL is required";
       }
       
+      if (!bookPdfFile && !singleBookPdfUrl) {
+        errors.bookPdf = "Please select a PDF file for the book";
+      }
+      
+      newStepsCompleted[2] = Object.keys(errors).length === 0;
+    } 
+    else if (currentStep === 3) {
+      // Details validation
       if (!publicationDate.trim()) {
         errors.publicationDate = "Publication date is required";
       }
       
-      // Only require PDF if it's not already uploaded
-      if (!bookPdfFile && !singleBookPdfUrl) {
-        errors.bookPdf = "Please select a PDF file for the book";
+      newStepsCompleted[3] = Object.keys(errors).length === 0;
+    } 
+    else if (currentStep === 4) {
+      // Additional info - always mark as completed as these are optional
+      newStepsCompleted[4] = true;
     }
     
     setFormErrors(errors);
+    setStepsCompleted(newStepsCompleted);
     return Object.keys(errors).length === 0;
   };
 
@@ -212,8 +287,10 @@ export default function AddNewBook() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate form
-    if (!validateForm()) {
+    // Validate all steps before submission
+    if (!validateCurrentStep()) {
+      // Show error notification
+      showNotification('error', 'Please fill in all required fields');
       return;
     }
     
@@ -228,28 +305,28 @@ export default function AddNewBook() {
       }
       
       // Single book data
-        formData.append('bookName', bookName);
-        formData.append('thumbnailUrl', thumbnailUrl);
-        formData.append('publicationDate', publicationDate);
-        formData.append('isYearOnly', isYearOnly.toString());
-        formData.append('summary', summary);
-        
-        // Add publisher and other metadata if available
-        if (publisher) formData.append('publisher', publisher);
-        if (genres.length > 0) formData.append('genres', JSON.stringify(genres));
-        if (ratings !== undefined) formData.append('ratings', ratings.toString());
-        if (averageRating !== undefined) formData.append('averageRating', averageRating.toString());
-        if (numberOfPages !== undefined) formData.append('numberOfPages', numberOfPages.toString());
-        if (characters.length > 0) formData.append('characters', JSON.stringify(characters));
-        if (language) formData.append('language', language);
-        
-        // For single book mode, use the already uploaded PDF URL if available
-        if (singleBookPdfUrl) {
-          formData.append('pdfUrl', singleBookPdfUrl);
-        } 
-        // Otherwise, attach the PDF file directly if we have one
-        else if (bookPdfFile) {
-          formData.append('pdf', bookPdfFile);
+      formData.append('bookName', bookName);
+      formData.append('thumbnailUrl', thumbnailUrl);
+      formData.append('publicationDate', publicationDate);
+      formData.append('isYearOnly', isYearOnly.toString());
+      formData.append('summary', summary);
+      
+      // Add publisher and other metadata if available
+      if (publisher) formData.append('publisher', publisher);
+      if (genres.length > 0) formData.append('genres', JSON.stringify(genres));
+      if (ratings !== undefined) formData.append('ratings', ratings.toString());
+      if (averageRating !== undefined) formData.append('averageRating', averageRating.toString());
+      if (numberOfPages !== undefined) formData.append('numberOfPages', numberOfPages.toString());
+      if (characters.length > 0) formData.append('characters', JSON.stringify(characters));
+      if (language) formData.append('language', language);
+      
+      // For single book mode, use the already uploaded PDF URL if available
+      if (singleBookPdfUrl) {
+        formData.append('pdfUrl', singleBookPdfUrl);
+      } 
+      // Otherwise, attach the PDF file directly if we have one
+      else if (bookPdfFile) {
+        formData.append('pdf', bookPdfFile);
       }
       
       // Make API call to save the form data
@@ -350,6 +427,10 @@ export default function AddNewBook() {
       
       const data = await response.json();
       
+      // Add debugging logs
+      console.log("Fetched metadata:", data);
+      console.log("Authors data:", data.authors);
+      
       // Populate form fields with the scraped data
       populateFormFields(data);
       
@@ -387,23 +468,77 @@ export default function AddNewBook() {
         }
         
         if (data.publicationDate) {
+          console.log("Raw publication date from scraper:", data.publicationDate);
+          
           // Check if it's a full date or just a year
           const yearOnlyMatch = /^\d{4}$/.test(data.publicationDate);
           const fullDateMatch = /^\d{4}-\d{2}-\d{2}$/.test(data.publicationDate);
           
           if (yearOnlyMatch) {
+            // It's already a year-only format (e.g., "2023")
             setPublicationDate(data.publicationDate);
             setIsYearOnly(true);
           } else if (fullDateMatch) {
+            // It's already a full date format (e.g., "2023-01-15")
             setPublicationDate(data.publicationDate);
             setIsYearOnly(false);
+          } else {
+            // Handle other formats like "January 2023" or "January 10, 2023"
+            // Try to extract a year
+            const yearMatch = data.publicationDate.match(/\b(19|20)\d{2}\b/);
+            if (yearMatch && yearMatch[0]) {
+              const year = yearMatch[0];
+              console.log("Extracted year from publication date:", year);
+              setPublicationDate(year);
+              setIsYearOnly(true);
+            } else {
+              // If no year found, try to parse the date
+              try {
+                const date = new Date(data.publicationDate);
+                if (!isNaN(date.getTime())) {
+                  // Valid date, format as YYYY-MM-DD
+                  const formattedDate = date.toISOString().split('T')[0];
+                  console.log("Parsed date from publication date:", formattedDate);
+                  setPublicationDate(formattedDate);
+                  setIsYearOnly(false);
+                } else {
+                  console.warn("Failed to parse publication date:", data.publicationDate);
+                }
+              } catch (error) {
+                console.warn("Error parsing publication date:", error);
+              }
+            }
           }
         }
         
         // If authors are available
-        if (data.authors && Array.isArray(data.authors) && data.authors.length > 0) {
-        const newAuthors = data.authors.map((authorName: string) => ({ id: crypto.randomUUID(), name: authorName }));
-          setAuthors(newAuthors);
+        if (data.authors) {
+          console.log("Authors data type:", typeof data.authors);
+          
+          // Handle different formats of author data
+          let authorsList: string[] = [];
+          
+          if (Array.isArray(data.authors)) {
+            // It's already an array
+            authorsList = data.authors;
+          } else if (typeof data.authors === 'string') {
+            // If it's a string, split by commas
+            authorsList = (data.authors as string).split(',').map((a: string) => a.trim());
+          } else if (typeof data.authors === 'object') {
+            // If it's an object, try to extract values
+            authorsList = Object.values(data.authors as Record<string, unknown>).map((a: unknown) => String(a));
+          }
+          
+          console.log("Processed authors list:", authorsList);
+          
+          if (authorsList.length > 0) {
+            const newAuthors = authorsList.map((authorName: string) => {
+              console.log("Creating author object for:", authorName);
+              return { id: crypto.randomUUID(), name: authorName };
+            });
+            console.log("New authors array:", newAuthors);
+            setAuthors(newAuthors);
+          }
         }
         
         // Populate additional fields
@@ -558,6 +693,43 @@ export default function AddNewBook() {
     showNotification('error', `Upload failed: ${errorMessage}`);
   };
 
+  // Function to go to next step
+  const goToNextStep = () => {
+    if (currentStep < totalSteps) {
+      const isValid = validateCurrentStep();
+      if (isValid) {
+        setCurrentStep(prev => prev + 1);
+        window.scrollTo(0, 0);
+      }
+    }
+  };
+
+  // Function to go to previous step
+  const goToPreviousStep = () => {
+    if (currentStep > 1) {
+      // When going back, we don't need validation
+      setCurrentStep(prev => prev - 1);
+      window.scrollTo(0, 0);
+    }
+  };
+
+  // Function to handle step click in the step indicator
+  const handleStepClick = (step: number) => {
+    // Only allow clicking on previously completed steps or the current step
+    if (step < currentStep) {
+      setCurrentStep(step);
+      window.scrollTo(0, 0);
+    } else if (step === currentStep) {
+      // Just scroll to top if clicking current step
+      window.scrollTo(0, 0);
+    } else if (stepsCompleted[currentStep]) {
+      // If current step is complete, allow moving forward
+      validateCurrentStep();
+      setCurrentStep(step);
+      window.scrollTo(0, 0);
+    }
+  };
+
   return (
     <div className="max-w-5xl mx-auto">
       <div className="mb-6 flex items-center justify-between">
@@ -600,321 +772,416 @@ export default function AddNewBook() {
           <p className="mt-1 text-sm text-gray-600">
             Enter the details of the book you want to add to the library.
           </p>
+          
+          {/* Step indicator */}
+          <div className="mt-4">
+            <StepIndicator 
+              currentStep={currentStep} 
+              totalSteps={totalSteps} 
+              stepsCompleted={stepsCompleted}
+              onStepClick={handleStepClick}
+            />
+          </div>
         </div>
         
         <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-6">
-          {/* Book Name */}
-            <div className="form-group">
-              <label htmlFor="bookName" className="block text-sm font-medium text-gray-700 mb-2">
-                <div className="flex items-center">
-                  <FiBook className="mr-2 h-4 w-4 text-indigo-500" />
-                  Book Name <span className="text-red-500 ml-1">*</span>
-                </div>
-              </label>
-              <input
-                type="text"
-                id="bookName"
-                className={`block w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm
-                  ${formErrors.bookName ? "border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500" : "border-gray-300"}`}
-                placeholder="Enter book name"
-                value={bookName}
-                onChange={(e) => setBookName(e.target.value)}
-              />
-              {formErrors.bookName && (
-                <p className="mt-2 text-sm text-red-600">{formErrors.bookName}</p>
-              )}
-            </div>
+          {/* Step 1: Basic Info */}
+          {currentStep === 1 && (
+            <div className="space-y-6">
+              {/* Auto-fill from web section at the top for better UX */}
+              <div className="form-group bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <h3 className="text-base font-medium text-gray-900">Quick Fill from Web</h3>
+                <p className="mt-1 text-sm text-gray-500">
+                  Save time by automatically populating book details from Fandom or Goodreads.
+                </p>
 
-          {/* Authors */}
-          <div className="form-group">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <div className="flex items-center">
-                <FiUsers className="mr-2 h-4 w-4 text-indigo-500" />
-                Authors <span className="text-red-500 ml-1">*</span>
-              </div>
-            </label>
-            <div className="space-y-3">
-              {authors.map((author, index) => (
-                <div key={author.id} className="flex items-center">
-                  <input
-                    type="text"
-                    className={`block w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm
-                      ${formErrors.authors ? "border-red-300 text-red-900 placeholder-red-300" : "border-gray-300"}`}
-                    placeholder={`Author ${index + 1}`}
-                    value={author.name}
-                    onChange={(e) => updateAuthor(author.id!, e.target.value)}
-                  />
-                  {authors.length > 1 && (
-                    <button 
+                <div className="mt-3">
+                  <div className="flex rounded-md shadow-sm">
+                    <div className="relative flex flex-grow items-stretch focus-within:z-10">
+                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                        <FiLink className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                      </div>
+                      <input
+                        type="text"
+                        id="metadataUrl"
+                        className={`block w-full rounded-none rounded-l-md border-gray-300 pl-10 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                          scrapingError ? "border-red-300 text-red-900 placeholder-red-300" : ""
+                        }`}
+                        placeholder="Paste a Fandom or Goodreads URL to auto-fill book details"
+                        value={metadataUrl}
+                        onChange={handleMetadataUrlChange}
+                      />
+                    </div>
+                    <button
                       type="button"
-                      onClick={() => removeAuthor(author.id!)}
-                      className="ml-2 p-1.5 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
-                      aria-label="Remove author"
+                      onClick={handleFetchMetadata}
+                      disabled={isScrapingMetadata || !metadataUrl.trim()}
+                      className={`relative -ml-px inline-flex items-center rounded-r-md border border-gray-300 bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+                        (isScrapingMetadata || !metadataUrl.trim()) ? "cursor-not-allowed opacity-75" : ""
+                      }`}
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                      </svg>
+                      {isScrapingMetadata ? (
+                        <>
+                          <FiLoader className="mr-2 h-4 w-4 animate-spin" />
+                          Fetching...
+                        </>
+                      ) : (
+                        <>
+                          <FiDownload className="mr-2 h-4 w-4" />
+                          Fetch Data
+                        </>
+                      )}
                     </button>
+                  </div>
+                </div>
+                
+                {scrapingError && (
+                  <div className="mt-3 flex items-center rounded-md bg-red-50 p-3 text-red-700">
+                    <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                    <span>{scrapingError}</span>
+                  </div>
+                )}
+                
+                {metadataSuccess && !scrapingError && (
+                  <div className="mt-3 flex items-center rounded-md bg-green-50 p-3 text-green-700">
+                    <FiCheckCircle className="mr-2 h-5 w-5" />
+                    <span>{metadataSuccess}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Book Name */}
+              <div className="form-group">
+                <label htmlFor="bookName" className="block text-sm font-medium text-gray-700 mb-2">
+                  <div className="flex items-center">
+                    <FiBook className="mr-2 h-4 w-4 text-indigo-500" />
+                    Book Name <span className="text-red-500 ml-1">*</span>
+                  </div>
+                </label>
+                <input
+                  type="text"
+                  id="bookName"
+                  className={`block w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm
+                    ${formErrors.bookName ? "border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500" : "border-gray-300"}`}
+                  placeholder="Enter book name"
+                  value={bookName}
+                  onChange={(e) => setBookName(e.target.value)}
+                />
+                {formErrors.bookName && (
+                  <p className="mt-2 text-sm text-red-600">{formErrors.bookName}</p>
+                )}
+              </div>
+
+              {/* Authors */}
+              <div className="form-group">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <div className="flex items-center">
+                    <FiUsers className="mr-2 h-4 w-4 text-indigo-500" />
+                    Authors <span className="text-red-500 ml-1">*</span>
+                  </div>
+                </label>
+                <div className="space-y-3">
+                  {authors.map((author, index) => (
+                    <div key={author.id} className="flex items-center">
+                      <input
+                        type="text"
+                        className={`block w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm
+                          ${formErrors.authors ? "border-red-300 text-red-900 placeholder-red-300" : "border-gray-300"}`}
+                        placeholder={`Author ${index + 1}`}
+                        value={author.name}
+                        onChange={(e) => updateAuthor(author.id!, e.target.value)}
+                      />
+                      {authors.length > 1 && (
+                        <button 
+                          type="button"
+                          onClick={() => removeAuthor(author.id!)}
+                          className="ml-2 p-1.5 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                          aria-label="Remove author"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={addAuthor}
+                  className="mt-3 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="-ml-0.5 mr-2 h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
+                  </svg>
+                  Add Author
+                </button>
+                {formErrors.authors && (
+                  <p className="mt-2 text-sm text-red-600">{formErrors.authors}</p>
+                )}
+              </div>
+
+              {/* Book Summary Field */}
+              <div className="form-group">
+                <label htmlFor="summary" className="block text-sm font-medium text-gray-700 mb-2">
+                  <div className="flex items-center">
+                    <FiFileText className="mr-2 h-4 w-4 text-indigo-500" />
+                    Book Summary
+                  </div>
+                </label>
+                <textarea
+                  id="summary"
+                  rows={4}
+                  className={`block w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm
+                    ${formErrors.summary ? "border-red-300 text-red-900 placeholder-red-300" : "border-gray-300"}`}
+                  placeholder="Enter a brief summary of the book..."
+                  value={summary}
+                  onChange={(e) => setSummary(e.target.value)}
+                />
+                {formErrors.summary && (
+                  <p className="mt-2 text-sm text-red-600">{formErrors.summary}</p>
+                )}
+                <p className="mt-1 text-xs text-gray-500">Provide a concise summary or description of the book's content</p>
+              </div>
+            </div>
+          )}
+          
+          {/* Step 2: Media (Thumbnail and PDF) */}
+          {currentStep === 2 && (
+            <div className="space-y-6">
+              {/* Single Book Thumbnail Input */}
+              <div className="form-group">
+                <label htmlFor="thumbnailUrl" className="block text-sm font-medium text-gray-700 mb-2">
+                  <div className="flex items-center">
+                    <FiImage className="mr-2 h-4 w-4 text-indigo-500" />
+                    Thumbnail URL <span className="text-red-500 ml-1">*</span>
+                  </div>
+                </label>
+                <div className="flex flex-col md:flex-row md:items-start md:space-x-4">
+                  <div className="flex-grow mb-4 md:mb-0">
+                    <input
+                      type="text"
+                      id="thumbnailUrl"
+                      className={`block w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm
+                        ${formErrors.thumbnailUrl ? "border-red-300 text-red-900 placeholder-red-300" : "border-gray-300"}`}
+                      placeholder="https://example.com/image.jpg"
+                      value={thumbnailUrl}
+                      onChange={(e) => setThumbnailUrl(e.target.value)}
+                    />
+                    {formErrors.thumbnailUrl && (
+                      <p className="mt-2 text-sm text-red-600">{formErrors.thumbnailUrl}</p>
+                    )}
+                    <p className="mt-1 text-xs text-gray-500">Enter a URL for the book cover image</p>
+                  </div>
+                  
+                  <div className="flex-shrink-0 flex justify-center">
+                    {thumbnailPreview ? (
+                      <BookThumbnail 
+                        src={thumbnailPreview} 
+                        alt="Thumbnail preview" 
+                        onError={() => {
+                          setThumbnailPreview("https://via.placeholder.com/120x160?text=Error");
+                        }}
+                      />
+                    ) : (
+                      <div className="h-48 w-32 border-2 border-dashed border-gray-300 rounded-md flex flex-col items-center justify-center text-gray-400">
+                        <FiImage className="h-10 w-10 mb-2" />
+                        <span className="text-xs text-center px-2">Cover preview will appear here</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Book PDF File Input for single book */}
+              <div className="form-group">
+                <label htmlFor="bookPdf" className="block text-sm font-medium text-gray-700 mb-2">
+                  <div className="flex items-center">
+                    <FiFileText className="mr-2 h-4 w-4 text-indigo-500" />
+                    Book File (PDF) <span className="text-red-500 ml-1">*</span>
+                  </div>
+                </label>
+                <div className="mt-1 bg-gray-50 border border-gray-300 border-dashed rounded-md p-4">
+                  <div className="flex justify-center">
+                    <div className="space-y-2 text-center">
+                      <svg className="mx-auto h-10 w-10 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H8m36-12h-4m4 0H20" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      <div className="flex text-sm text-gray-600">
+                        <label htmlFor="bookPdf" className="relative cursor-pointer rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                          <span>Upload a PDF file</span>
+                          <input
+                            id="bookPdf"
+                            name="bookPdf"
+                            type="file"
+                            accept=".pdf"
+                            className="sr-only"
+                            onChange={handleSingleBookPdfChange}
+                            disabled={singleBookUploadStatus === 'uploading'}
+                          />
+                        </label>
+                        <p className="pl-1">or drag and drop</p>
+                      </div>
+                      <p className="text-xs text-gray-500">PDF up to 100MB</p>
+                    </div>
+                  </div>
+                  
+                  {/* Selected file info */}
+                  {bookPdfFile && (
+                    <div className="mt-4 flex items-center justify-between bg-white p-3 rounded-md border border-gray-200">
+                      <div className="flex items-center">
+                        <svg className="h-8 w-8 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+                        </svg>
+                        <div className="ml-3">
+                          <p className="text-sm font-medium text-gray-900">{bookPdfFile.name}</p>
+                          <p className="text-sm text-gray-500">{(bookPdfFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setBookPdfFile(null)}
+                        className="text-gray-400 hover:text-gray-500"
+                        disabled={singleBookUploadStatus === 'uploading'}
+                      >
+                        <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
+                      </button>
+                    </div>
                   )}
                 </div>
-              ))}
-            </div>
-            <button
-              type="button"
-              onClick={addAuthor}
-              className="mt-3 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="-ml-0.5 mr-2 h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
-              </svg>
-              Add Author
-            </button>
-            {formErrors.authors && (
-              <p className="mt-2 text-sm text-red-600">{formErrors.authors}</p>
-            )}
-          </div>
-
-          {/* Single Book Thumbnail Input */}
-          <div className="form-group">
-            <label htmlFor="thumbnailUrl" className="block text-sm font-medium text-gray-700 mb-2">
-              <div className="flex items-center">
-                <FiImage className="mr-2 h-4 w-4 text-indigo-500" />
-                Thumbnail URL <span className="text-red-500 ml-1">*</span>
-              </div>
-            </label>
-            <div className="flex items-start space-x-4">
-              <div className="flex-grow">
-                <input
-                  type="text"
-                  id="thumbnailUrl"
-                  className={`block w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm
-                    ${formErrors.thumbnailUrl ? "border-red-300 text-red-900 placeholder-red-300" : "border-gray-300"}`}
-                  placeholder="https://example.com/image.jpg"
-                  value={thumbnailUrl}
-                  onChange={(e) => setThumbnailUrl(e.target.value)}
-                />
-                {formErrors.thumbnailUrl && (
-                  <p className="mt-2 text-sm text-red-600">{formErrors.thumbnailUrl}</p>
+                
+                {/* Upload progress indicators */}
+                {singleBookUploadStatus === 'uploading' && singleBookUploadProgress !== null && (
+                  <div className="mt-3">
+                    <div className="relative pt-1">
+                      <div className="flex mb-2 items-center justify-between">
+                        <div>
+                          <span className="text-xs font-semibold inline-block text-indigo-600">
+                            Uploading...
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-xs font-semibold inline-block text-indigo-600">
+                            {singleBookUploadProgress}%
+                          </span>
+                        </div>
+                      </div>
+                      <div className="overflow-hidden h-2 text-xs flex rounded bg-indigo-200">
+                        <div 
+                          className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-indigo-500 transition-all duration-300 ease-in-out"
+                          style={{ width: `${singleBookUploadProgress}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
                 )}
-                <p className="mt-1 text-xs text-gray-500">Enter a URL for the book cover image</p>
-              </div>
-              
-              {thumbnailPreview && (
-                <div className="flex-shrink-0">
-                  <BookThumbnail 
-                    src={thumbnailPreview} 
-                    alt="Thumbnail preview" 
-                    onError={() => {
-                      setThumbnailPreview("https://via.placeholder.com/120x160?text=Error");
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Book PDF File Input for single book */}
-          <div className="form-group">
-            <label htmlFor="bookPdf" className="block text-sm font-medium text-gray-700 mb-2">
-              <div className="flex items-center">
-                <FiFileText className="mr-2 h-4 w-4 text-indigo-500" />
-                Book File (PDF) <span className="text-red-500 ml-1">*</span>
-              </div>
-            </label>
-            <div className="mt-1 bg-gray-50 border border-gray-300 border-dashed rounded-md p-4">
-              <div className="flex justify-center">
-                <div className="space-y-2 text-center">
-                  <svg className="mx-auto h-10 w-10 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H8m36-12h-4m4 0H20" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  <div className="flex text-sm text-gray-600">
-                    <label htmlFor="bookPdf" className="relative cursor-pointer rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
-                      <span>Upload a PDF file</span>
-                      <input
-                        id="bookPdf"
-                        name="bookPdf"
-                        type="file"
-                        accept=".pdf"
-                        className="sr-only"
-                        onChange={handleSingleBookPdfChange}
-                        disabled={singleBookUploadStatus === 'uploading'}
-                      />
-                    </label>
-                    <p className="pl-1">or drag and drop</p>
-                  </div>
-                  <p className="text-xs text-gray-500">PDF up to 100MB</p>
-                </div>
-              </div>
-              
-              {/* Selected file info */}
-              {bookPdfFile && (
-                <div className="mt-4 flex items-center justify-between bg-white p-3 rounded-md border border-gray-200">
-                  <div className="flex items-center">
-                    <svg className="h-8 w-8 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
-                    </svg>
-                    <div className="ml-3">
-                      <p className="text-sm font-medium text-gray-900">{bookPdfFile.name}</p>
-                      <p className="text-sm text-gray-500">{(bookPdfFile.size / 1024 / 1024).toFixed(2)} MB</p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setBookPdfFile(null)}
-                    className="text-gray-400 hover:text-gray-500"
-                    disabled={singleBookUploadStatus === 'uploading'}
-                  >
-                    <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
-                  </button>
-                </div>
-              )}
-            </div>
-            
-            {/* Upload progress indicators */}
-            {singleBookUploadStatus === 'uploading' && singleBookUploadProgress !== null && (
-              <div className="mt-3">
-                <div className="relative pt-1">
-                  <div className="flex mb-2 items-center justify-between">
+                
+                {/* Success message */}
+                {singleBookUploadStatus === 'success' && singleBookPdfUrl && (
+                  <div className="mt-3 flex items-center rounded-md bg-green-50 p-3 text-green-700">
+                    <FiCheckCircle className="mr-2 h-5 w-5" />
                     <div>
-                      <span className="text-xs font-semibold inline-block text-indigo-600">
-                        Uploading...
-                      </span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-xs font-semibold inline-block text-indigo-600">
-                        {singleBookUploadProgress}%
-                      </span>
+                      <span className="font-medium">Upload successful!</span>
+                      <button 
+                        type="button"
+                        onClick={() => window.open(singleBookPdfUrl, '_blank')}
+                        className="ml-2 text-green-800 underline"
+                      >
+                        View file
+                      </button>
                     </div>
                   </div>
-                  <div className="overflow-hidden h-2 text-xs flex rounded bg-indigo-200">
-                    <div 
-                      className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-indigo-500 transition-all duration-300 ease-in-out"
-                      style={{ width: `${singleBookUploadProgress}%` }}
-                    ></div>
+                )}
+                
+                {/* Error message */}
+                {singleBookUploadStatus === 'error' && singleBookUploadError && (
+                  <div className="mt-3 flex items-center rounded-md bg-red-50 p-3 text-red-700">
+                    <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                    <span>{singleBookUploadError}</span>
                   </div>
-                </div>
+                )}
+                
+                {formErrors.bookPdf && (
+                  <p className="mt-2 text-sm text-red-600">{formErrors.bookPdf}</p>
+                )}
               </div>
-            )}
-            
-            {/* Success message */}
-            {singleBookUploadStatus === 'success' && singleBookPdfUrl && (
-              <div className="mt-3 flex items-center rounded-md bg-green-50 p-3 text-green-700">
-                <FiCheckCircle className="mr-2 h-5 w-5" />
-                <div>
-                  <span className="font-medium">Upload successful!</span>
-                  <button 
-                    type="button"
-                    onClick={() => window.open(singleBookPdfUrl, '_blank')}
-                    className="ml-2 text-green-800 underline"
-                  >
-                    View file
-                  </button>
-                </div>
-              </div>
-            )}
-            
-            {/* Error message */}
-            {singleBookUploadStatus === 'error' && singleBookUploadError && (
-              <div className="mt-3 flex items-center rounded-md bg-red-50 p-3 text-red-700">
-                <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-                <span>{singleBookUploadError}</span>
-              </div>
-            )}
-            
-            {formErrors.bookPdf && (
-              <p className="mt-2 text-sm text-red-600">{formErrors.bookPdf}</p>
-            )}
-          </div>
-
-          {/* Publication Date */}
-          <div className="form-group">
-            <label htmlFor="publicationDate" className="block text-sm font-medium text-gray-700 mb-2">
-              <div className="flex items-center justify-between w-full">
-                <div className="flex items-center">
-                  <FiCalendar className="mr-2 h-4 w-4 text-indigo-500" />
-                  Publication Date <span className="text-red-500 ml-1">*</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="mr-2 text-xs text-gray-500">
-                    {isYearOnly ? "Year only" : "Full date"}
-                  </span>
-                  <button 
-                    type="button"
-                    onClick={handleYearToggle}
-                    className="text-xs text-indigo-600 hover:text-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded-md px-2 py-1"
-                  >
-                    Toggle format
-                  </button>
-                </div>
-              </div>
-            </label>
-            
-            <div className="mt-1">
-              {isYearOnly ? (
-                <input
-                  type="text"
-                  id="publicationDate"
-                  placeholder="YYYY"
-                  pattern="\d{4}"
-                  className={`block w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm
-                    ${formErrors.publicationDate ? "border-red-300 text-red-900 placeholder-red-300" : "border-gray-300"}`}
-                  value={publicationDate}
-                  onChange={(e) => setPublicationDate(e.target.value)}
-                />
-              ) : (
-                <input
-                  type="date"
-                  id="publicationDate"
-                  className={`block w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm
-                    ${formErrors.publicationDate ? "border-red-300 text-red-900 placeholder-red-300" : "border-gray-300"}`}
-                  value={publicationDate}
-                  onChange={(e) => setPublicationDate(e.target.value)}
-                />
-              )}
             </div>
-            
-            {formErrors.publicationDate && (
-              <p className="mt-2 text-sm text-red-600">{formErrors.publicationDate}</p>
-            )}
-          </div>
-
-          {/* Book Summary Field */}
-          <div className="form-group">
-            <label htmlFor="summary" className="block text-sm font-medium text-gray-700 mb-2">
-              <div className="flex items-center">
-                <FiFileText className="mr-2 h-4 w-4 text-indigo-500" />
-                Book Summary
+          )}
+          
+          {/* Step 3: Publication */}
+          {currentStep === 3 && (
+            <div className="space-y-6">
+              {/* Publication Date */}
+              <div className="form-group">
+                <label htmlFor="publicationDate" className="block text-sm font-medium text-gray-700 mb-2">
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center">
+                      <FiCalendar className="mr-2 h-4 w-4 text-indigo-500" />
+                      Publication Date <span className="text-red-500 ml-1">*</span>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="mr-2 text-xs text-gray-500">
+                        {isYearOnly ? "Year only" : "Full date"}
+                      </span>
+                      <button 
+                        type="button"
+                        onClick={handleYearToggle}
+                        className="text-xs text-indigo-600 hover:text-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded-md px-2 py-1"
+                      >
+                        Toggle format
+                      </button>
+                    </div>
+                  </div>
+                </label>
+                
+                {isYearOnly ? (
+                  <div className="mt-1">
+                    <div className="relative rounded-md shadow-sm">
+                      <input
+                        type="text"
+                        id="publicationDate"
+                        placeholder="YYYY"
+                        pattern="\d{4}"
+                        className={`block w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm
+                          ${formErrors.publicationDate ? "border-red-300 text-red-900 placeholder-red-300" : "border-gray-300"}`}
+                        value={publicationDate}
+                        onChange={(e) => setPublicationDate(e.target.value)}
+                      />
+                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <FiCalendar className="h-5 w-5 text-gray-400" />
+                      </div>
+                    </div>
+                    <p className="mt-1 text-xs text-gray-500">Enter the year of publication (e.g. 2023)</p>
+                  </div>
+                ) : (
+                  <div className="mt-1">
+                    <div className="relative rounded-md shadow-sm">
+                      <input
+                        type="date"
+                        id="publicationDate"
+                        className={`block w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm
+                          ${formErrors.publicationDate ? "border-red-300 text-red-900 placeholder-red-300" : "border-gray-300"}`}
+                        value={publicationDate}
+                        onChange={(e) => setPublicationDate(e.target.value)}
+                      />
+                    </div>
+                    <p className="mt-1 text-xs text-gray-500">Select the exact publication date</p>
+                  </div>
+                )}
+                
+                {formErrors.publicationDate && (
+                  <p className="mt-2 text-sm text-red-600">{formErrors.publicationDate}</p>
+                )}
               </div>
-            </label>
-            <textarea
-              id="summary"
-              rows={4}
-              className={`block w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm
-                ${formErrors.summary ? "border-red-300 text-red-900 placeholder-red-300" : "border-gray-300"}`}
-              placeholder="Enter a brief summary of the book..."
-              value={summary}
-              onChange={(e) => setSummary(e.target.value)}
-            />
-            {formErrors.summary && (
-              <p className="mt-2 text-sm text-red-600">{formErrors.summary}</p>
-            )}
-            <p className="mt-1 text-xs text-gray-500">Provide a concise summary or description of the book's content</p>
-          </div>
-
-          {/* Additional fields for book */}
-          <div className="form-group">
-            <div className="border-t border-gray-200 pt-4 mb-4">
-              <h3 className="text-base font-medium text-gray-900">Additional Book Details</h3>
-              <p className="mt-1 text-sm text-gray-500">Optional information to enhance the book's metadata.</p>
-            </div>
-            
-            <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+              
               {/* Publisher */}
-              <div className="sm:col-span-3">
+              <div className="form-group">
                 <label htmlFor="publisher" className="block text-sm font-medium text-gray-700">Publisher</label>
                 <div className="mt-1">
                   <input
@@ -926,10 +1193,11 @@ export default function AddNewBook() {
                     onChange={(e) => setPublisher(e.target.value)}
                   />
                 </div>
+                <p className="mt-1 text-xs text-gray-500">Enter the name of the publishing company (optional)</p>
               </div>
               
               {/* Language */}
-              <div className="sm:col-span-3">
+              <div className="form-group">
                 <label htmlFor="language" className="block text-sm font-medium text-gray-700">Language</label>
                 <div className="mt-1">
                   <input
@@ -941,199 +1209,201 @@ export default function AddNewBook() {
                     onChange={(e) => setLanguage(e.target.value)}
                   />
                 </div>
-              </div>
-              
-              {/* Number of Pages */}
-              <div className="sm:col-span-2">
-                <label htmlFor="numberOfPages" className="block text-sm font-medium text-gray-700">Number of Pages</label>
-                <div className="mt-1">
-                  <input
-                    type="number"
-                    id="numberOfPages"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="Number of pages"
-                    value={numberOfPages || ""}
-                    onChange={(e) => setNumberOfPages(parseInt(e.target.value) || undefined)}
-                  />
-                </div>
-              </div>
-              
-              {/* Ratings */}
-              <div className="sm:col-span-2">
-                <label htmlFor="ratings" className="block text-sm font-medium text-gray-700">Ratings</label>
-                <div className="mt-1">
-                  <input
-                    type="number"
-                    id="ratings"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="Number of ratings"
-                    value={ratings || ""}
-                    onChange={(e) => setRatings(parseInt(e.target.value) || undefined)}
-                  />
-                </div>
-              </div>
-              
-              {/* Average Rating */}
-              <div className="sm:col-span-2">
-                <label htmlFor="averageRating" className="block text-sm font-medium text-gray-700">Average Rating</label>
-                <div className="mt-1">
-                  <input
-                    type="number"
-                    id="averageRating"
-                    step="0.01"
-                    min="0"
-                    max="5"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="Average Rating (0-5)"
-                    value={averageRating || ""}
-                    onChange={(e) => setAverageRating(parseFloat(e.target.value) || undefined)}
-                  />
-                </div>
-              </div>
-              
-              {/* Genres - as a comma-separated input */}
-              <div className="sm:col-span-6">
-                <label htmlFor="genres" className="block text-sm font-medium text-gray-700">Genres</label>
-                <div className="mt-1">
-                  <input
-                    type="text"
-                    id="genres"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="Fantasy, Adventure, Mystery"
-                    value={genres.join(", ")}
-                    onChange={(e) => {
-                      const genresArray = e.target.value.split(",").map(genre => genre.trim()).filter(genre => genre !== "");
-                      setGenres(genresArray);
-                    }}
-                  />
-                  <p className="mt-1 text-xs text-gray-500">Separate genres with commas</p>
-                </div>
-              </div>
-              
-              {/* Characters - as a comma-separated input */}
-              <div className="sm:col-span-6">
-                <label htmlFor="characters" className="block text-sm font-medium text-gray-700">Characters</label>
-                <div className="mt-1">
-                  <input
-                    type="text"
-                    id="characters"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="Harry Potter, Hermione Granger, Ron Weasley"
-                    value={characters.join(", ")}
-                    onChange={(e) => {
-                      const charactersArray = e.target.value.split(",").map(character => character.trim()).filter(character => character !== "");
-                      setCharacters(charactersArray);
-                    }}
-                  />
-                  <p className="mt-1 text-xs text-gray-500">Separate character names with commas</p>
-                </div>
+                <p className="mt-1 text-xs text-gray-500">Enter the language of the book (e.g. English, Spanish)</p>
               </div>
             </div>
-          </div>
-
-          {/* Metadata URL Input */}
-          <div className="form-group">
-            <div className="border-t border-gray-200 pt-4 mb-4">
-              <h3 className="text-base font-medium text-gray-900">Auto-fill from Web</h3>
-              <p className="mt-1 text-sm text-gray-500">
-                Automatically populate book details from a Fandom or Goodreads URL.
-              </p>
-            </div>
-
-            <div className="mt-1">
-              <div className="flex rounded-md shadow-sm">
-                <div className="relative flex flex-grow items-stretch focus-within:z-10">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                    <FiLink className="h-5 w-5 text-gray-400" aria-hidden="true" />
+          )}
+          
+          {/* Step 4: Additional Details */}
+          {currentStep === 4 && (
+            <div className="space-y-6">
+              <div className="form-group">
+                <h3 className="text-base font-medium text-gray-900">Additional Book Details</h3>
+                <p className="mt-1 text-sm text-gray-500">These details are optional but can enhance the book's metadata.</p>
+              </div>
+              
+              <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                {/* Number of Pages */}
+                <div className="sm:col-span-2">
+                  <label htmlFor="numberOfPages" className="block text-sm font-medium text-gray-700">Number of Pages</label>
+                  <div className="mt-1">
+                    <div className="relative rounded-md shadow-sm">
+                      <input
+                        type="number"
+                        id="numberOfPages"
+                        className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        placeholder="Number of pages"
+                        value={numberOfPages || ""}
+                        onChange={(e) => setNumberOfPages(parseInt(e.target.value) || undefined)}
+                      />
+                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+                        </svg>
+                      </div>
+                    </div>
                   </div>
-                  <input
-                    type="text"
-                    id="metadataUrl"
-                    className={`block w-full rounded-none rounded-l-md border-gray-300 pl-10 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                      scrapingError ? "border-red-300 text-red-900 placeholder-red-300" : ""
-                    }`}
-                    placeholder="Paste a Fandom or Goodreads URL to auto-fill book details"
-                    value={metadataUrl}
-                    onChange={handleMetadataUrlChange}
-                  />
                 </div>
-                <button
-                  type="button"
-                  onClick={handleFetchMetadata}
-                  disabled={isScrapingMetadata || !metadataUrl.trim()}
-                  className={`relative -ml-px inline-flex items-center rounded-r-md border border-gray-300 bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
-                    (isScrapingMetadata || !metadataUrl.trim()) ? "cursor-not-allowed opacity-75" : ""
-                  }`}
-                >
-                  {isScrapingMetadata ? (
-                    <>
-                      <FiLoader className="mr-2 h-4 w-4 animate-spin" />
-                      Fetching...
-                    </>
-                  ) : (
-                    <>
-                      <FiDownload className="mr-2 h-4 w-4" />
-                      Fetch Data
-                    </>
-                  )}
-                </button>
+                
+                {/* Ratings */}
+                <div className="sm:col-span-2">
+                  <label htmlFor="ratings" className="block text-sm font-medium text-gray-700">Ratings</label>
+                  <div className="mt-1">
+                    <div className="relative rounded-md shadow-sm">
+                      <input
+                        type="number"
+                        id="ratings"
+                        className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        placeholder="Number of ratings"
+                        value={ratings || ""}
+                        onChange={(e) => setRatings(parseInt(e.target.value) || undefined)}
+                      />
+                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Average Rating */}
+                <div className="sm:col-span-2">
+                  <label htmlFor="averageRating" className="block text-sm font-medium text-gray-700">Average Rating</label>
+                  <div className="mt-1">
+                    <div className="relative rounded-md shadow-sm">
+                      <input
+                        type="number"
+                        id="averageRating"
+                        step="0.01"
+                        min="0"
+                        max="5"
+                        className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        placeholder="Average Rating (0-5)"
+                        value={averageRating || ""}
+                        onChange={(e) => setAverageRating(parseFloat(e.target.value) || undefined)}
+                      />
+                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <p className="mt-1 text-xs text-gray-500">Average rating out of 5</p>
+                  </div>
+                </div>
+                
+                {/* Genres - as a comma-separated input */}
+                <div className="sm:col-span-6">
+                  <label htmlFor="genres" className="block text-sm font-medium text-gray-700">Genres</label>
+                  <div className="mt-1">
+                    <input
+                      type="text"
+                      id="genres"
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      placeholder="Fantasy, Adventure, Mystery"
+                      value={genres.join(", ")}
+                      onChange={(e) => {
+                        const genresArray = e.target.value.split(",").map(genre => genre.trim()).filter(genre => genre !== "");
+                        setGenres(genresArray);
+                      }}
+                    />
+                    <p className="mt-1 text-xs text-gray-500">Separate genres with commas</p>
+                  </div>
+                </div>
+                
+                {/* Characters - as a comma-separated input */}
+                <div className="sm:col-span-6">
+                  <label htmlFor="characters" className="block text-sm font-medium text-gray-700">Characters</label>
+                  <div className="mt-1">
+                    <input
+                      type="text"
+                      id="characters"
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      placeholder="Harry Potter, Hermione Granger, Ron Weasley"
+                      value={characters.join(", ")}
+                      onChange={(e) => {
+                        const charactersArray = e.target.value.split(",").map(character => character.trim()).filter(character => character !== "");
+                        setCharacters(charactersArray);
+                      }}
+                    />
+                    <p className="mt-1 text-xs text-gray-500">Separate character names with commas</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="form-group bg-green-50 p-4 rounded-lg border border-green-200 mt-6">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0">
+                    <FiCheckCircle className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-green-800">Ready to submit</h3>
+                    <div className="mt-2 text-sm text-green-700">
+                      <p>You've completed all required fields! Click "Save Book" to add this book to your library.</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-            
-            {scrapingError && (
-              <div className="mt-3 flex items-center rounded-md bg-red-50 p-3 text-red-700">
-                <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-                <span>{scrapingError}</span>
-              </div>
-            )}
-            
-            {metadataSuccess && !scrapingError && (
-              <div className="mt-3 flex items-center rounded-md bg-green-50 p-3 text-green-700">
-                <FiCheckCircle className="mr-2 h-5 w-5" />
-                <span>{metadataSuccess}</span>
-              </div>
-            )}
-            
-            {!scrapingError && !metadataSuccess && (
-              <p className="mt-2 text-sm text-gray-500">
-                Paste a URL from Fandom or Goodreads to automatically fill book details.
-              </p>
-            )}
-          </div>
-
-          {/* Submit Button */}
+          )}
+          
+          {/* Step navigation buttons */}
           <div className="form-group border-t border-gray-200 pt-6">
-            <div className="flex justify-end">
-              <Link
-                href="/admin/books"
-                className="mr-4 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
-              >
-                Cancel
-              </Link>
+            <div className="flex justify-between">
               <button
-                type="submit"
-                disabled={isSubmitting}
-                className={`inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors ${
-                  isSubmitting ? "cursor-not-allowed opacity-75" : ""
+                type="button"
+                onClick={goToPreviousStep}
+                className={`inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors ${
+                  currentStep === 1 ? 'invisible' : ''
                 }`}
               >
-                {isSubmitting ? (
-                  <>
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <FiSave className="mr-2 h-4 w-4" />
-                    Save Book
-                  </>
-                )}
+                <FiChevronLeft className="mr-2 h-4 w-4" />
+                Previous
               </button>
+              
+              <div>
+                {currentStep === totalSteps ? (
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className={`inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors ${
+                      isSubmitting ? "cursor-not-allowed opacity-75" : ""
+                    }`}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <FiSave className="mr-2 h-4 w-4" />
+                        Save Book
+                      </>
+                    )}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={goToNextStep}
+                    className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
+                  >
+                    Next
+                    <FiChevronRight className="ml-2 h-4 w-4" />
+                  </button>
+                )}
+                
+                <Link
+                  href="/admin/books"
+                  className="ml-4 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
+                >
+                  Cancel
+                </Link>
+              </div>
             </div>
           </div>
         </form>
