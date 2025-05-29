@@ -6,7 +6,7 @@ import Link from "next/link";
 import { FiArrowLeft, FiSave, FiImage, FiCalendar, FiUsers, FiBook, FiFileText, FiCheckCircle, FiLink, FiLoader, FiDownload, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import gsap from "gsap";
 import { useUserSettings } from "@/hooks/useUserSettings";
-import { useNotification } from "@/contexts/NotificationContext";
+import toast from "react-hot-toast";
 
 interface Author {
   name: string;
@@ -101,7 +101,6 @@ const BookThumbnail = ({
 export default function AddNewBook() {
   const router = useRouter();
   const { settings, isLoading: isSettingsLoading, syncStatus, lastSyncMessage } = useUserSettings();
-  const { showNotification } = useNotification();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState<{
     bookName?: string;
@@ -135,7 +134,6 @@ export default function AddNewBook() {
   const [metadataUrl, setMetadataUrl] = useState("");
   const [isScrapingMetadata, setIsScrapingMetadata] = useState(false);
   const [scrapingError, setScrapingError] = useState<string | null>(null);
-  const [metadataSuccess, setMetadataSuccess] = useState<string | null>(null);
 
   // Add these state variables for single book upload
   const [singleBookUploadProgress, setSingleBookUploadProgress] = useState<number | null>(null);
@@ -156,9 +154,9 @@ export default function AddNewBook() {
   useEffect(() => {
     // Only show important notifications (error states)
     if (syncStatus === 'error') {
-      showNotification('error', lastSyncMessage || 'Failed to synchronize settings');
+      toast.error(lastSyncMessage || 'Failed to synchronize settings');
     }
-  }, [syncStatus, lastSyncMessage, showNotification]);
+  }, [syncStatus, lastSyncMessage]);
 
   // Update thumbnail preview when URL changes
   useEffect(() => {
@@ -225,7 +223,7 @@ export default function AddNewBook() {
     // Validate all fields before submission
     if (!validateForm()) {
       // Show error notification
-      showNotification('error', 'Please fill in all required fields');
+      toast.error('Please fill in all required fields');
       return;
     }
     
@@ -283,11 +281,11 @@ export default function AddNewBook() {
         throw new Error(errorData.error || `Failed to save: ${response.statusText}`);
       }
       
-      showNotification('success', 'Book added successfully!');
+      toast.success('Book added successfully!');
       router.push('/admin/books');
     } catch (error) {
       console.error("Error submitting form:", error);
-      showNotification('error', 'Failed to save book. Please try again.');
+      toast.error('Failed to save book. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -351,7 +349,6 @@ export default function AddNewBook() {
     
     setIsScrapingMetadata(true);
     setScrapingError(null);
-    setMetadataSuccess(null);
     
     try {
       // Call the generic scraper API endpoint
@@ -446,18 +443,16 @@ export default function AddNewBook() {
       // Populate form fields with the scraped data
       populateFormFields(data);
       
-      // Set success message
+      // Only use the notification system for success messages
       if ('title' in data) {
-        setMetadataSuccess(`Book "${data.title}" data imported successfully!`);
+        toast.success(`Book "${data.title}" data imported successfully!`);
       } else {
-        setMetadataSuccess(`Book data imported successfully!`);
+        toast.success('Book data imported successfully!');
       }
-      
-      showNotification('success', 'Metadata successfully fetched and applied!');
     } catch (error) {
       console.error('Error fetching metadata:', error);
       setScrapingError(error instanceof Error ? error.message : 'Failed to fetch metadata');
-      showNotification('error', 'Failed to fetch metadata. See error for details.');
+      toast.error('Failed to fetch metadata. See error for details.');
     } finally {
       setIsScrapingMetadata(false);
     }
@@ -630,7 +625,6 @@ export default function AddNewBook() {
   const handleMetadataUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMetadataUrl(e.target.value);
     setScrapingError(null);
-    setMetadataSuccess(null);
   };
   
   // Handle fetch metadata button click
@@ -763,7 +757,7 @@ export default function AddNewBook() {
   const handleSingleBookUploadError = (errorMessage: string) => {
     setSingleBookUploadStatus('error');
     setSingleBookUploadError(errorMessage);
-    showNotification('error', `Upload failed: ${errorMessage}`);
+    toast.error(`Upload failed: ${errorMessage}`);
   };
 
   return (
@@ -864,13 +858,6 @@ export default function AddNewBook() {
                   <path fillRule="evenodd" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" clipRule="evenodd" />
                 </svg>
                 <span>{scrapingError}</span>
-              </div>
-            )}
-            
-            {metadataSuccess && !scrapingError && (
-              <div className="mt-3 flex items-center rounded-md bg-green-50 p-3 text-green-700">
-                <FiCheckCircle className="mr-2 h-5 w-5" />
-                <span>{metadataSuccess}</span>
               </div>
             )}
           </div>

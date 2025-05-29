@@ -3,13 +3,12 @@
 import { useState, useEffect, useRef } from "react";
 import { FiSave, FiSettings, FiLock, FiCheck, FiLoader, FiRefreshCw } from "react-icons/fi";
 import { useUserSettings } from "@/hooks/useUserSettings";
-import { useNotification } from "@/contexts/NotificationContext";
+import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
 
 export default function AdminSettings() {
   const { data: session } = useSession();
   const { settings, updateSettings, saveChanges, isLoading, syncStatus, lastSyncMessage } = useUserSettings();
-  const { showNotification } = useNotification();
   const [isSaving, setIsSaving] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
   const notificationShownRef = useRef<boolean>(false);
@@ -43,7 +42,7 @@ export default function AdminSettings() {
     if (syncStatus === 'success' && !notificationShownRef.current) {
       notificationShownRef.current = true;
       console.log('Settings page: Showing success notification with message:', lastSyncMessage);
-      showNotification('success', lastSyncMessage || 'Settings synchronized successfully');
+      toast.success(lastSyncMessage || 'Settings synchronized successfully');
       setTimeout(() => {
         notificationShownRef.current = false;
         console.log('Settings page: Reset notification flag after timeout');
@@ -51,13 +50,13 @@ export default function AdminSettings() {
     } else if (syncStatus === 'error') {
       notificationShownRef.current = true;
       console.log('Settings page: Showing error notification with message:', lastSyncMessage);
-      showNotification('error', lastSyncMessage || 'Failed to synchronize settings');
+      toast.error(lastSyncMessage || 'Failed to synchronize settings');
       setTimeout(() => {
         notificationShownRef.current = false;
         console.log('Settings page: Reset notification flag after timeout');
       }, 5000);
     }
-  }, [syncStatus, lastSyncMessage, showNotification]);
+  }, [syncStatus, lastSyncMessage]);
 
   const handleApiKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFilesVcApiKey(e.target.value);

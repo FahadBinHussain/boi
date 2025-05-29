@@ -68,7 +68,29 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
-          <Toaster position="top-right" />
+          <Toaster 
+            position="bottom-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: '#333',
+                color: '#fff',
+                boxShadow: '0 3px 10px rgba(0,0,0,0.2)',
+                padding: '16px',
+                borderRadius: '8px',
+              },
+              success: {
+                style: {
+                  background: '#10B981',
+                },
+              },
+              error: {
+                style: {
+                  background: '#EF4444',
+                },
+              },
+            }}
+          />
         </Providers>
       </body>
     </html>

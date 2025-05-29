@@ -4,8 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { FiPlusCircle, FiSearch, FiEdit2, FiTrash2, FiFilter, FiDownload, FiChevronLeft, FiChevronRight, FiBook, FiLoader } from "react-icons/fi";
 import gsap from "gsap";
-import { useNotification } from "@/contexts/NotificationContext";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 // Define book type
 interface Book {
@@ -27,7 +26,6 @@ export default function BooksManagement() {
   const [sort, setSort] = useState<{ field: string; direction: "asc" | "desc" }>({ field: "createdAt", direction: "desc" });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { showNotification } = useNotification();
   
   // Fetch books from the API
   useEffect(() => {
