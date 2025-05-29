@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { FiMenu, FiX, FiBook, FiSearch, FiArrowRight, FiHome, FiGrid, FiInfo } from 'react-icons/fi';
+import { FiMenu, FiX, FiBook, FiSearch, FiArrowRight, FiHome, FiGrid, FiInfo, FiUsers, FiLayers } from 'react-icons/fi';
 import LoginButton from '../auth/LoginButton';
 import gsap from 'gsap';
 
@@ -197,30 +197,44 @@ const Header = () => {
             </Link>
             
             <Link 
-              href="/categories" 
+              href="/genres" 
               className={`px-4 py-2 mx-1 rounded-lg font-medium transition-all duration-300 relative group ${
-                activeLink === '/categories' ? 'text-indigo-600' : 'text-gray-700 hover:text-indigo-600'
+                activeLink === '/genres' ? 'text-indigo-600' : 'text-gray-700 hover:text-indigo-600'
               }`}
               onMouseEnter={animateIndicator}
               onMouseLeave={hideIndicator}
             >
               <div className="flex items-center gap-1.5">
-                <FiGrid size={16} className={activeLink === '/categories' ? 'text-indigo-500' : 'text-gray-400 group-hover:text-indigo-500'} />
-                <span>Categories</span>
+                <FiGrid size={16} className={activeLink === '/genres' ? 'text-indigo-500' : 'text-gray-400 group-hover:text-indigo-500'} />
+                <span>Genres</span>
               </div>
             </Link>
             
             <Link 
-              href="/about" 
+              href="/authors" 
               className={`px-4 py-2 mx-1 rounded-lg font-medium transition-all duration-300 relative group ${
-                activeLink === '/about' ? 'text-indigo-600' : 'text-gray-700 hover:text-indigo-600'
+                activeLink === '/authors' ? 'text-indigo-600' : 'text-gray-700 hover:text-indigo-600'
               }`}
               onMouseEnter={animateIndicator}
               onMouseLeave={hideIndicator}
             >
               <div className="flex items-center gap-1.5">
-                <FiInfo size={16} className={activeLink === '/about' ? 'text-indigo-500' : 'text-gray-400 group-hover:text-indigo-500'} />
-                <span>About</span>
+                <FiUsers size={16} className={activeLink === '/authors' ? 'text-indigo-500' : 'text-gray-400 group-hover:text-indigo-500'} />
+                <span>Authors</span>
+              </div>
+            </Link>
+            
+            <Link 
+              href="/series" 
+              className={`px-4 py-2 mx-1 rounded-lg font-medium transition-all duration-300 relative group ${
+                activeLink === '/series' ? 'text-indigo-600' : 'text-gray-700 hover:text-indigo-600'
+              }`}
+              onMouseEnter={animateIndicator}
+              onMouseLeave={hideIndicator}
+            >
+              <div className="flex items-center gap-1.5">
+                <FiLayers size={16} className={activeLink === '/series' ? 'text-indigo-500' : 'text-gray-400 group-hover:text-indigo-500'} />
+                <span>Series</span>
               </div>
             </Link>
           </div>
@@ -302,20 +316,28 @@ const Header = () => {
                   <span className="font-medium">Books</span>
                 </Link>
                 <Link 
-                  href="/categories" 
+                  href="/genres" 
                   className="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <FiGrid size={18} className="text-gray-400" />
-                  <span className="font-medium">Categories</span>
+                  <span className="font-medium">Genres</span>
                 </Link>
                 <Link 
-                  href="/about" 
+                  href="/authors" 
                   className="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <FiInfo size={18} className="text-gray-400" />
-                  <span className="font-medium">About</span>
+                  <FiUsers size={18} className="text-gray-400" />
+                  <span className="font-medium">Authors</span>
+                </Link>
+                <Link 
+                  href="/series" 
+                  className="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <FiLayers size={18} className="text-gray-400" />
+                  <span className="font-medium">Series</span>
                 </Link>
                 
                 {/* Mobile Sign In Button */}
