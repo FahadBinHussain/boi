@@ -179,6 +179,8 @@ exports.Prisma.BookScalarFieldEnum = {
   characters: 'characters',
   language: 'language',
   pdfUrl: 'pdfUrl',
+  series: 'series',
+  seriesPosition: 'seriesPosition',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

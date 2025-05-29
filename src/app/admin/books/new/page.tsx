@@ -39,6 +39,8 @@ interface ScrapedBookData {
   numberOfPages?: number;
   characters?: string[];
   language?: string;
+  series?: string;
+  seriesPosition?: number;
 }
 
 // Add this component at the top of the file, before the AddNewBook function
@@ -126,6 +128,8 @@ export default function AddNewBook() {
   const [numberOfPages, setNumberOfPages] = useState<number | undefined>(undefined);
   const [characters, setCharacters] = useState<string[]>([]);
   const [language, setLanguage] = useState("");
+  const [series, setSeries] = useState("");
+  const [seriesPosition, setSeriesPosition] = useState<number | undefined>(undefined);
   
   // Add new state variables for metadata URL functionality
   const [metadataUrl, setMetadataUrl] = useState("");
@@ -249,6 +253,8 @@ export default function AddNewBook() {
       if (numberOfPages !== undefined) formData.append('numberOfPages', numberOfPages.toString());
       if (characters.length > 0) formData.append('characters', JSON.stringify(characters));
       if (language) formData.append('language', language);
+      if (series) formData.append('series', series);
+      if (seriesPosition !== undefined) formData.append('seriesPosition', seriesPosition.toString());
       
       // For single book mode, use the already uploaded PDF URL if available
       if (singleBookPdfUrl) {
@@ -577,6 +583,15 @@ export default function AddNewBook() {
       
       if (data.language) {
         setLanguage(data.language);
+      }
+      
+      // Handle series information if available
+      if (data.series) {
+        setSeries(data.series);
+      }
+      
+      if (data.seriesPosition !== undefined) {
+        setSeriesPosition(data.seriesPosition);
       }
     }
   };
@@ -1170,6 +1185,39 @@ export default function AddNewBook() {
           <div className="border-t border-gray-200 pt-6">
             <h3 className="text-lg font-medium text-gray-900 mb-4">Additional Book Details (Optional)</h3>
             <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+              {/* Series Information */}
+              <div className="sm:col-span-4">
+                <label htmlFor="series" className="block text-sm font-medium text-gray-700">Series</label>
+                <div className="mt-1">
+                  <input
+                    type="text"
+                    id="series"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    placeholder="Series name (e.g. Harry Potter)"
+                    value={series}
+                    onChange={(e) => setSeries(e.target.value)}
+                  />
+                  <p className="mt-1 text-xs text-gray-500">If this book is part of a series, enter the series name</p>
+                </div>
+              </div>
+              
+              <div className="sm:col-span-2">
+                <label htmlFor="seriesPosition" className="block text-sm font-medium text-gray-700">Position in Series</label>
+                <div className="mt-1">
+                  <input
+                    type="number"
+                    id="seriesPosition"
+                    step="0.1"
+                    min="0"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    placeholder="1, 2, 3.5, etc."
+                    value={seriesPosition || ""}
+                    onChange={(e) => setSeriesPosition(parseFloat(e.target.value) || undefined)}
+                  />
+                  <p className="mt-1 text-xs text-gray-500">Book's position in the series (can be decimal for in-between books)</p>
+                </div>
+              </div>
+            
               {/* Number of Pages */}
               <div className="sm:col-span-2">
                 <label htmlFor="numberOfPages" className="block text-sm font-medium text-gray-700">Number of Pages</label>

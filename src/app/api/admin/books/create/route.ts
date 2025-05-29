@@ -133,6 +133,11 @@ export async function POST(req: NextRequest) {
     const characters = charactersJson ? JSON.parse(charactersJson) as string[] : [];
     const language = formData.get('language') as string || undefined;
     
+    // Get series information
+    const series = formData.get('series') as string || undefined;
+    const seriesPositionStr = formData.get('seriesPosition') as string;
+    const seriesPosition = seriesPositionStr ? parseFloat(seriesPositionStr) : undefined;
+    
     // Get the PDF file or URL
     const pdfFile = formData.get('pdf') as File | null;
     const pdfUrl = formData.get('pdfUrl') as string | null;
@@ -246,6 +251,9 @@ export async function POST(req: NextRequest) {
           numberOfPages: numberOfPages,
           characters: characters,
           language: language,
+          series: series,
+          seriesPosition: seriesPosition,
+          pdfUrl: fileUrl,
           authors: {
             connect: authorIds.map(id => ({ id }))
           }

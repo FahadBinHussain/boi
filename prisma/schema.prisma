@@ -79,6 +79,8 @@ model Book {
   characters      String[]
   language        String?
   pdfUrl          String?
+  series          String?
+  seriesPosition  Float?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   authors         Author[]

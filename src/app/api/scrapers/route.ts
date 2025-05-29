@@ -5,6 +5,54 @@ import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
+// Helper function to parse series position from various formats
+function parseSeriesPosition(positionStr: string | number | undefined): number | undefined {
+  console.log("Parsing series position from:", positionStr, "type:", typeof positionStr);
+  
+  if (positionStr === undefined) return undefined;
+  
+  // If it's already a number, return it
+  if (typeof positionStr === 'number') return positionStr;
+  
+  // If it's a string, try to parse it
+  if (typeof positionStr === 'string') {
+    // Handle comma-separated values (e.g., "1,2,3")
+    if (positionStr.includes(',')) {
+      // For multiple positions, use the first one or the lowest one
+      const positions = positionStr.split(',')
+        .map(p => parseFloat(p.trim()))
+        .filter(p => !isNaN(p));
+      
+      console.log("Parsed positions from comma-separated string:", positions);
+      
+      if (positions.length > 0) {
+        // Return the lowest position number
+        const minPosition = Math.min(...positions);
+        console.log("Using minimum position:", minPosition);
+        return minPosition;
+      }
+    }
+    
+    // Handle single number
+    const parsed = parseFloat(positionStr);
+    if (!isNaN(parsed)) {
+      console.log("Parsed as single number:", parsed);
+      return parsed;
+    }
+    
+    // Handle "#X" format (e.g., "#1", "#2")
+    const hashMatch = positionStr.match(/#(\d+(\.\d+)?)/);
+    if (hashMatch && hashMatch[1]) {
+      const hashParsed = parseFloat(hashMatch[1]);
+      console.log("Parsed from hash format:", hashParsed);
+      return hashParsed;
+    }
+  }
+  
+  console.log("Could not parse series position, returning undefined");
+  return undefined;
+}
+
 interface ScrapedBookData {
   title: string;
   imageUrl?: string;
@@ -18,6 +66,8 @@ interface ScrapedBookData {
   numberOfPages?: number;
   characters?: string[];
   language?: string;
+  series?: string;
+  seriesPosition?: number;
 }
 
 // Helper function to detect URL type
@@ -118,7 +168,9 @@ export async function POST(request: NextRequest) {
           ratings: scrapedData.ratings,
           numberOfPages: scrapedData.numberOfPages,
           characters: scrapedData.characters,
-          language: scrapedData.language
+          language: scrapedData.language,
+          series: scrapedData.series || scrapedData.seriesName,
+          seriesPosition: parseSeriesPosition(scrapedData.seriesPosition || scrapedData.positionInSeries)
         };
       } else if (urlType === 'goodreads') {
         // Log the raw scraped data structure from Goodreads
@@ -126,6 +178,8 @@ export async function POST(request: NextRequest) {
         console.log("Authors data from Goodreads:", scrapedData.authors);
         console.log("Author data from Goodreads:", scrapedData.author);
         console.log("Publication date from Goodreads:", scrapedData.publicationDate);
+        console.log("Series name from Goodreads:", scrapedData.seriesName);
+        console.log("Position in series from Goodreads:", scrapedData.positionInSeries);
         
         // Handle author data appropriately
         let authorsList = [];
@@ -254,7 +308,9 @@ export async function POST(request: NextRequest) {
           averageRating: scrapedData.averageRating ? Number(scrapedData.averageRating) : undefined,
           numberOfPages: scrapedData.numberOfPages ? Number(scrapedData.numberOfPages) : undefined,
           language: scrapedData.language,
-          characters: scrapedData.characters
+          characters: scrapedData.characters,
+          series: scrapedData.seriesName || scrapedData.series,
+          seriesPosition: parseSeriesPosition(scrapedData.positionInSeries || scrapedData.seriesPosition)
         };
         
         console.log("Transformed Goodreads data:", transformedData);
@@ -263,6 +319,7 @@ export async function POST(request: NextRequest) {
         transformedData = scrapedData;
       }
       
+      console.log("Final transformed data:", transformedData);
       return NextResponse.json(transformedData, { status: 200 });
     } catch (parseError) {
       console.error('Failed to parse JSON:', parseError);
