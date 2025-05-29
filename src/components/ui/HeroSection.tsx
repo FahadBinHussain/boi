@@ -14,6 +14,15 @@ const HeroSection = () => {
   const heroRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [particles, setParticles] = useState<Array<{
+    id: number;
+    width: string;
+    height: string;
+    background: string;
+    left: string;
+    top: string;
+    boxShadow: string;
+  }>>([]);
   
   // Handle mouse movement for the 3D effect
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -26,6 +35,27 @@ const HeroSection = () => {
     
     setMousePosition({ x, y });
   };
+  
+  // Generate particles only on the client side
+  useEffect(() => {
+    const generatedParticles = Array.from({ length: 30 }).map((_, i) => {
+      return {
+        id: i,
+        width: `${Math.random() * 6 + 2}px`,
+        height: `${Math.random() * 6 + 2}px`,
+        background: i % 3 === 0 ? 'rgba(139, 92, 246, 0.7)' : 
+                  i % 3 === 1 ? 'rgba(99, 102, 241, 0.7)' : 
+                  'rgba(244, 114, 182, 0.7)',
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        boxShadow: i % 3 === 0 ? '0 0 15px rgba(139, 92, 246, 0.5)' : 
+                   i % 3 === 1 ? '0 0 15px rgba(99, 102, 241, 0.5)' : 
+                   '0 0 15px rgba(244, 114, 182, 0.5)'
+      };
+    });
+    
+    setParticles(generatedParticles);
+  }, []);
   
   useEffect(() => {
     // Mark component as loaded
@@ -172,22 +202,18 @@ const HeroSection = () => {
       <div className="hero-decoration hero-float hero-parallax absolute top-[35%] left-[8%] w-[120px] h-[120px] border border-white/10 rounded-lg backdrop-blur-sm bg-white/5 rotate-45 shadow-xl"></div>
       <div className="hero-decoration hero-float hero-parallax-reverse absolute bottom-[12%] right-[15%] w-[100px] h-[100px] border border-white/10 rounded-3xl backdrop-blur-sm bg-white/5 -rotate-12 shadow-xl"></div>
       
-      {/* Floating particles */}
-      {Array.from({ length: 30 }).map((_, i) => (
+      {/* Floating particles - client-side only */}
+      {particles.map((particle) => (
         <div 
-          key={i}
+          key={particle.id}
           className="hero-particle absolute rounded-full"
           style={{
-            width: `${Math.random() * 6 + 2}px`,
-            height: `${Math.random() * 6 + 2}px`,
-            background: i % 3 === 0 ? 'rgba(139, 92, 246, 0.7)' : 
-                      i % 3 === 1 ? 'rgba(99, 102, 241, 0.7)' : 
-                      'rgba(244, 114, 182, 0.7)',
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            boxShadow: i % 3 === 0 ? '0 0 15px rgba(139, 92, 246, 0.5)' : 
-                       i % 3 === 1 ? '0 0 15px rgba(99, 102, 241, 0.5)' : 
-                       '0 0 15px rgba(244, 114, 182, 0.5)'
+            width: particle.width,
+            height: particle.height,
+            background: particle.background,
+            left: particle.left,
+            top: particle.top,
+            boxShadow: particle.boxShadow
           }}
         ></div>
       ))}

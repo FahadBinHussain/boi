@@ -35,6 +35,23 @@ export default function RootLayout({
               // Ensure consistent rendering by removing any classes that might cause hydration mismatches
               if (typeof window !== 'undefined') {
                 document.documentElement.className = '';
+                
+                // Fix for date and time hydration mismatches
+                // Store the initial time at page load for components that need to use time
+                window.__INITIAL_TIME__ = {
+                  now: Date.now(),
+                  date: new Date().toISOString()
+                };
+                
+                // Force any floating point/random-based calculations to be deterministic during hydration
+                window.__HYDRATING__ = true;
+                
+                // Clean up after hydration is complete
+                window.addEventListener('load', function() {
+                  setTimeout(function() {
+                    window.__HYDRATING__ = false;
+                  }, 0);
+                });
               }
             })();
           `}
@@ -42,6 +59,7 @@ export default function RootLayout({
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
+        suppressHydrationWarning
       >
         <Providers>
           <Header />
