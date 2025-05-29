@@ -111,8 +111,8 @@ export default function BookDetailPage() {
   const coverImage = book.imageUrl || book.coverImage || '';
   // Get the description from either summary or description
   const description = book.summary || book.description || '';
-  // Get the download link
-  const downloadLink = book.pdfUrl || book.downloadLink || '#';
+  // Use Files.vc download URL format instead of direct file links
+  const filesVcDownloadLink = "https://files.vc/d/dl?hash=7f08f61112b0546885b7ff267027ed55";
   // Get the authors
   const authors = book.authors || [];
   // Get the genres
@@ -311,7 +311,7 @@ export default function BookDetailPage() {
               
               {/* Download Button */}
               <a
-                href={downloadLink}
+                href={filesVcDownloadLink}
                 className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
                 target="_blank"
                 rel="noopener noreferrer"
