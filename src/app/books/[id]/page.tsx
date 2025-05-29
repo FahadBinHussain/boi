@@ -4,12 +4,45 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { FiDownload, FiArrowLeft, FiCalendar, FiFileText, FiTag } from 'react-icons/fi';
+import { FiDownload, FiArrowLeft, FiCalendar, FiFileText, FiTag, FiBook, FiUsers, FiLayers, FiStar, FiGlobe, FiHash } from 'react-icons/fi';
 import { motion } from 'framer-motion';
-import type { Book } from '@/lib/books';
+
+interface Author {
+  id: string;
+  name: string;
+}
+
+interface Book {
+  id: string;
+  title: string;
+  authors: Author[];
+  imageUrl?: string;
+  summary?: string;
+  publisher?: string;
+  genres: string[];
+  ratings?: number;
+  averageRating?: number;
+  numberOfPages?: number;
+  characters: string[];
+  language?: string;
+  pdfUrl?: string;
+  seriesName?: string;
+  seriesPosition?: number[];
+  publicationDate?: string;
+  seriesId?: string;
+  // Legacy fields
+  author?: string;
+  coverImage?: string;
+  description?: string;
+  categories?: string[];
+  downloadLink?: string;
+  fileSize?: string;
+  format?: string;
+}
 
 export default function BookDetailPage() {
-  const { id } = useParams();
+  const params = useParams<{ id: string }>();
+  const bookId = params?.id;
   const [book, setBook] = useState<Book | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -19,7 +52,7 @@ export default function BookDetailPage() {
       setIsLoading(true);
       try {
         // Fetch book details from the API using the book ID
-        const response = await fetch(`/api/books/${id}`);
+        const response = await fetch(`/api/books/${bookId}`);
         
         if (!response.ok) {
           if (response.status === 404) {
@@ -40,10 +73,10 @@ export default function BookDetailPage() {
       }
     };
 
-    if (id) {
+    if (bookId) {
       fetchBookDetails();
     }
-  }, [id]);
+  }, [bookId]);
 
   if (isLoading) {
     return (
@@ -74,120 +107,218 @@ export default function BookDetailPage() {
     );
   }
 
+  // Get the cover image from either imageUrl or coverImage
+  const coverImage = book.imageUrl || book.coverImage || '';
+  // Get the description from either summary or description
+  const description = book.summary || book.description || '';
+  // Get the download link
+  const downloadLink = book.pdfUrl || book.downloadLink || '#';
+  // Get the authors
+  const authors = book.authors || [];
+  // Get the genres
+  const genres = book.genres || book.categories || [];
+
   return (
-    <div className="bg-gray-50 min-h-screen py-12">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Back button */}
-        <div className="mb-8">
-          <Link href="/books" className="inline-flex items-center gap-2 text-gray-600 hover:text-indigo-600 transition-colors">
-            <FiArrowLeft size={16} />
-            Back to all books
-          </Link>
-        </div>
-
-        {/* Book Details */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200">
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4">
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-6xl mx-auto px-4">
+        <Link 
+          href="/books" 
+          className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 mb-6"
+        >
+          <FiArrowLeft size={16} />
+          Back to all books
+        </Link>
+        
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          <div className="md:flex">
             {/* Book Cover */}
-            <div className="p-6 flex items-center justify-center md:border-r border-gray-100">
-              <motion.div 
-                className="relative w-48 h-72 overflow-hidden rounded-lg shadow-lg"
-                whileHover={{ scale: 1.03 }}
-                transition={{ type: "spring", stiffness: 300 }}
-              >
-                <Image
-                  src={book.coverImage}
-                  alt={`${book.title} cover`}
-                  fill
-                  className=""
-                  style={{ 
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'fill',
-                    objectPosition: 'center'
-                  }}
-                  sizes="(max-width: 768px) 100vw, 300px"
-                  priority
-                />
-              </motion.div>
+            <div className="md:w-1/3 bg-gray-100 flex items-center justify-center p-8">
+              <div className="relative w-full max-w-xs aspect-[2/3] shadow-lg">
+                {coverImage ? (
+                  <Image
+                    src={coverImage}
+                    alt={book.title}
+                    fill
+                    className="object-cover rounded"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gray-200 rounded flex items-center justify-center">
+                    <FiBook size={64} className="text-gray-400" />
+                  </div>
+                )}
+              </div>
             </div>
-
-            {/* Book Info */}
-            <div className="p-6 md:p-8 md:col-span-2 lg:col-span-3">
+            
+            {/* Book Details */}
+            <div className="md:w-2/3 p-6 md:p-8">
               <h1 className="text-3xl font-bold text-gray-900 mb-2">{book.title}</h1>
-              <p className="text-xl text-gray-600 mb-4">by {book.author}</p>
-
-              <div className="mt-6 mb-8">
-                <h2 className="text-lg font-semibold text-gray-900 mb-3">About the Book</h2>
-                <p className="text-gray-700 leading-relaxed">{book.description}</p>
+              
+              <div className="mb-4">
+                {authors.length > 0 ? (
+                  <div className="flex flex-wrap items-center gap-1">
+                    <span className="text-gray-600">By</span>
+                    {authors.map((author, index) => (
+                      <span key={author.id}>
+                        <Link 
+                          href={`/authors/${author.id}`}
+                          className="text-indigo-600 hover:text-indigo-800"
+                        >
+                          {author.name}
+                        </Link>
+                        {index < authors.length - 1 && <span className="text-gray-600">,</span>}
+                      </span>
+                    ))}
+                  </div>
+                ) : book.author ? (
+                  <div className="text-gray-600">By {book.author}</div>
+                ) : null}
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              
+              {/* Series information if available */}
+              {book.seriesName && (
+                <div className="mb-4 text-gray-700">
+                  <span className="font-medium">Series: </span>
+                  <Link 
+                    href={`/series/${book.seriesId || ''}`}
+                    className="text-indigo-600 hover:text-indigo-800"
+                  >
+                    {book.seriesName}
+                  </Link>
+                  {book.seriesPosition && book.seriesPosition.length > 0 && (
+                    <span> (Book {book.seriesPosition.join(', ')})</span>
+                  )}
+                </div>
+              )}
+              
+              {/* Description */}
+              <div className="mb-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-2">Description</h2>
+                <p className="text-gray-700 leading-relaxed">{description}</p>
+              </div>
+              
+              {/* Additional Details */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 {/* Publication Date */}
-                <div className="flex items-start gap-3">
-                  <div className="text-indigo-500">
-                    <FiCalendar size={20} />
+                {(book.publicationDate) && (
+                  <div className="flex items-start gap-2">
+                    <FiCalendar className="text-gray-500 mt-1" />
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-900">Publication Date</h3>
+                      <p className="text-gray-700">{book.publicationDate}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500">Publication Date</h3>
-                    <p className="text-gray-900">{book.publicationDate}</p>
+                )}
+                
+                {/* Publisher */}
+                {book.publisher && (
+                  <div className="flex items-start gap-2">
+                    <FiFileText className="text-gray-500 mt-1" />
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-900">Publisher</h3>
+                      <p className="text-gray-700">{book.publisher}</p>
+                    </div>
                   </div>
-                </div>
-
-                {/* File Format */}
-                <div className="flex items-start gap-3">
-                  <div className="text-indigo-500">
-                    <FiFileText size={20} />
+                )}
+                
+                {/* Language */}
+                {book.language && (
+                  <div className="flex items-start gap-2">
+                    <FiGlobe className="text-gray-500 mt-1" />
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-900">Language</h3>
+                      <p className="text-gray-700">{book.language}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500">Format</h3>
-                    <p className="text-gray-900">{book.format}</p>
+                )}
+                
+                {/* Number of Pages */}
+                {book.numberOfPages && (
+                  <div className="flex items-start gap-2">
+                    <FiLayers className="text-gray-500 mt-1" />
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-900">Pages</h3>
+                      <p className="text-gray-700">{book.numberOfPages}</p>
+                    </div>
                   </div>
-                </div>
-
-                {/* File Size */}
-                <div className="flex items-start gap-3">
-                  <div className="text-indigo-500">
-                    <FiDownload size={20} />
+                )}
+                
+                {/* Average Rating */}
+                {book.averageRating && (
+                  <div className="flex items-start gap-2">
+                    <FiStar className="text-gray-500 mt-1" />
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-900">Rating</h3>
+                      <p className="text-gray-700">{book.averageRating} / 5 ({book.ratings} ratings)</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500">File Size</h3>
-                    <p className="text-gray-900">{book.fileSize}</p>
+                )}
+                
+                {/* Format and File Size (legacy fields) */}
+                {book.format && (
+                  <div className="flex items-start gap-2">
+                    <FiFileText className="text-gray-500 mt-1" />
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-900">Format</h3>
+                      <p className="text-gray-700">{book.format}</p>
+                    </div>
                   </div>
-                </div>
+                )}
+                
+                {book.fileSize && (
+                  <div className="flex items-start gap-2">
+                    <FiFileText className="text-gray-500 mt-1" />
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-900">File Size</h3>
+                      <p className="text-gray-700">{book.fileSize}</p>
+                    </div>
+                  </div>
+                )}
               </div>
-
-              {/* Categories */}
-              <div className="flex items-start gap-3 mb-8">
-                <div className="text-indigo-500 mt-1">
-                  <FiTag size={20} />
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-2">Categories</h3>
+              
+              {/* Characters */}
+              {book.characters && book.characters.length > 0 && (
+                <div className="mb-6">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-2">Characters</h2>
                   <div className="flex flex-wrap gap-2">
-                    {book.categories.map(category => (
-                      <Link 
-                        key={category} 
-                        href={`/categories?selected=${category}`}
-                        className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm hover:bg-indigo-100 transition-colors"
+                    {book.characters.map((character, index) => (
+                      <span 
+                        key={index}
+                        className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm"
                       >
-                        {category}
-                      </Link>
+                        {character}
+                      </span>
                     ))}
                   </div>
                 </div>
-              </div>
-
+              )}
+              
+              {/* Genres/Categories */}
+              {genres.length > 0 && (
+                <div className="mb-6">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-2">Genres</h2>
+                  <div className="flex flex-wrap gap-2">
+                    {genres.map((genre, index) => (
+                      <span 
+                        key={index}
+                        className="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm"
+                      >
+                        {genre}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
               {/* Download Button */}
-              <div className="mt-8">
-                <a 
-                  href={book.downloadLink}
-                  className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"
-                >
-                  <FiDownload size={18} />
-                  Download Book
-                </a>
-              </div>
+              <a
+                href={downloadLink}
+                className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FiDownload size={18} />
+                Download Book
+              </a>
             </div>
           </div>
         </div>
