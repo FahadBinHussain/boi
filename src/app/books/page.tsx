@@ -1,28 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { categories } from '@/lib/books';
 import BookGrid from '@/components/ui/BookGrid';
-import CategoryFilter from '@/components/ui/CategoryFilter';
 import { FiSearch, FiLoader } from 'react-icons/fi';
-
-// Define book type to match what comes from the API
-interface Book {
-  id: string;
-  title: string;
-  author: string;
-  coverImage: string;
-  description: string;
-  categories: string[];
-  downloadLink: string;
-  fileSize: string;
-  format: string;
-  publicationDate: string;
-}
+import type { Book } from '@/lib/books';
 
 export default function BooksPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [books, setBooks] = useState<Book[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -52,15 +36,6 @@ export default function BooksPage() {
     
     fetchBooks();
   }, []);
-
-  // Function to toggle a category selection
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategories(prev => 
-      prev.includes(category)
-        ? prev.filter(c => c !== category)
-        : [...prev, category]
-    );
-  };
 
   // Filter books based on search query
   const filteredBooks = books.filter(book => {
@@ -98,35 +73,24 @@ export default function BooksPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Sidebar with Categories */}
-          <div className="lg:col-span-1">
-            <CategoryFilter 
-              categories={categories}
-              selectedCategories={selectedCategories}
-              onCategoryChange={handleCategoryChange}
+        {/* Main Content - Book Grid */}
+        <div>
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <FiLoader className="animate-spin h-8 w-8 text-indigo-600" />
+              <span className="ml-2 text-lg text-gray-600">Loading books...</span>
+            </div>
+          ) : error ? (
+            <div className="bg-red-50 p-4 rounded-lg border border-red-200 text-red-700">
+              <p className="font-medium">{error}</p>
+              <p className="mt-1 text-sm">Please try refreshing the page or contact support if the problem persists.</p>
+            </div>
+          ) : (
+            <BookGrid 
+              books={filteredBooks}
+              selectedGenres={[]} 
             />
-          </div>
-
-          {/* Main Content - Book Grid */}
-          <div className="lg:col-span-3">
-            {isLoading ? (
-              <div className="flex justify-center items-center h-64">
-                <FiLoader className="animate-spin h-8 w-8 text-indigo-600" />
-                <span className="ml-2 text-lg text-gray-600">Loading books...</span>
-              </div>
-            ) : error ? (
-              <div className="bg-red-50 p-4 rounded-lg border border-red-200 text-red-700">
-                <p className="font-medium">{error}</p>
-                <p className="mt-1 text-sm">Please try refreshing the page or contact support if the problem persists.</p>
-              </div>
-            ) : (
-              <BookGrid 
-                books={filteredBooks} 
-                selectedCategories={selectedCategories} 
-              />
-            )}
-          </div>
+          )}
         </div>
       </div>
     </div>
