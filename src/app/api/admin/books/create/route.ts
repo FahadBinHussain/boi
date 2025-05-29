@@ -43,8 +43,31 @@ export async function POST(req: NextRequest) {
     // Single book mode
     const bookName = formData.get('bookName') as string;
     const thumbnailUrl = formData.get('thumbnailUrl') as string;
-    const publicationDate = formData.get('publicationDate') as string;
+    let publicationDate = formData.get('publicationDate') as string;
     const summary = formData.get('summary') as string;
+    
+    // Validate and normalize publication date format
+    if (publicationDate) {
+      // Check if it's a valid year-only format (YYYY)
+      if (/^\d{4}$/.test(publicationDate)) {
+        // Valid year-only format, keep as is
+        console.log('Valid year-only date format:', publicationDate);
+      } 
+      // Check if it's a valid full date format (YYYY-MM-DD)
+      else if (/^\d{4}-\d{2}-\d{2}$/.test(publicationDate)) {
+        // Valid full date format, keep as is
+        console.log('Valid full date format:', publicationDate);
+      } 
+      // Try to extract a year if not in a standard format
+      else {
+        console.log('Non-standard date format:', publicationDate);
+        const yearMatch = publicationDate.match(/\b(19|20)\d{2}\b/);
+        if (yearMatch) {
+          publicationDate = yearMatch[0];
+          console.log('Extracted year from non-standard format:', publicationDate);
+        }
+      }
+    }
     
     // Get optional metadata fields
     const publisher = formData.get('publisher') as string || undefined;

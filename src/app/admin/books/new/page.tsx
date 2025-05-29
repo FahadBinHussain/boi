@@ -265,6 +265,14 @@ export default function AddNewBook() {
       // Details validation
       if (!publicationDate.trim()) {
         errors.publicationDate = "Publication date is required";
+      } else {
+        // Validate date format - either YYYY or YYYY-MM-DD
+        const yearOnlyPattern = /^\d{4}$/;
+        const fullDatePattern = /^\d{4}-\d{2}-\d{2}$/;
+        
+        if (!yearOnlyPattern.test(publicationDate) && !fullDatePattern.test(publicationDate)) {
+          errors.publicationDate = "Please enter a valid year (YYYY) or date (YYYY-MM-DD)";
+        }
       }
       
       newStepsCompleted[3] = Object.keys(errors).length === 0;
@@ -471,40 +479,51 @@ export default function AddNewBook() {
       
       // Set publication date if available
       if (data.publicationDate) {
-        console.log("Setting publication date:", data.publicationDate);
+        console.log("Setting publication date from data:", data.publicationDate);
         
-        // Try to extract a year or parse the date
+        // Try to extract a year or parse the date using multiple approaches
         const yearOnlyMatch = /^\d{4}$/.test(data.publicationDate);
         const fullDateMatch = /^\d{4}-\d{2}-\d{2}$/.test(data.publicationDate);
         
         if (yearOnlyMatch) {
-          // It's already a year-only format (e.g., "2023")
+          // Already in correct year format (e.g., "2023")
+          console.log("Using year-only format directly:", data.publicationDate);
           setPublicationDate(data.publicationDate);
         } else if (fullDateMatch) {
-          // It's already a full date format (e.g., "2023-01-15")
+          // Already in correct date format (e.g., "2023-01-15")
+          console.log("Using full date format directly:", data.publicationDate);
           setPublicationDate(data.publicationDate);
         } else {
-          // Handle other formats like "January 2023" or "January 10, 2023"
-          // Try to extract a year
+          // Try to extract year from various formats
           const yearMatch = data.publicationDate.match(/\b(19|20)\d{2}\b/);
           if (yearMatch && yearMatch[0]) {
             const year = yearMatch[0];
             console.log("Extracted year from publication date:", year);
             setPublicationDate(year);
           } else {
-            // If no year found, try to parse the date
+            // Try to parse other date formats like "January 2023", "Jan 15, 2023", etc.
             try {
-              const date = new Date(data.publicationDate);
-              if (!isNaN(date.getTime())) {
+              const dateObj = new Date(data.publicationDate);
+              if (!isNaN(dateObj.getTime())) {
                 // Valid date, format as YYYY-MM-DD
-                const formattedDate = date.toISOString().split('T')[0];
-                console.log("Parsed date from publication date:", formattedDate);
+                const formattedDate = dateObj.toISOString().split('T')[0];
+                console.log("Parsed date and formatted as YYYY-MM-DD:", formattedDate);
                 setPublicationDate(formattedDate);
               } else {
                 console.warn("Failed to parse publication date:", data.publicationDate);
+                // If all parsing fails, just use the raw string but limit to 20 chars
+                const safeValue = data.publicationDate.substring(0, 20);
+                console.log("Using original value with truncation:", safeValue);
+                setPublicationDate(safeValue);
               }
             } catch (error) {
               console.warn("Error parsing publication date:", error);
+              // Try to set just the first 4 digits if they look like a year
+              const possibleYear = data.publicationDate.replace(/\D/g, '').substring(0, 4);
+              if (possibleYear.length === 4 && parseInt(possibleYear) > 1500 && parseInt(possibleYear) < 2100) {
+                console.log("Extracted possible year digits:", possibleYear);
+                setPublicationDate(possibleYear);
+              }
             }
           }
         }
@@ -1112,14 +1131,16 @@ export default function AddNewBook() {
                 <div className="mt-1">
                   <div className="relative rounded-md shadow-sm">
                     <input
-                      type="date"
+                      type="text"
                       id="publicationDate"
                       className={`block w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm
                         ${formErrors.publicationDate ? "border-red-300 text-red-900 placeholder-red-300" : "border-gray-300"}`}
+                      placeholder="YYYY or YYYY-MM-DD"
                       value={publicationDate}
                       onChange={(e) => setPublicationDate(e.target.value)}
                     />
                   </div>
+                  <p className="mt-1 text-xs text-gray-500">Enter year (YYYY) or full date (YYYY-MM-DD)</p>
                 </div>
                 
                 {formErrors.publicationDate && (
