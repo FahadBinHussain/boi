@@ -111,8 +111,13 @@ export default function BookDetailPage() {
   const coverImage = book.imageUrl || book.coverImage || '';
   // Get the description from either summary or description
   const description = book.summary || book.description || '';
-  // Use Files.vc download URL format instead of direct file links
-  const filesVcDownloadLink = "https://files.vc/d/dl?hash=7f08f61112b0546885b7ff267027ed55";
+  
+  // Get the download link - convert direct file URL to Files.vc download page URL
+  const downloadUrl = book.pdfUrl || book.downloadLink || '#';
+  const filesVcDownloadLink = downloadUrl.includes('cdn-1.files.vc') || downloadUrl.includes('cdn-2.files.vc')
+    ? `https://files.vc/d/dl?hash=${downloadUrl.split('/').pop()?.split('.')[0] || ''}`
+    : downloadUrl;
+  
   // Get the authors
   const authors = book.authors || [];
   // Get the genres

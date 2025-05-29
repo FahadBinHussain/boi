@@ -169,6 +169,15 @@ export async function POST(req: NextRequest) {
     if (pdfUrl) {
       fileUrl = pdfUrl;
       console.log('Using pre-uploaded PDF URL:', fileUrl);
+      
+      // Convert direct file URL to Files.vc download page URL if needed
+      if (fileUrl && (fileUrl.includes('cdn-1.files.vc') || fileUrl.includes('cdn-2.files.vc'))) {
+        const fileHash = fileUrl.split('/').pop()?.split('.')[0];
+        if (fileHash) {
+          fileUrl = `https://files.vc/d/dl?hash=${fileHash}`;
+          console.log('Converted pre-uploaded URL to Files.vc download page URL:', fileUrl);
+        }
+      }
     }
     // Otherwise, upload the PDF file if provided
     else if (pdfFile) {
@@ -227,6 +236,15 @@ export async function POST(req: NextRequest) {
         fs.rmdirSync(tempDir);
         
         fileUrl = uploadResult.file_url || uploadResult.page_url;
+        
+        // Convert direct file URL to Files.vc download page URL if needed
+        if (fileUrl && (fileUrl.includes('cdn-1.files.vc') || fileUrl.includes('cdn-2.files.vc'))) {
+          const fileHash = fileUrl.split('/').pop()?.split('.')[0];
+          if (fileHash) {
+            fileUrl = `https://files.vc/d/dl?hash=${fileHash}`;
+            console.log('Converted to Files.vc download page URL:', fileUrl);
+          }
+        }
         
       } catch (error: any) {
         console.error('Error uploading PDF:', error);

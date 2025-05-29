@@ -125,12 +125,24 @@ export async function POST(req: NextRequest) {
       fs.unlinkSync(tempFilePath);
       fs.rmdirSync(tempDir);
       
+      // Get the file URL from the upload result
+      let fileUrl = uploadResult.file_url || uploadResult.page_url;
+      
+      // Convert direct file URL to Files.vc download page URL if needed
+      if (fileUrl && (fileUrl.includes('cdn-1.files.vc') || fileUrl.includes('cdn-2.files.vc'))) {
+        const fileHash = fileUrl.split('/').pop()?.split('.')[0];
+        if (fileHash) {
+          fileUrl = `https://files.vc/d/dl?hash=${fileHash}`;
+          console.log('Converted to Files.vc download page URL:', fileUrl);
+        }
+      }
+      
       // Return the successful response
       return NextResponse.json({
         success: true,
         message: 'File uploaded successfully',
         fileData: {
-          url: uploadResult.file_url || uploadResult.page_url,
+          url: fileUrl,
           name: file.name,
           size: file.size,
           ...uploadResult

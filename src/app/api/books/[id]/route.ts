@@ -37,6 +37,12 @@ export async function GET(
     // Get series information
     const seriesName = book.bookSeries?.name || book.series || '';
     
+    // Convert direct file URL to Files.vc download page URL if needed
+    const pdfUrl = book.pdfUrl || '#';
+    const downloadUrl = pdfUrl.includes('cdn-1.files.vc') || pdfUrl.includes('cdn-2.files.vc')
+      ? `https://files.vc/d/dl?hash=${pdfUrl.split('/').pop()?.split('.')[0] || ''}`
+      : pdfUrl;
+    
     const transformedBook = {
       id: book.id,
       title: book.title,
@@ -44,7 +50,7 @@ export async function GET(
       imageUrl: book.imageUrl || '',
       summary: book.summary || '',
       genres: allGenres,
-      pdfUrl: book.pdfUrl || '#',
+      pdfUrl: downloadUrl,
       publicationDate: book.publicationDate || '',
       seriesId: book.seriesId || '',
       seriesName: seriesName,
@@ -54,7 +60,7 @@ export async function GET(
       coverImage: book.imageUrl || '',
       description: book.summary || '',
       categories: allGenres,
-      downloadLink: book.pdfUrl || '#',
+      downloadLink: downloadUrl,
       fileSize: '2.5 MB', // This could be calculated from the actual file if needed
       format: 'PDF'
     };
