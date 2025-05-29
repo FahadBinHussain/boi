@@ -5,6 +5,7 @@ import Link from "next/link";
 import { FiPlusCircle, FiSearch, FiEdit2, FiTrash2, FiFilter, FiDownload, FiChevronLeft, FiChevronRight, FiBook, FiLoader } from "react-icons/fi";
 import gsap from "gsap";
 import { useNotification } from "@/contexts/NotificationContext";
+import { toast } from "react-hot-toast";
 
 // Define book type
 interface Book {
@@ -113,13 +114,40 @@ export default function BooksManagement() {
   };
   
   // Delete selected books
-  const deleteSelected = () => {
-    if (window.confirm(`Are you sure you want to delete ${selectedBooks.length} selected book(s)?`)) {
-      // In a real application, you'd make an API call to delete books here
-      // For now, we'll just update the local state
-      setBooks(books.filter(book => !selectedBooks.includes(book.id)));
+  const deleteSelected = async () => {
+    if (selectedBooks.length === 0) return;
+
+    const confirmDelete = window.confirm(`Are you sure you want to delete ${selectedBooks.length} book(s)?`);
+    if (!confirmDelete) return;
+
+    setIsLoading(true);
+    
+    try {
+      // Use the bulk delete endpoint for multiple books
+      const response = await fetch('/api/admin/books/bulk-delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ bookIds: selectedBooks }),
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to delete books');
+      }
+      
+      // Update local state
+      setBooks(prevBooks => prevBooks.filter(book => !selectedBooks.includes(book.id)));
       setSelectedBooks([]);
-      showNotification('success', `${selectedBooks.length} book(s) deleted successfully.`);
+      
+      toast.success(`${result.count} book(s) deleted successfully.`);
+    } catch (error) {
+      console.error('Error deleting books:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to delete books');
+    } finally {
+      setIsLoading(false);
     }
   };
   
@@ -337,26 +365,40 @@ export default function BooksManagement() {
                           {book.status}
                         </span>
                       </td>
-                      <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                        <div className="flex items-center justify-end space-x-2">
+                      <td className="px-6 py-4 text-right text-sm font-medium">
+                        <div className="flex justify-end space-x-2">
                           <Link
-                            href={`/admin/books/edit/${book.id}`}
-                            className="text-indigo-600 hover:text-indigo-900"
+                            href={`/admin/books/${book.id}`}
+                            className="rounded bg-blue-100 p-1.5 text-blue-600 hover:bg-blue-200 focus:outline-none"
                           >
-                            <FiEdit2 className="h-4 w-4" aria-hidden="true" />
-                            <span className="sr-only">Edit {book.title}</span>
+                            <FiEdit2 className="h-4 w-4" />
+                            <span className="sr-only">Edit</span>
                           </Link>
                           <button
-                            onClick={() => {
+                            onClick={async () => {
                               if (window.confirm(`Are you sure you want to delete "${book.title}"?`)) {
-                                setBooks(books.filter(b => b.id !== book.id));
-                                showNotification('success', `"${book.title}" deleted successfully.`);
+                                try {
+                                  const response = await fetch(`/api/admin/books/${book.id}`, {
+                                    method: 'DELETE',
+                                  });
+                                  
+                                  if (!response.ok) {
+                                    throw new Error(`Failed to delete book: ${response.statusText}`);
+                                  }
+                                  
+                                  // Update local state
+                                  setBooks(books.filter(b => b.id !== book.id));
+                                  toast.success(`"${book.title}" deleted successfully.`);
+                                } catch (error) {
+                                  console.error('Error deleting book:', error);
+                                  toast.error('Failed to delete book. Please try again.');
+                                }
                               }
                             }}
-                            className="text-red-600 hover:text-red-900"
+                            className="rounded bg-red-100 p-1.5 text-red-600 hover:bg-red-200 focus:outline-none"
                           >
-                            <FiTrash2 className="h-4 w-4" aria-hidden="true" />
-                            <span className="sr-only">Delete {book.title}</span>
+                            <FiTrash2 className="h-4 w-4" />
+                            <span className="sr-only">Delete</span>
                           </button>
                         </div>
                       </td>
