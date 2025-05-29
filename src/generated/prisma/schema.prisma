@@ -8,6 +8,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Authentication models
+model User {
+  id            String        @id @default(cuid())
+  name          String?
+  email         String?       @unique
+  emailVerified DateTime?
+  image         String?
+  role          UserRole      @default(USER)
+  accounts      Account[]
+  sessions      Session[]
+  settings      UserSettings?
+}
+
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -34,18 +47,6 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model User {
-  id            String        @id @default(cuid())
-  name          String?
-  email         String?       @unique
-  emailVerified DateTime?
-  image         String?
-  role          UserRole      @default(USER)
-  accounts      Account[]
-  sessions      Session[]
-  settings      UserSettings?
-}
-
 model VerificationToken {
   identifier String
   token      String   @unique
@@ -54,6 +55,7 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+// User preferences and settings
 model UserSettings {
   id               String   @id @default(cuid())
   userId           String   @unique
@@ -65,6 +67,7 @@ model UserSettings {
   @@index([userId])
 }
 
+// Book model with all fields
 model Book {
   id              String   @id @default(cuid())
   title           String
@@ -86,6 +89,7 @@ model Book {
   authors         Author[]
 }
 
+// Author model
 model Author {
   id        String   @id @default(cuid())
   name      String

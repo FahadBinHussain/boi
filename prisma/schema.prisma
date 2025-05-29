@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -56,19 +57,19 @@ model VerificationToken {
 
 // User preferences and settings
 model UserSettings {
-  id               String   @id @default(cuid())
-  userId           String   @unique
-  filesVcApiKey    String?  // API key for Files.vc
-  filesVcAccountId String?  // Account ID for Files.vc
-  updatedAt        DateTime @updatedAt
-  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                      String   @id @default(cuid())
+  userId                  String   @unique
+  filesVcApiKey           String?  // Plain API key field
+  filesVcAccountId        String?  // Account ID for Files.vc
+  updatedAt               DateTime @updatedAt
+  user                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
 
 // Book model with all fields
 model Book {
-  id              String   @id @default(cuid())
+  id              String    @id @default(cuid())
   title           String
   imageUrl        String?
   publicationDate String?
@@ -83,18 +84,26 @@ model Book {
   pdfUrl          String?
   series          String?
   seriesPosition  Float[]
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  authors         Author[] @relation("BookToAuthor")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  authors         Author[]
 }
 
 // Author model
 model Author {
-  id        String   @id @default(cuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  books     Book[]   @relation("BookToAuthor")
+  id          String   @id @default(cuid())
+  name        String
+  books       Book[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AdminApiKey {
+  adminId     String
+  serviceName String
+  apiKey      String
+  
+  @@id([adminId, serviceName])
 }
 
 enum UserRole {
