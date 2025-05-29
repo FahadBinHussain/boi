@@ -255,14 +255,14 @@ const HeroSection = () => {
               </Link>
               
               <Link 
-                href="/categories" 
+                href="/genres" 
                 className="group relative overflow-hidden rounded-xl"
               >
                 <div className="absolute inset-0 bg-white/10 backdrop-blur-md border border-white/20 group-hover:bg-white/15 transition-all duration-500"></div>
                 <div className="absolute -inset-px bg-gradient-to-r from-indigo-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 rounded-xl blur transition-all duration-700"></div>
                 <div className="relative px-7 py-3.5 flex items-center gap-2">
                   <FiSearch className="text-white" size={18} />
-                  <span className="font-medium text-white">Browse Categories</span>
+                  <span className="font-medium text-white">Browse Genres</span>
                 </div>
               </Link>
             </div>
@@ -360,7 +360,7 @@ const HeroSection = () => {
                       <span className="font-bold">12K+</span>
                     </div>
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-white/80 text-sm">Categories</span>
+                      <span className="text-white/80 text-sm">Genres</span>
                       <span className="font-bold">48+</span>
                     </div>
                     <div className="flex items-center justify-between">

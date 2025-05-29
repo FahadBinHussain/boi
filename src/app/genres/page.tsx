@@ -2,17 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { categories } from '@/lib/books';
+import { genres } from '@/lib/books';
 import Link from 'next/link';
 import { FiGrid, FiBookOpen, FiLoader } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import type { Book } from '@/lib/books';
 
-export default function CategoriesPage() {
+export default function GenresPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [activeGenre, setActiveGenre] = useState<string | null>(null);
   const [books, setBooks] = useState<Book[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,25 +43,25 @@ export default function CategoriesPage() {
     fetchBooks();
   }, []);
 
-  // Check if a category is selected from URL params
+  // Check if a genre is selected from URL params
   useEffect(() => {
-    const selected = searchParams.get('selected');
-    if (selected && categories.includes(selected)) {
-      setActiveCategory(selected);
+    const selected = searchParams?.get('selected');
+    if (selected && genres.includes(selected)) {
+      setActiveGenre(selected);
     }
   }, [searchParams]);
 
-  // Function to handle category click
-  const handleCategoryClick = (category: string) => {
-    setActiveCategory(category);
-    router.push(`/categories?selected=${category}`);
+  // Function to handle genre click
+  const handleGenreClick = (genre: string) => {
+    setActiveGenre(genre);
+    router.push(`/genres?selected=${genre}`);
   };
 
-  // Get books for the active category
-  const getCategoryBooks = () => {
-    if (!activeCategory) return [];
+  // Get books for the active genre
+  const getGenreBooks = () => {
+    if (!activeGenre) return [];
     return books.filter(book => 
-      book.categories.includes(activeCategory)
+      book.genres.includes(activeGenre)
     );
   };
 
@@ -85,20 +85,20 @@ export default function CategoriesPage() {
     <div className="bg-gray-50 min-h-screen py-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-10">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Categories</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">Genres</h1>
           <p className="text-lg text-gray-600">
-            Browse our extensive collection of books by category
+            Browse our extensive collection of books by genre
           </p>
         </div>
 
-        {/* Categories Grid */}
+        {/* Genres Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-12">
-          {categories.map((category) => (
+          {genres.map((genre) => (
             <motion.button
-              key={category}
-              onClick={() => handleCategoryClick(category)}
+              key={genre}
+              onClick={() => handleGenreClick(genre)}
               className={`p-6 rounded-lg text-center transition-colors ${
-                activeCategory === category
+                activeGenre === genre
                   ? 'bg-indigo-600 text-white shadow-md'
                   : 'bg-white border border-gray-200 text-gray-800 hover:bg-indigo-50'
               }`}
@@ -108,9 +108,9 @@ export default function CategoriesPage() {
               <div className="flex flex-col items-center">
                 <FiGrid 
                   size={24} 
-                  className={`mb-3 ${activeCategory === category ? 'text-white' : 'text-indigo-500'}`} 
+                  className={`mb-3 ${activeGenre === genre ? 'text-white' : 'text-indigo-500'}`} 
                 />
-                <span className="font-medium">{category}</span>
+                <span className="font-medium">{genre}</span>
               </div>
             </motion.button>
           ))}
@@ -132,17 +132,17 @@ export default function CategoriesPage() {
           </div>
         )}
 
-        {/* Selected Category Books */}
-        {!isLoading && !error && activeCategory && (
+        {/* Selected Genre Books */}
+        {!isLoading && !error && activeGenre && (
           <div className="mt-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">
-                <span className="text-indigo-600">{activeCategory}</span> Books
+                <span className="text-indigo-600">{activeGenre}</span> Books
               </h2>
               <button 
                 onClick={() => {
-                  setActiveCategory(null);
-                  router.push('/categories');
+                  setActiveGenre(null);
+                  router.push('/genres');
                 }}
                 className="text-sm text-gray-600 hover:text-indigo-600"
               >
@@ -157,7 +157,7 @@ export default function CategoriesPage() {
               initial="hidden"
               animate="show"
             >
-              {getCategoryBooks().map((book) => (
+              {getGenreBooks().map((book) => (
                 <motion.div key={book.id} variants={item}>
                   <Link href={`/books/${book.id}`}>
                     <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200 transition-all hover:shadow-md h-full flex flex-col">
@@ -196,19 +196,19 @@ export default function CategoriesPage() {
               ))}
             </motion.div>
 
-            {getCategoryBooks().length === 0 && (
+            {getGenreBooks().length === 0 && (
               <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-                <p className="text-gray-600">No books found in this category.</p>
+                <p className="text-gray-600">No books found in this genre.</p>
               </div>
             )}
           </div>
         )}
 
-        {/* No Category Selected */}
-        {!isLoading && !error && !activeCategory && (
+        {/* No Genre Selected */}
+        {!isLoading && !error && !activeGenre && (
           <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Select a category</h2>
-            <p className="text-gray-600">Click on a category above to view related books.</p>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Select a genre</h2>
+            <p className="text-gray-600">Click on a genre above to view related books.</p>
           </div>
         )}
       </div>

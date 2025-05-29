@@ -4,15 +4,15 @@ export interface Book {
   author: string;
   coverImage: string;
   description: string;
-  categories: string[];
+  genres: string[];
   downloadLink: string;
   fileSize: string;
   format: string;
   publicationDate: string;
 }
 
-// List of all possible categories
-export const categories = [
+// List of all possible genres
+export const genres = [
   "Classic",
   "Fiction",
   "Novel",

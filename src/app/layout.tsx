@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "বই - Free Books Download",
-  description: "A digital library offering free access to books across various genres and categories.",
+  description: "A digital library offering free access to books across various genres.",
 };
 
 export default function RootLayout({

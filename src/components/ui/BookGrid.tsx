@@ -7,24 +7,24 @@ import type { Book } from '@/lib/books';
 
 interface BookGridProps {
   books: Book[];
-  selectedCategories: string[];
+  selectedGenres: string[];
   compact?: boolean;
 }
 
-const BookGrid = ({ books, selectedCategories, compact = false }: BookGridProps) => {
+const BookGrid = ({ books, selectedGenres, compact = false }: BookGridProps) => {
   const [filteredBooks, setFilteredBooks] = useState<Book[]>(books);
 
-  // Filter books when selected categories change
+  // Filter books when selected genres change
   useEffect(() => {
-    if (selectedCategories.length === 0) {
+    if (selectedGenres.length === 0) {
       setFilteredBooks(books);
     } else {
       const filtered = books.filter(book => 
-        book.categories.some(category => selectedCategories.includes(category))
+        book.genres.some(genre => selectedGenres.includes(genre))
       );
       setFilteredBooks(filtered);
     }
-  }, [books, selectedCategories]);
+  }, [books, selectedGenres]);
 
   // Animation for container
   const container = {
@@ -49,7 +49,7 @@ const BookGrid = ({ books, selectedCategories, compact = false }: BookGridProps)
         <div className="text-center">
           <h3 className="text-lg font-medium text-gray-900 mb-2">No books found</h3>
           <p className="text-gray-600">
-            Try selecting different categories or clearing your filters
+            Try selecting different genres or clearing your filters
           </p>
         </div>
       </div>

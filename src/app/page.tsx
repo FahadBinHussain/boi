@@ -1,6 +1,6 @@
 'use client';
 
-import { categories } from '@/lib/books';
+import { genres } from '@/lib/books';
 import HeroSection from '@/components/ui/HeroSection';
 import BookGrid from '@/components/ui/BookGrid';
 import { FiBookOpen, FiDownload, FiUsers, FiLogIn, FiLoader } from 'react-icons/fi';
@@ -54,8 +54,8 @@ export default function Home() {
   const featuresHeaderRef = useRef<HTMLDivElement>(null);
   const featureBoxesRef = useRef<HTMLDivElement>(null);
   const featuredSectionRef = useRef<HTMLElement>(null);
-  const categoryHeaderRef = useRef<HTMLDivElement>(null);
-  const categoriesRef = useRef<HTMLDivElement>(null);
+  const genreHeaderRef = useRef<HTMLDivElement>(null);
+  const genresRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
     // Features section animations with timeline
@@ -278,18 +278,18 @@ export default function Home() {
     }
     
     // Categories animations with enhanced staggered reveal
-    if (categoryHeaderRef.current) {
-      const categoryHeaderTl = gsap.timeline({
+    if (genreHeaderRef.current) {
+      const genreHeaderTl = gsap.timeline({
         scrollTrigger: {
-          trigger: categoryHeaderRef.current,
+          trigger: genreHeaderRef.current,
           start: "top 80%",
           toggleActions: "play none none reverse"
         }
       });
       
       // Animate the header with a mask reveal effect
-      categoryHeaderTl
-        .fromTo(categoryHeaderRef.current.querySelector('h2'),
+      genreHeaderTl
+        .fromTo(genreHeaderRef.current.querySelector('h2'),
           { 
             opacity: 0, 
             y: 20,
@@ -303,7 +303,7 @@ export default function Home() {
             ease: "power2.out" 
           }
         )
-        .fromTo(categoryHeaderRef.current.querySelector('p'),
+        .fromTo(genreHeaderRef.current.querySelector('p'),
           { 
             opacity: 0, 
             y: 20 
@@ -319,13 +319,13 @@ export default function Home() {
     }
     
     // Category boxes animation with floating effect
-    if (categoriesRef.current) {
-      const categoryItems = categoriesRef.current.querySelectorAll('a');
+    if (genresRef.current) {
+      const categoryItems = genresRef.current.querySelectorAll('a');
       
       // Create a timeline for categories
       const categoriesTl = gsap.timeline({
         scrollTrigger: {
-          trigger: categoriesRef.current,
+          trigger: genresRef.current,
           start: "top 80%",
           toggleActions: "play none none reverse"
         }
@@ -449,7 +449,7 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Wide Selection</h3>
               <p className="text-gray-600">
-                Access thousands of books across various genres and categories.
+                Access thousands of books across various genres.
               </p>
             </div>
 
@@ -507,7 +507,7 @@ export default function Home() {
               <p className="mt-1 text-sm">Please try refreshing the page or contact support if the problem persists.</p>
             </div>
           ) : (
-            <BookGrid books={featuredBooks} selectedCategories={[]} compact={true} />
+            <BookGrid books={featuredBooks} selectedGenres={[]} compact={true} />
           )}
         </div>
       </section>
@@ -517,26 +517,26 @@ export default function Home() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div 
             className="text-center mb-12"
-            ref={categoryHeaderRef}
+            ref={genreHeaderRef}
           >
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Explore Categories</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Explore Genres</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Find your next read by browsing our collection by category
+              Find your next read by browsing our collection by genre
             </p>
           </div>
 
           <div 
             className="grid grid-cols-2 md:grid-cols-4 gap-4"
-            ref={categoriesRef}
+            ref={genresRef}
           >
-            {categories.slice(0, 8).map((category) => (
+            {genres.slice(0, 8).map((genre) => (
               <Link 
-                key={category} 
-                href={`/categories?selected=${category}`}
+                key={genre} 
+                href={`/genres?selected=${genre}`}
                 className="bg-gray-50 hover:bg-indigo-50 border border-gray-200 rounded-lg p-6 text-center transition-colors group"
               >
                 <h3 className="font-medium text-gray-900 group-hover:text-indigo-600 transition-colors">
-                  {category}
+                  {genre}
                 </h3>
               </Link>
             ))}
@@ -544,10 +544,10 @@ export default function Home() {
           
           <div className="text-center mt-8">
             <Link 
-              href="/categories" 
+              href="/genres" 
               className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition-colors"
             >
-              View All Categories
+              View All Genres
             </Link>
           </div>
         </div>

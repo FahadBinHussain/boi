@@ -18,8 +18,8 @@ export async function GET(req: NextRequest) {
       // Get the first author's name or empty string if no authors
       const authorName = book.authors.length > 0 ? book.authors[0].name : '';
       
-      // Get the genres as categories
-      const categories = book.genres || [];
+      // Get the genres
+      const genres = book.genres || [];
       
       return {
         id: book.id,
@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
         author: authorName,
         coverImage: book.imageUrl || '',
         description: book.summary || '',
-        categories: categories,
+        genres: genres,
         downloadLink: book.pdfUrl || '#',
         fileSize: '2.5 MB', // This could be calculated from the actual file if needed
         format: 'PDF',

@@ -14,7 +14,7 @@ const Footer = () => {
               About বই
             </h3>
             <p className="text-gray-600 text-sm leading-relaxed">
-              বই is a digital library offering free access to books across various genres and categories.
+              বই is a digital library offering free access to books across various genres.
               Our mission is to promote reading and make knowledge accessible to everyone.
             </p>
           </div>
@@ -43,10 +43,10 @@ const Footer = () => {
               </li>
               <li>
                 <Link 
-                  href="/categories" 
+                  href="/genres" 
                   className="text-gray-600 hover:text-indigo-600 text-sm transition-colors"
                 >
-                  Categories
+                  Genres
                 </Link>
               </li>
               <li>

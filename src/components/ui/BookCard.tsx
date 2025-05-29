@@ -175,19 +175,19 @@ const BookCard = ({ book, compact = false }: BookCardProps) => {
         <h3 className={`font-semibold text-gray-900 mb-1 line-clamp-1 group-hover:text-indigo-600 transition-colors ${compact ? 'text-sm' : ''}`}>{book.title}</h3>
         <p className={`text-sm text-gray-600 mb-2 ${compact ? 'text-xs' : ''}`}>{book.author}</p>
         
-        {/* Categories */}
+        {/* Genres */}
         <div className="flex flex-wrap gap-1 mt-auto pt-2">
-          {book.categories.slice(0, compact ? 1 : 2).map((category) => (
+          {book.genres.slice(0, compact ? 1 : 2).map((genre) => (
             <span 
-              key={category} 
+              key={genre} 
               className={`px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-full group-hover:bg-indigo-100 group-hover:text-indigo-700 transition-colors ${compact ? 'text-[10px] px-1.5 py-0.5' : ''}`}
             >
-              {category}
+              {genre}
             </span>
           ))}
-          {book.categories.length > (compact ? 1 : 2) && (
+          {book.genres.length > (compact ? 1 : 2) && (
             <span className={`px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-full group-hover:bg-indigo-100 group-hover:text-indigo-700 transition-colors ${compact ? 'text-[10px] px-1.5 py-0.5' : ''}`}>
-              +{book.categories.length - (compact ? 1 : 2)}
+              +{book.genres.length - (compact ? 1 : 2)}
             </span>
           )}
         </div>
