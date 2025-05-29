@@ -1,11 +1,23 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+// Authentication models
+model User {
+  id            String        @id @default(cuid())
+  name          String?
+  email         String?       @unique
+  emailVerified DateTime?
+  image         String?
+  role          UserRole      @default(USER)
+  accounts      Account[]
+  sessions      Session[]
+  settings      UserSettings?
 }
 
 model Account {
@@ -34,18 +46,6 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model User {
-  id            String        @id @default(cuid())
-  name          String?
-  email         String?       @unique
-  emailVerified DateTime?
-  image         String?
-  role          UserRole      @default(USER)
-  accounts      Account[]
-  sessions      Session[]
-  settings      UserSettings?
-}
-
 model VerificationToken {
   identifier String
   token      String   @unique
@@ -54,19 +54,21 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+// User preferences and settings
 model UserSettings {
-  id                      String   @id @default(cuid())
-  userId                  String   @unique
-  filesVcApiKey           String?  // Plain API key field
-  filesVcAccountId        String?  // Account ID for Files.vc
-  updatedAt               DateTime @updatedAt
-  user                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  filesVcApiKey    String?  // API key for Files.vc
+  filesVcAccountId String?  // Account ID for Files.vc
+  updatedAt        DateTime @updatedAt
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
 
+// Book model with all fields
 model Book {
-  id              String    @id @default(cuid())
+  id              String   @id @default(cuid())
   title           String
   imageUrl        String?
   publicationDate String?
@@ -81,25 +83,18 @@ model Book {
   pdfUrl          String?
   series          String?
   seriesPosition  Float[]
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  authors         Author[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  authors         Author[] @relation("BookToAuthor")
 }
 
+// Author model
 model Author {
-  id          String   @id @default(cuid())
-  name        String
-  books       Book[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-model AdminApiKey {
-  adminId     String
-  serviceName String
-  apiKey      String
-  
-  @@id([adminId, serviceName])
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  books     Book[]   @relation("BookToAuthor")
 }
 
 enum UserRole {
