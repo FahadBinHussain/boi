@@ -78,14 +78,14 @@ export default function Home() {
       pageTl
         .fromTo(pageOverlayRef.current, 
           { 
-            y: 0,
+            clipPath: "circle(100% at center)",
             opacity: 1 
           },
           { 
-            y: '-100%',
+            clipPath: "circle(0% at center)",
             opacity: 0,
-            duration: 1,
-            ease: "power2.inOut"
+            duration: 1.2,
+            ease: "power3.inOut"
           }
         )
         .fromTo(pageWrapperRef.current, 
@@ -467,9 +467,17 @@ export default function Home() {
       {/* Page loading overlay */}
       <div 
         ref={pageOverlayRef} 
-        className="fixed inset-0 bg-indigo-600 z-50 flex items-center justify-center"
+        className="fixed inset-0 bg-gradient-to-br from-indigo-600 to-purple-700 z-50 flex items-center justify-center"
       >
-        <div className="text-white text-3xl font-bold">বই</div>
+        <div className="relative">
+          <div className="w-24 h-24 border-t-4 border-b-4 border-white rounded-full animate-spin"></div>
+          <div className="w-20 h-20 border-t-4 border-b-4 border-indigo-300 rounded-full animate-spin absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style={{ animationDirection: 'reverse', animationDuration: '1s' }}></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-xl font-light">বই</div>
+        </div>
+        
+        <div className="absolute bottom-12 left-0 right-0 flex justify-center">
+          <div className="text-white/80 text-sm font-light tracking-widest uppercase">Loading Experience</div>
+        </div>
       </div>
       
       {/* Main content */}
