@@ -650,27 +650,64 @@ export default function AddNewBook() {
     formData.append('file', file);
     
     try {
-      const response = await fetch('/api/admin/upload', {
-        method: 'POST',
-        body: formData,
-        // Don't set Content-Type header, let the browser set it with the boundary
+      // Use XMLHttpRequest instead of fetch to track upload progress
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        
+        // Track upload progress
+        xhr.upload.addEventListener('progress', (event) => {
+          if (event.lengthComputable) {
+            const percentComplete = Math.round((event.loaded / event.total) * 100);
+            console.log(`Upload progress: ${percentComplete}%`);
+            setSingleBookUploadProgress(percentComplete);
+          }
+        });
+        
+        // Handle successful upload
+        xhr.addEventListener('load', () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              const data = JSON.parse(xhr.responseText);
+              if (data && data.fileData && data.fileData.url) {
+                setSingleBookPdfUrl(data.fileData.url);
+                setSingleBookUploadStatus('success');
+                setSingleBookUploadProgress(100);
+                resolve(data);
+              } else {
+                throw new Error('Invalid response format from server');
+              }
+            } catch (error) {
+              reject(error);
+            }
+          } else {
+            try {
+              const errorData = JSON.parse(xhr.responseText);
+              reject(new Error(errorData.error || `HTTP error ${xhr.status}`));
+            } catch {
+              reject(new Error(`HTTP error ${xhr.status}`));
+            }
+          }
+        });
+        
+        // Handle network errors
+        xhr.addEventListener('error', () => {
+          reject(new Error('Network error occurred during upload'));
+        });
+        
+        // Handle timeout
+        xhr.addEventListener('timeout', () => {
+          reject(new Error('Upload timed out'));
+        });
+        
+        // Handle abort
+        xhr.addEventListener('abort', () => {
+          reject(new Error('Upload was aborted'));
+        });
+        
+        // Open and send the request
+        xhr.open('POST', '/api/admin/upload', true);
+        xhr.send(formData);
       });
-      
-      // Check if the request was successful
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `HTTP error ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      if (data && data.fileData && data.fileData.url) {
-        setSingleBookPdfUrl(data.fileData.url);
-        setSingleBookUploadStatus('success');
-        setSingleBookUploadProgress(100);
-      } else {
-        throw new Error('Invalid response format from server');
-      }
     } catch (error) {
       console.error('Error uploading file:', error);
       handleSingleBookUploadError(error instanceof Error ? error.message : 'Unknown error occurred');
