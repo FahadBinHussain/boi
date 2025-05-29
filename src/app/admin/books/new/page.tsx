@@ -189,10 +189,9 @@ export default function AddNewBook() {
       errors.bookPdf = "Please select a PDF file for the book";
     }
     
-    // Details validation
-    if (!publicationDate.trim()) {
-      errors.publicationDate = "Publication date is required";
-    } else {
+    // Details validation - publication date is now optional
+    if (publicationDate.trim()) {
+      // Only validate if a date is provided
       // Validate date format - either YYYY or YYYY-MM-DD
       const yearOnlyPattern = /^\d{4}$/;
       const fullDatePattern = /^\d{4}-\d{2}-\d{2}$/;
@@ -1139,7 +1138,7 @@ export default function AddNewBook() {
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-center">
                       <FiCalendar className="mr-2 h-4 w-4 text-indigo-500" />
-                      Publication Date <span className="text-red-500 ml-1">*</span>
+                      Publication Date
                     </div>
                   </div>
                 </label>

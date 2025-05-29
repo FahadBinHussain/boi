@@ -43,11 +43,11 @@ export async function POST(req: NextRequest) {
     // Single book mode
     const bookName = formData.get('bookName') as string;
     const thumbnailUrl = formData.get('thumbnailUrl') as string;
-    let publicationDate = formData.get('publicationDate') as string;
+    let publicationDate = formData.get('publicationDate') as string | null;
     const summary = formData.get('summary') as string;
     
     // Simplified validation and normalization of publication date format
-    if (publicationDate) {
+    if (publicationDate && publicationDate.trim() !== '') {
       console.log('Original publication date:', publicationDate);
       
       // If it's already in YYYY-MM-DD format, validate it
@@ -117,6 +117,10 @@ export async function POST(req: NextRequest) {
           }
         }
       }
+    } else {
+      // If publication date is not provided or empty, set it to null
+      publicationDate = null;
+      console.log('No publication date provided');
     }
     
     // Get optional metadata fields
