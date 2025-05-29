@@ -128,7 +128,7 @@ export default function AddNewBook() {
   const [characters, setCharacters] = useState<string[]>([]);
   const [language, setLanguage] = useState("");
   const [series, setSeries] = useState("");
-  const [seriesPosition, setSeriesPosition] = useState<number[]>([]);
+  const [seriesPosition, setSeriesPosition] = useState<string>("");
   
   // Add new state variables for metadata URL functionality
   const [metadataUrl, setMetadataUrl] = useState("");
@@ -253,11 +253,9 @@ export default function AddNewBook() {
       if (series) formData.append('series', series);
       
       // Handle series position data
-      if (seriesPosition.length > 0) {
+      if (seriesPosition) {
         console.log("Series position data to send:", seriesPosition);
-        const seriesPositionJson = JSON.stringify(seriesPosition);
-        console.log("Series position JSON:", seriesPositionJson);
-        formData.append('seriesPosition', seriesPositionJson);
+        formData.append('seriesPosition', seriesPosition);
       }
       
       // For single book mode, use the already uploaded PDF URL if available
@@ -598,23 +596,17 @@ export default function AddNewBook() {
         // If it's already an array of numbers
         if (Array.isArray(data.seriesPosition)) {
           console.log("Setting series position from array:", data.seriesPosition);
-          setSeriesPosition(data.seriesPosition);
+          setSeriesPosition(data.seriesPosition.join(", "));
         }
         // If it's a single number
         else if (typeof data.seriesPosition === 'number') {
           console.log("Setting series position from single number:", data.seriesPosition);
-          setSeriesPosition([data.seriesPosition]);
+          setSeriesPosition(data.seriesPosition.toString());
         }
         // If it's a string (e.g., "1,2,3")
         else if (typeof data.seriesPosition === 'string') {
           console.log("Parsing series position from string:", data.seriesPosition);
-          const positions = data.seriesPosition
-            .split(',')
-            .map(p => parseFloat(p.trim()))
-            .filter(p => !isNaN(p));
-          
-          console.log("Setting series position from parsed string:", positions);
-          setSeriesPosition(positions);
+          setSeriesPosition(data.seriesPosition);
         }
       }
     }
@@ -1224,18 +1216,11 @@ export default function AddNewBook() {
                     type="text"
                     id="seriesPosition"
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="1, 2, 3.5, etc."
-                    value={seriesPosition.join(", ")}
-                    onChange={(e) => {
-                      const input = e.target.value;
-                      // Parse comma-separated numbers, removing invalid entries
-                      const positions = input.split(",")
-                        .map(p => parseFloat(p.trim()))
-                        .filter(p => !isNaN(p));
-                      setSeriesPosition(positions);
-                    }}
+                    placeholder="1, 1/1, 2.5, etc."
+                    value={seriesPosition}
+                    onChange={(e) => setSeriesPosition(e.target.value)}
                   />
-                  <p className="mt-1 text-xs text-gray-500">Book's position in the series (can be decimal for in-between books)</p>
+                  <p className="mt-1 text-xs text-gray-500">Book's position in the series (can be any format like "1/1" or "2")</p>
                 </div>
               </div>
             

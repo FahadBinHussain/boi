@@ -139,44 +139,25 @@ export async function POST(req: NextRequest) {
     
     // Get series information
     const seriesName = formData.get('series') as string || undefined;
-    const seriesPositionStr = formData.get('seriesPosition') as string;
+    const seriesPositionStr = formData.get('seriesPosition') as string || undefined;
     console.log('Raw seriesPosition from form:', seriesPositionStr);
     
-    // Parse series position as an array for the updated schema
-    let seriesPosition: number[] = [];
-    if (seriesPositionStr) {
-      try {
-        // First try to parse as JSON if it's already formatted as such
-        if (seriesPositionStr.startsWith('[') && seriesPositionStr.endsWith(']')) {
-          console.log('Parsing seriesPosition as JSON array');
-          seriesPosition = JSON.parse(seriesPositionStr);
-          console.log('Parsed JSON array:', seriesPosition);
-        } 
-        // Otherwise handle as comma-separated string
-        else if (seriesPositionStr.includes(',')) {
-          console.log('Parsing seriesPosition as comma-separated string');
-          seriesPosition = seriesPositionStr
-            .split(',')
-            .map(p => parseFloat(p.trim()))
-            .filter(p => !isNaN(p));
-          console.log('Parsed comma-separated values:', seriesPosition);
-        } else {
-          // Handle single number - convert to array with one element
-          console.log('Parsing seriesPosition as single number');
-          const parsed = parseFloat(seriesPositionStr);
-          if (!isNaN(parsed)) {
-            seriesPosition = [parsed];
-            console.log('Parsed single number:', seriesPosition);
-          }
-        }
-      } catch (error) {
-        console.error('Error parsing seriesPosition:', error);
-        // Fallback to empty array if parsing fails
-        seriesPosition = [];
-      }
-    }
+    // For schema compatibility, we need to extract numbers for the seriesPosition array field
+    // but we'll preserve the original format in the series field
+    let seriesPositionNums: number[] = [];
+    let seriesWithPosition = seriesName;
     
-    console.log('Final seriesPosition array to save:', seriesPosition);
+    if (seriesPositionStr && seriesName) {
+      // Extract numbers for the seriesPosition array field (required for schema compatibility)
+      const numberMatches = seriesPositionStr.match(/\d+(\.\d+)?/g);
+      if (numberMatches) {
+        seriesPositionNums = numberMatches.map(n => parseFloat(n)).filter(n => !isNaN(n));
+      }
+      
+      // Preserve the original format by appending it to the series name
+      seriesWithPosition = `${seriesName} (${seriesPositionStr})`;
+      console.log('Series with position:', seriesWithPosition);
+    }
     
     // Get the PDF file or URL
     const pdfFile = formData.get('pdf') as File | null;
@@ -329,8 +310,8 @@ export async function POST(req: NextRequest) {
         numberOfPages: numberOfPages,
         characters: characters,
         language: language,
-        series: seriesName, // Keep for backward compatibility
-        seriesPosition: seriesPosition,
+        series: seriesWithPosition,
+        seriesPosition: seriesPositionNums,
         pdfUrl: fileUrl,
         // Author relation
         authors: {

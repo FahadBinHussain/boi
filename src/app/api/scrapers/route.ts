@@ -6,7 +6,7 @@ import { promisify } from 'util';
 const execAsync = promisify(exec);
 
 // Helper function to parse series position from various formats
-function parseSeriesPosition(positionStr: string | number | undefined): number | number[] | undefined {
+function parseSeriesPosition(positionStr: string | number | undefined): string | number | undefined {
   console.log("Parsing series position from:", positionStr, "type:", typeof positionStr);
   
   if (positionStr === undefined) {
@@ -14,59 +14,17 @@ function parseSeriesPosition(positionStr: string | number | undefined): number |
     return undefined;
   }
   
-  // If it's already a number, return it
+  // If it's already a number, return it as a string
   if (typeof positionStr === 'number') {
-    console.log("Series position is a number, returning:", positionStr);
-    return positionStr;
+    console.log("Series position is a number, returning as string:", positionStr.toString());
+    return positionStr.toString();
   }
   
-  // If it's a string, try to parse it
+  // If it's a string, preserve the original format
   if (typeof positionStr === 'string') {
-    // Handle comma-separated values (e.g., "1,2,3")
-    if (positionStr.includes(',')) {
-      console.log("Series position contains commas, parsing as list");
-      // Parse all positions and return the array
-      const positions = positionStr.split(',')
-        .map(p => {
-          const trimmed = p.trim();
-          console.log(`Parsing position part: "${trimmed}"`);
-          return parseFloat(trimmed);
-        })
-        .filter(p => {
-          const isValid = !isNaN(p);
-          if (!isValid) console.log(`Filtered out invalid position: ${p}`);
-          return isValid;
-        });
-      
-      console.log("Parsed positions from comma-separated string:", positions);
-      
-      if (positions.length > 0) {
-        // Return all positions instead of just the minimum
-        console.log("Returning array of positions:", positions);
-        return positions;
-      } else {
-        console.log("No valid positions found in comma-separated string");
-      }
-    }
-    
-    // Handle single number
-    const parsed = parseFloat(positionStr);
-    if (!isNaN(parsed)) {
-      console.log("Parsed as single number:", parsed);
-      return parsed;
-    } else {
-      console.log(`Failed to parse "${positionStr}" as a number`);
-    }
-    
-    // Handle "#X" format (e.g., "#1", "#2")
-    const hashMatch = positionStr.match(/#(\d+(\.\d+)?)/);
-    if (hashMatch && hashMatch[1]) {
-      const hashParsed = parseFloat(hashMatch[1]);
-      console.log("Parsed from hash format:", hashParsed);
-      return hashParsed;
-    } else if (positionStr.includes('#')) {
-      console.log(`String contains # but couldn't extract number: "${positionStr}"`);
-    }
+    // Return the string as-is for formats like "1/1"
+    console.log("Preserving original series position format:", positionStr);
+    return positionStr;
   }
   
   console.log("Could not parse series position, returning undefined");
@@ -87,7 +45,7 @@ interface ScrapedBookData {
   characters?: string[];
   language?: string;
   series?: string;
-  seriesPosition?: number | number[];
+  seriesPosition?: string | number;
 }
 
 // Helper function to detect URL type
