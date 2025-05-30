@@ -61,6 +61,7 @@ export async function GET(
       seriesId: book.seriesId || '',
       seriesName: seriesName,
       seriesPosition: book.seriesPosition || '',
+      scraperUrl: book.scraperUrl || '',
       // Legacy format support
       author: authors.length > 0 ? authors[0].name : '',
       coverImage: book.imageUrl || '',

@@ -4,7 +4,9 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { FiDownload, FiArrowLeft, FiCalendar, FiFileText, FiTag, FiBook, FiUsers, FiLayers, FiStar, FiGlobe, FiHash } from 'react-icons/fi';
+import { FiDownload, FiArrowLeft, FiCalendar, FiFileText, FiTag, FiBook, FiUsers, FiLayers, FiStar, FiGlobe, FiHash, FiExternalLink } from 'react-icons/fi';
+import { FaGoodreads, FaWikipediaW, FaAmazon } from 'react-icons/fa';
+import { SiWikipedia } from 'react-icons/si';
 import { motion } from 'framer-motion';
 
 interface Author {
@@ -30,6 +32,7 @@ interface Book {
   seriesPosition?: string;
   publicationDate?: string;
   seriesId?: string;
+  scraperUrl?: string;
   // Legacy fields
   author?: string;
   coverImage?: string;
@@ -39,6 +42,50 @@ interface Book {
   fileSize?: string;
   format?: string;
 }
+
+// Helper function to determine the source type from URL
+const getSourceInfo = (url: string | undefined) => {
+  if (!url) return { type: 'unknown', icon: FiExternalLink, color: 'emerald' };
+  
+  const lowerUrl = url.toLowerCase();
+  
+  if (lowerUrl.includes('goodreads.com')) {
+    return { 
+      type: 'goodreads', 
+      icon: FaGoodreads, 
+      color: 'amber',
+      name: 'Goodreads'
+    };
+  } else if (lowerUrl.includes('fandom.com') || lowerUrl.includes('wikia.com')) {
+    return { 
+      type: 'fandom', 
+      icon: FaWikipediaW, 
+      color: 'purple',
+      name: 'Fandom'
+    };
+  } else if (lowerUrl.includes('wikipedia.org')) {
+    return { 
+      type: 'wikipedia', 
+      icon: SiWikipedia, 
+      color: 'slate',
+      name: 'Wikipedia'
+    };
+  } else if (lowerUrl.includes('amazon.com') || lowerUrl.includes('amzn.')) {
+    return { 
+      type: 'amazon', 
+      icon: FaAmazon, 
+      color: 'orange',
+      name: 'Amazon'
+    };
+  }
+  
+  return { 
+    type: 'unknown', 
+    icon: FiExternalLink, 
+    color: 'emerald',
+    name: 'Source'
+  };
+};
 
 export default function BookDetailPage() {
   const params = useParams<{ id: string }>();
@@ -346,15 +393,52 @@ export default function BookDetailPage() {
               )}
               
               {/* Download Button */}
-              <a
-                href={filesVcDownloadLink}
-                className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <FiDownload size={18} />
-                Download Book
-              </a>
+              <div className="flex flex-wrap gap-3">
+                <a
+                  href={filesVcDownloadLink}
+                  className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <FiDownload size={18} />
+                  Download Book
+                </a>
+                
+                {book.scraperUrl && (() => {
+                  const sourceInfo = getSourceInfo(book.scraperUrl);
+                  const SourceIcon = sourceInfo.icon;
+                  
+                  // Define color classes based on the source type
+                  const colorClasses = {
+                    goodreads: "bg-amber-600 hover:bg-amber-700",
+                    fandom: "bg-purple-600 hover:bg-purple-700",
+                    wikipedia: "bg-slate-600 hover:bg-slate-700",
+                    amazon: "bg-orange-600 hover:bg-orange-700",
+                    unknown: "bg-emerald-600 hover:bg-emerald-700"
+                  };
+                  
+                  const buttonColorClass = colorClasses[sourceInfo.type as keyof typeof colorClasses] || colorClasses.unknown;
+                  
+                  return (
+                    <div className="relative group/tooltip">
+                      <a
+                        href={book.scraperUrl}
+                        className={`inline-flex items-center gap-3 ${buttonColorClass} text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 relative overflow-hidden group`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <span className="absolute inset-0 opacity-10 bg-[radial-gradient(circle,_white_1px,_transparent_1px)] bg-[length:8px_8px]"></span>
+                        <SourceIcon size={20} className="relative z-10 transform transition-transform duration-300 group-hover:scale-110" />
+                        <span className="relative z-10">{sourceInfo.name}</span>
+                      </a>
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none">
+                        {book.scraperUrl}
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
             </div>
           </div>
         </div>
