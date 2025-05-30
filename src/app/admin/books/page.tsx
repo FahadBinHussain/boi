@@ -38,36 +38,59 @@ export default function BooksManagement() {
     }
   }, [isAdmin, isAdminLoading, router]);
   
+  // Fetch books from the API
+  useEffect(() => {
+    // Only fetch books if user is admin and not being redirected
+    if (isAdmin && !isAdminLoading) {
+      const fetchBooks = async () => {
+        try {
+          setIsLoading(true);
+          setError(null);
+          
+          const response = await fetch('/api/admin/books');
+          
+          if (!response.ok) {
+            throw new Error(`Failed to fetch books: ${response.statusText}`);
+          }
+          
+          const data = await response.json();
+          setBooks(data);
+        } catch (err) {
+          console.error('Error fetching books:', err);
+          setError('Failed to load books. Please try again later.');
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      
+      fetchBooks();
+    }
+  }, [isAdmin, isAdminLoading]);
+  
+  // GSAP animations
+  useEffect(() => {
+    if (isAdmin && !isAdminLoading) {
+      gsap.fromTo(
+        ".book-table-row",
+        { 
+          opacity: 0,
+          y: 20
+        },
+        { 
+          opacity: 1,
+          y: 0,
+          stagger: 0.05,
+          duration: 0.5,
+          ease: "power2.out"
+        }
+      );
+    }
+  }, [currentPage, filter, searchTerm, sort, isAdmin, isAdminLoading]);
+  
   // If loading or not admin, don't render the page yet
   if (isAdminLoading || !isAdmin) {
     return null;
   }
-  
-  // Fetch books from the API
-  useEffect(() => {
-    const fetchBooks = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        
-        const response = await fetch('/api/admin/books');
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch books: ${response.statusText}`);
-        }
-        
-        const data = await response.json();
-        setBooks(data);
-      } catch (err) {
-        console.error('Error fetching books:', err);
-        setError('Failed to load books. Please try again later.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    fetchBooks();
-  }, []);
   
   const booksPerPage = 8;
   
@@ -164,24 +187,6 @@ export default function BooksManagement() {
       setIsLoading(false);
     }
   };
-  
-  // GSAP animations
-  useEffect(() => {
-    gsap.fromTo(
-      ".book-table-row",
-      { 
-        opacity: 0,
-        y: 20
-      },
-      { 
-        opacity: 1,
-        y: 0,
-        stagger: 0.05,
-        duration: 0.5,
-        ease: "power2.out"
-      }
-    );
-  }, [currentPage, filter, searchTerm, sort]);
   
   return (
     <div>

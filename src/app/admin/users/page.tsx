@@ -6,24 +6,36 @@ import gsap from "gsap";
 import { useAdmin } from "@/lib/hooks/useAdmin";
 import { useRouter } from "next/navigation";
 
+// Define User type
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+  lastLogin: string;
+  joined: string;
+  downloads: number;
+}
+
 // Mock data for users
 const mockUsers = [
-  { id: 1, name: "Alex Johnson", email: "alex@example.com", role: "user", status: "active", lastLogin: "2023-06-20", joined: "2023-05-15", downloads: 28 },
-  { id: 2, name: "Sarah Miller", email: "sarah@example.com", role: "user", status: "active", lastLogin: "2023-06-18", joined: "2023-05-18", downloads: 12 },
-  { id: 3, name: "David Clark", email: "david@example.com", role: "user", status: "inactive", lastLogin: "2023-06-01", joined: "2023-05-22", downloads: 5 },
-  { id: 4, name: "Emily Williams", email: "emily@example.com", role: "admin", status: "active", lastLogin: "2023-06-21", joined: "2023-04-10", downloads: 42 },
-  { id: 5, name: "Michael Brown", email: "michael@example.com", role: "user", status: "active", lastLogin: "2023-06-15", joined: "2023-05-05", downloads: 18 },
-  { id: 6, name: "Jessica Davis", email: "jessica@example.com", role: "user", status: "active", lastLogin: "2023-06-19", joined: "2023-05-28", downloads: 9 },
-  { id: 7, name: "Robert Wilson", email: "robert@example.com", role: "user", status: "inactive", lastLogin: "2023-05-30", joined: "2023-04-22", downloads: 3 },
-  { id: 8, name: "Amanda Martinez", email: "amanda@example.com", role: "user", status: "active", lastLogin: "2023-06-17", joined: "2023-06-01", downloads: 7 },
-  { id: 9, name: "Thomas Taylor", email: "thomas@example.com", role: "user", status: "active", lastLogin: "2023-06-20", joined: "2023-06-10", downloads: 2 },
-  { id: 10, name: "Jennifer Garcia", email: "jennifer@example.com", role: "user", status: "active", lastLogin: "2023-06-16", joined: "2023-05-20", downloads: 15 },
-  { id: 11, name: "Kevin Rodriguez", email: "kevin@example.com", role: "user", status: "inactive", lastLogin: "2023-05-25", joined: "2023-05-10", downloads: 4 },
-  { id: 12, name: "Lisa Smith", email: "lisa@example.com", role: "user", status: "active", lastLogin: "2023-06-18", joined: "2023-06-05", downloads: 8 }
+  { id: "1", name: "Alex Johnson", email: "alex@example.com", role: "user", status: "active", lastLogin: "2023-06-20", joined: "2023-05-15", downloads: 28 },
+  { id: "2", name: "Sarah Miller", email: "sarah@example.com", role: "user", status: "active", lastLogin: "2023-06-18", joined: "2023-05-18", downloads: 12 },
+  { id: "3", name: "David Clark", email: "david@example.com", role: "user", status: "inactive", lastLogin: "2023-06-01", joined: "2023-05-22", downloads: 5 },
+  { id: "4", name: "Emily Williams", email: "emily@example.com", role: "admin", status: "active", lastLogin: "2023-06-21", joined: "2023-04-10", downloads: 42 },
+  { id: "5", name: "Michael Brown", email: "michael@example.com", role: "user", status: "active", lastLogin: "2023-06-15", joined: "2023-05-05", downloads: 18 },
+  { id: "6", name: "Jessica Davis", email: "jessica@example.com", role: "user", status: "active", lastLogin: "2023-06-19", joined: "2023-05-28", downloads: 9 },
+  { id: "7", name: "Robert Wilson", email: "robert@example.com", role: "user", status: "inactive", lastLogin: "2023-05-30", joined: "2023-04-22", downloads: 3 },
+  { id: "8", name: "Amanda Martinez", email: "amanda@example.com", role: "user", status: "active", lastLogin: "2023-06-17", joined: "2023-06-01", downloads: 7 },
+  { id: "9", name: "Thomas Taylor", email: "thomas@example.com", role: "user", status: "active", lastLogin: "2023-06-20", joined: "2023-06-10", downloads: 2 },
+  { id: "10", name: "Jennifer Garcia", email: "jennifer@example.com", role: "user", status: "active", lastLogin: "2023-06-16", joined: "2023-05-20", downloads: 15 },
+  { id: "11", name: "Kevin Rodriguez", email: "kevin@example.com", role: "user", status: "inactive", lastLogin: "2023-05-25", joined: "2023-05-10", downloads: 4 },
+  { id: "12", name: "Lisa Smith", email: "lisa@example.com", role: "user", status: "active", lastLogin: "2023-06-18", joined: "2023-06-05", downloads: 8 }
 ];
 
 export default function UsersManagement() {
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<User[]>(mockUsers); // Initialize with mock data
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
@@ -41,6 +53,26 @@ export default function UsersManagement() {
       router.push('/admin/books/new');
     }
   }, [isAdmin, isAdminLoading, router]);
+  
+  // GSAP animations
+  useEffect(() => {
+    if (isAdmin && !isAdminLoading) {
+      gsap.fromTo(
+        ".user-table-row",
+        { 
+          opacity: 0,
+          y: 20
+        },
+        { 
+          opacity: 1,
+          y: 0,
+          stagger: 0.05,
+          duration: 0.5,
+          ease: "power2.out"
+        }
+      );
+    }
+  }, [currentPage, filter, roleFilter, searchTerm, sort, isAdmin, isAdminLoading]);
   
   // If loading or not admin, don't render the page yet
   if (isAdminLoading || !isAdmin) {
@@ -120,24 +152,6 @@ export default function UsersManagement() {
   const sendEmail = (email: string) => {
     alert(`Email would be sent to ${email}`);
   };
-  
-  // GSAP animations
-  useEffect(() => {
-    gsap.fromTo(
-      ".user-table-row",
-      { 
-        opacity: 0,
-        y: 20
-      },
-      { 
-        opacity: 1,
-        y: 0,
-        stagger: 0.05,
-        duration: 0.5,
-        ease: "power2.out"
-      }
-    );
-  }, [currentPage, filter, roleFilter, searchTerm, sort]);
   
   // User stats
   const totalActiveUsers = users.filter(user => user.status === "active").length;

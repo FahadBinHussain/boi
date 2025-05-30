@@ -55,67 +55,71 @@ export default function AdminDashboard() {
   const { isAdmin, isLoading } = useAdmin();
   const router = useRouter();
   
+  // Redirect regular users to the add book page
   useEffect(() => {
-    // Redirect regular users to the add book page
     if (!isLoading && !isAdmin) {
       router.push('/admin/books/new');
     }
   }, [isAdmin, isLoading, router]);
   
+  // Animation effects
+  useEffect(() => {
+    // Only run animations if user is admin and not being redirected
+    if (isAdmin && !isLoading) {
+      // Animate the dashboard cards
+      gsap.fromTo(
+        ".dashboard-card",
+        { 
+          y: 30, 
+          opacity: 0 
+        },
+        { 
+          y: 0, 
+          opacity: 1, 
+          stagger: 0.1,
+          duration: 0.7,
+          ease: "power2.out"
+        }
+      );
+      
+      // Animate the tables
+      gsap.fromTo(
+        ".dashboard-table",
+        { 
+          opacity: 0,
+          y: 20
+        },
+        { 
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          delay: 0.4,
+          ease: "power2.out"
+        }
+      );
+      
+      // Simple chart animation with GSAP
+      if (chartRef.current) {
+        const bars = chartRef.current.querySelectorAll(".chart-bar");
+        gsap.fromTo(
+          bars,
+          { height: 0 },
+          { 
+            height: "100%", 
+            duration: 1.5,
+            ease: "elastic.out(1, 0.3)",
+            stagger: 0.1,
+            delay: 0.5
+          }
+        );
+      }
+    }
+  }, [isAdmin, isLoading]);
+  
   // If loading or not admin, don't render the dashboard yet
   if (isLoading || !isAdmin) {
     return null;
   }
-  
-  useEffect(() => {
-    // Animate the dashboard cards
-    gsap.fromTo(
-      ".dashboard-card",
-      { 
-        y: 30, 
-        opacity: 0 
-      },
-      { 
-        y: 0, 
-        opacity: 1, 
-        stagger: 0.1,
-        duration: 0.7,
-        ease: "power2.out"
-      }
-    );
-    
-    // Animate the tables
-    gsap.fromTo(
-      ".dashboard-table",
-      { 
-        opacity: 0,
-        y: 20
-      },
-      { 
-        opacity: 1,
-        y: 0,
-        duration: 0.7,
-        delay: 0.4,
-        ease: "power2.out"
-      }
-    );
-    
-    // Simple chart animation with GSAP
-    if (chartRef.current) {
-      const bars = chartRef.current.querySelectorAll(".chart-bar");
-      gsap.fromTo(
-        bars,
-        { height: 0 },
-        { 
-          height: "100%", 
-          duration: 1.5,
-          ease: "elastic.out(1, 0.3)",
-          stagger: 0.1,
-          delay: 0.5
-        }
-      );
-    }
-  }, []);
 
   return (
     <div>

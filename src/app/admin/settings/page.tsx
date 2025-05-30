@@ -17,6 +17,12 @@ export default function AdminSettings() {
   const { isAdmin, isLoading: isAdminLoading } = useAdmin();
   const router = useRouter();
   
+  // Local state for form controls
+  const [filesVcApiKey, setFilesVcApiKey] = useState("");
+  const [filesVcAccountId, setFilesVcAccountId] = useState("");
+  const [isApiKeyModified, setIsApiKeyModified] = useState(false);
+  const [isAccountIdModified, setIsAccountIdModified] = useState(false);
+  
   // Redirect regular users to the add book page
   useEffect(() => {
     if (!isAdminLoading && !isAdmin) {
@@ -24,17 +30,6 @@ export default function AdminSettings() {
     }
   }, [isAdmin, isAdminLoading, router]);
   
-  // If loading or not admin, don't render the page yet
-  if (isAdminLoading || !isAdmin) {
-    return null;
-  }
-  
-  // Local state for form controls
-  const [filesVcApiKey, setFilesVcApiKey] = useState("");
-  const [filesVcAccountId, setFilesVcAccountId] = useState("");
-  const [isApiKeyModified, setIsApiKeyModified] = useState(false);
-  const [isAccountIdModified, setIsAccountIdModified] = useState(false);
-
   // Load settings when component mounts
   useEffect(() => {
     if (!isLoading && settings) {
@@ -144,6 +139,11 @@ export default function AdminSettings() {
         return null;
     }
   };
+  
+  // If loading or not admin, don't render the page yet
+  if (isAdminLoading || !isAdmin) {
+    return null;
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
