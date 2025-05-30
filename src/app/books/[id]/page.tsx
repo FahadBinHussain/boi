@@ -179,22 +179,6 @@ export default function BookDetailPage() {
                 ) : null}
               </div>
               
-              {/* Series information if available */}
-              {book.seriesName && (
-                <div className="mb-4 text-gray-700">
-                  <span className="font-medium">Series: </span>
-                  <Link 
-                    href={`/series/${book.seriesId || ''}`}
-                    className="text-indigo-600 hover:text-indigo-800"
-                  >
-                    {book.seriesName}
-                  </Link>
-                  {book.seriesPosition && (
-                    <span> (Book {book.seriesPosition})</span>
-                  )}
-                </div>
-              )}
-              
               {/* Description */}
               <div className="mb-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-2">Description</h2>
@@ -203,6 +187,35 @@ export default function BookDetailPage() {
               
               {/* Additional Details */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                {/* Series information if available */}
+                {book.seriesName && (
+                  <div className="flex items-start gap-2">
+                    <FiBook className="text-gray-500 mt-1" />
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-900">Series</h3>
+                      <p className="text-gray-700">
+                        <Link 
+                          href={`/series/${book.seriesId || ''}`}
+                          className="text-indigo-600 hover:text-indigo-800"
+                        >
+                          {book.seriesName}
+                        </Link>
+                      </p>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Series Position if available */}
+                {book.seriesPosition && (
+                  <div className="flex items-start gap-2">
+                    <FiHash className="text-gray-500 mt-1" />
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-900">Position in Series</h3>
+                      <p className="text-gray-700">{book.seriesPosition}</p>
+                    </div>
+                  </div>
+                )}
+                
                 {/* Publication Date */}
                 {(book.publicationDate) && (
                   <div className="flex items-start gap-2">
