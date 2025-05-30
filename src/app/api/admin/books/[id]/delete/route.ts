@@ -3,14 +3,11 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
 
-// Minimal implementation with standard types
-export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+// Most basic implementation with no type annotations
+export async function DELETE(request, context) {
   try {
     // Get the book ID from the URL params
-    const bookId = params.id;
+    const bookId = context.params.id;
     
     // Authenticate the admin
     const session = await getServerSession(authOptions);

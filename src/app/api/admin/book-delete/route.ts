@@ -3,8 +3,18 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
+    // Parse the request body to get the book ID
+    const { bookId } = await request.json();
+    
+    if (!bookId) {
+      return NextResponse.json({ 
+        error: 'Missing book ID',
+        details: 'Book ID is required to delete a book'
+      }, { status: 400 });
+    }
+    
     // Authenticate the admin
     const session = await getServerSession(authOptions);
     
@@ -15,39 +25,27 @@ export async function POST(req: Request) {
       }, { status: 401 });
     }
 
-    // Get book IDs from request body
-    const { bookIds } = await req.json();
-    
-    if (!bookIds || !Array.isArray(bookIds) || bookIds.length === 0) {
-      return NextResponse.json({ 
-        error: 'Missing book IDs',
-        details: 'Book IDs are required to delete books'
-      }, { status: 400 });
-    }
+    console.log(`Deleting book with ID: ${bookId}`);
 
-    console.log(`Bulk deleting ${bookIds.length} books`);
-
-    // Delete the books from the database
-    const result = await prisma.book.deleteMany({
+    // Delete the book from the database
+    const deletedBook = await prisma.book.delete({
       where: {
-        id: {
-          in: bookIds
-        }
+        id: bookId
       }
     });
 
-    console.log(`${result.count} books deleted successfully`);
+    console.log(`Book deleted successfully: ${deletedBook.title}`);
 
     return NextResponse.json({ 
       success: true,
-      message: `${result.count} books deleted successfully`,
-      count: result.count
+      message: 'Book deleted successfully',
+      deletedBook
     });
   } catch (error) {
-    console.error('Error deleting books:', error);
+    console.error('Error deleting book:', error);
     return NextResponse.json(
       { 
-        error: 'Failed to delete books', 
+        error: 'Failed to delete book', 
         details: error instanceof Error ? error.message : 'Unknown error' 
       },
       { status: 500 }

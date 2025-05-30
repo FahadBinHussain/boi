@@ -1,13 +1,10 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-// Simple GET handler for fetching a single book
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+// Simple GET handler with no type annotations
+export async function GET(request, context) {
   try {
-    const bookId = params.id;
+    const bookId = context.params.id;
     
     const book = await prisma.book.findUnique({
       where: { id: bookId },

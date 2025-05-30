@@ -376,8 +376,12 @@ export default function BooksManagement() {
                             onClick={async () => {
                               if (window.confirm(`Are you sure you want to delete "${book.title}"?`)) {
                                 try {
-                                  const response = await fetch(`/api/admin/books/${book.id}/delete`, {
-                                    method: 'DELETE',
+                                  const response = await fetch(`/api/admin/book-delete`, {
+                                    method: 'POST',
+                                    headers: {
+                                      'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({ bookId: book.id }),
                                   });
                                   
                                   if (!response.ok) {
