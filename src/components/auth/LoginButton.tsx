@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { signIn, signOut, useSession } from 'next-auth/react';
-import { FiLogIn, FiLogOut, FiUser } from 'react-icons/fi';
+import { FiLogIn, FiLogOut, FiUser, FiPlusCircle } from 'react-icons/fi';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
@@ -20,6 +20,7 @@ const LoginButton = () => {
   
   // Cast the user to include role
   const user = session?.user as ExtendedUser | undefined;
+  const isAdmin = user?.role === 'ADMIN';
 
   if (status === 'loading') {
     // Show loading state
@@ -56,13 +57,23 @@ const LoginButton = () => {
             animate={{ opacity: 1, y: 0 }}
             className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200"
           >
-            {user?.role === 'ADMIN' && (
+            {/* Show different links based on user role */}
+            {isAdmin ? (
               <Link 
                 href="/admin" 
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 onClick={() => setIsDropdownOpen(false)}
               >
                 Admin Dashboard
+              </Link>
+            ) : (
+              <Link 
+                href="/admin/books/new" 
+                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                onClick={() => setIsDropdownOpen(false)}
+              >
+                <FiPlusCircle className="mr-2 h-4 w-4" />
+                Add Book
               </Link>
             )}
             <Link 
