@@ -4,6 +4,8 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { FiBook, FiUsers, FiTrendingUp, FiDownload, FiPlusCircle, FiAlertCircle } from "react-icons/fi";
 import gsap from "gsap";
+import { useAdmin } from "@/lib/hooks/useAdmin";
+import { useRouter } from "next/navigation";
 
 // Define types for our data
 interface Book {
@@ -50,6 +52,20 @@ function StatCard({ title, value, icon, color }: { title: string; value: string;
 
 export default function AdminDashboard() {
   const chartRef = useRef<HTMLDivElement>(null);
+  const { isAdmin, isLoading } = useAdmin();
+  const router = useRouter();
+  
+  useEffect(() => {
+    // Redirect regular users to the add book page
+    if (!isLoading && !isAdmin) {
+      router.push('/admin/books/new');
+    }
+  }, [isAdmin, isLoading, router]);
+  
+  // If loading or not admin, don't render the dashboard yet
+  if (isLoading || !isAdmin) {
+    return null;
+  }
   
   useEffect(() => {
     // Animate the dashboard cards

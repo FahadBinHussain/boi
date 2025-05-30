@@ -5,6 +5,8 @@ import Link from "next/link";
 import { FiPlusCircle, FiSearch, FiEdit2, FiTrash2, FiFilter, FiDownload, FiChevronLeft, FiChevronRight, FiBook, FiLoader } from "react-icons/fi";
 import gsap from "gsap";
 import toast from "react-hot-toast";
+import { useAdmin } from "@/lib/hooks/useAdmin";
+import { useRouter } from "next/navigation";
 
 // Define book type
 interface Book {
@@ -26,6 +28,20 @@ export default function BooksManagement() {
   const [sort, setSort] = useState<{ field: string; direction: "asc" | "desc" }>({ field: "createdAt", direction: "desc" });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { isAdmin, isLoading: isAdminLoading } = useAdmin();
+  const router = useRouter();
+  
+  // Redirect regular users to the add book page
+  useEffect(() => {
+    if (!isAdminLoading && !isAdmin) {
+      router.push('/admin/books/new');
+    }
+  }, [isAdmin, isAdminLoading, router]);
+  
+  // If loading or not admin, don't render the page yet
+  if (isAdminLoading || !isAdmin) {
+    return null;
+  }
   
   // Fetch books from the API
   useEffect(() => {

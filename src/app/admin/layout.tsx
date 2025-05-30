@@ -16,7 +16,8 @@ import {
   FiX,
   FiBarChart2,
   FiDatabase,
-  FiRefreshCw
+  FiRefreshCw,
+  FiPlusCircle
 } from "react-icons/fi";
 import gsap from "gsap";
 
@@ -32,7 +33,7 @@ export default function AdminLayout({
   
   useEffect(() => {
     // Animation for sidebar elements
-    if (!isLoading && isAdmin) {
+    if (!isLoading) {
       gsap.fromTo(
         ".sidebar-item",
         { 
@@ -59,7 +60,7 @@ export default function AdminLayout({
         }
       );
     }
-  }, [isLoading, isAdmin]);
+  }, [isLoading]);
 
   if (isLoading) {
     return (
@@ -70,16 +71,17 @@ export default function AdminLayout({
     );
   }
 
-  if (!isAdmin) {
-    return null; // This will be redirected by the useAdmin hook
-  }
-
-  const navItems = [
-    { name: "Dashboard", href: "/admin", icon: <FiHome className="h-5 w-5" /> },
-    { name: "Books", href: "/admin/books", icon: <FiBook className="h-5 w-5" /> },
-    { name: "Users", href: "/admin/users", icon: <FiUsers className="h-5 w-5" /> },
-    { name: "Settings", href: "/admin/settings", icon: <FiSettings className="h-5 w-5" /> },
-  ];
+  // Define navigation items based on user role
+  const navItems = isAdmin 
+    ? [
+        { name: "Dashboard", href: "/admin", icon: <FiHome className="h-5 w-5" /> },
+        { name: "Books", href: "/admin/books", icon: <FiBook className="h-5 w-5" /> },
+        { name: "Users", href: "/admin/users", icon: <FiUsers className="h-5 w-5" /> },
+        { name: "Settings", href: "/admin/settings", icon: <FiSettings className="h-5 w-5" /> },
+      ]
+    : [
+        { name: "Add Book", href: "/admin/books/new", icon: <FiPlusCircle className="h-5 w-5" /> },
+      ];
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -119,8 +121,9 @@ export default function AdminLayout({
                 {user?.name?.charAt(0) || "A"}
               </div>
               <div className="ml-3">
-                <p className="text-sm font-medium text-white">{user?.name || "Admin"}</p>
+                <p className="text-sm font-medium text-white">{user?.name || "User"}</p>
                 <p className="text-xs text-indigo-300">{user?.email || ""}</p>
+                <p className="text-xs text-indigo-300">{isAdmin ? "Admin" : "User"}</p>
               </div>
             </div>
           </div>

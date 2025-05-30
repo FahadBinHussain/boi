@@ -11,26 +11,26 @@ const { uploadFile } = require('../../../../../../files.vc-Uploader/lib/uploader
 
 export async function POST(req: NextRequest) {
   try {
-    // Authenticate the admin
+    // Authenticate the user (both admin and regular users allowed)
     const session = await getServerSession(authOptions);
     
-    if (!session || !session.user || session.user.role !== 'ADMIN') {
+    if (!session || !session.user) {
       return NextResponse.json({ 
-        error: 'Unauthorized: Only administrators can create books',
-        details: 'Authentication failed or user is not an admin'
+        error: 'Unauthorized: You must be logged in to create books',
+        details: 'Authentication failed'
       }, { status: 401 });
     }
     
-    // Find the admin user in the database to get the ID
-    const adminUser = await prisma.user.findUnique({
+    // Find the user in the database to get the ID
+    const user = await prisma.user.findUnique({
       where: { email: session.user.email as string },
       select: { id: true }
     });
     
-    if (!adminUser) {
+    if (!user) {
       return NextResponse.json({
-        error: 'Admin user not found in database',
-        details: 'The authenticated admin user was not found in the database'
+        error: 'User not found in database',
+        details: 'The authenticated user was not found in the database'
       }, { status: 404 });
     }
 
@@ -186,7 +186,7 @@ export async function POST(req: NextRequest) {
         
         // Get API key from user settings
         const userSettings = await prisma.userSettings.findUnique({
-          where: { userId: adminUser.id },
+          where: { userId: user.id },
           select: { filesVcApiKey: true, filesVcAccountId: true }
         });
 

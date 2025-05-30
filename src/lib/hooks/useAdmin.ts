@@ -25,9 +25,8 @@ export function useAdmin() {
       return;
     }
     
-    if (user?.role !== "ADMIN") {
-      router.push("/auth/error?error=AccessDenied");
-    }
+    // Allow both admin and regular users to access the admin dashboard
+    // No redirect for non-admin users
   }, [session, status, router, user]);
   
   return {

@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { FiSave, FiSettings, FiLock, FiCheck, FiLoader, FiRefreshCw } from "react-icons/fi";
+import { FiSave, FiSettings, FiLock, FiCheck, FiLoader, FiRefreshCw, FiAlertCircle, FiCheckCircle } from "react-icons/fi";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
+import { useAdmin } from "@/lib/hooks/useAdmin";
+import { useRouter } from "next/navigation";
 
 export default function AdminSettings() {
   const { data: session } = useSession();
@@ -12,6 +14,20 @@ export default function AdminSettings() {
   const [isSaving, setIsSaving] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
   const notificationShownRef = useRef<boolean>(false);
+  const { isAdmin, isLoading: isAdminLoading } = useAdmin();
+  const router = useRouter();
+  
+  // Redirect regular users to the add book page
+  useEffect(() => {
+    if (!isAdminLoading && !isAdmin) {
+      router.push('/admin/books/new');
+    }
+  }, [isAdmin, isAdminLoading, router]);
+  
+  // If loading or not admin, don't render the page yet
+  if (isAdminLoading || !isAdmin) {
+    return null;
+  }
   
   // Local state for form controls
   const [filesVcApiKey, setFilesVcApiKey] = useState("");

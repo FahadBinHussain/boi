@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FiSearch, FiFilter, FiMail, FiEye, FiUserX, FiUserCheck, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { FiSearch, FiFilter, FiMail, FiEye, FiUserX, FiUserCheck, FiChevronLeft, FiChevronRight, FiEdit2, FiTrash2, FiLoader, FiUsers } from "react-icons/fi";
 import gsap from "gsap";
+import { useAdmin } from "@/lib/hooks/useAdmin";
+import { useRouter } from "next/navigation";
 
 // Mock data for users
 const mockUsers = [
@@ -21,13 +23,29 @@ const mockUsers = [
 ];
 
 export default function UsersManagement() {
-  const [users, setUsers] = useState(mockUsers);
+  const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
-  const [filter, setFilter] = useState<"all" | "active" | "inactive">("all");
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [filter, setFilter] = useState<"all" | "active" | "pending">("all");
   const [roleFilter, setRoleFilter] = useState<"all" | "admin" | "user">("all");
-  const [sort, setSort] = useState<{ field: string; direction: "asc" | "desc" }>({ field: "joined", direction: "desc" });
+  const [sort, setSort] = useState<{ field: string; direction: "asc" | "desc" }>({ field: "createdAt", direction: "desc" });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { isAdmin, isLoading: isAdminLoading } = useAdmin();
+  const router = useRouter();
+  
+  // Redirect regular users to the add book page
+  useEffect(() => {
+    if (!isAdminLoading && !isAdmin) {
+      router.push('/admin/books/new');
+    }
+  }, [isAdmin, isAdminLoading, router]);
+  
+  // If loading or not admin, don't render the page yet
+  if (isAdminLoading || !isAdmin) {
+    return null;
+  }
   
   const usersPerPage = 8;
   
@@ -70,7 +88,7 @@ export default function UsersManagement() {
   };
   
   // Toggle select one user
-  const toggleSelectUser = (id: number) => {
+  const toggleSelectUser = (id: string) => {
     if (selectedUsers.includes(id)) {
       setSelectedUsers(selectedUsers.filter(userId => userId !== id));
     } else {
@@ -88,11 +106,11 @@ export default function UsersManagement() {
   };
   
   // Toggle user status
-  const toggleUserStatus = (id: number) => {
+  const toggleUserStatus = (id: string) => {
     setUsers(
       users.map(user => 
         user.id === id 
-          ? { ...user, status: user.status === "active" ? "inactive" : "active" } 
+          ? { ...user, status: user.status === "active" ? "pending" : "active" } 
           : user
       )
     );
@@ -196,11 +214,11 @@ export default function UsersManagement() {
               <select
                 className="rounded-md border-0 py-1.5 pl-2 pr-8 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
                 value={filter}
-                onChange={(e) => setFilter(e.target.value as "all" | "active" | "inactive")}
+                onChange={(e) => setFilter(e.target.value as "all" | "active" | "pending")}
               >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
+                <option value="pending">Pending</option>
               </select>
             </div>
             
