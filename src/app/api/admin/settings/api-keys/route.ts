@@ -163,7 +163,7 @@ export async function GET(req: Request) {
 }
 
 // Function to retrieve an API key
-export async function getApiKey(adminId: string, serviceName: string): Promise<string | null> {
+async function getApiKey(adminId: string, serviceName: string): Promise<string | null> {
   if (!adminId || !serviceName) return null;
 
   try {
