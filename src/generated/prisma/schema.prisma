@@ -83,7 +83,7 @@ model Book {
   language        String?
   pdfUrl          String?
   series          String? // Keep this for backward compatibility
-  seriesPosition  Float[]
+  seriesPosition  String? // Changed from Float[] to String? to store exact format like "1/1"
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   authors         Author[]

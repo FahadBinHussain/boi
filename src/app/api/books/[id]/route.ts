@@ -54,7 +54,7 @@ export async function GET(
       publicationDate: book.publicationDate || '',
       seriesId: book.seriesId || '',
       seriesName: seriesName,
-      seriesPosition: book.seriesPosition || [],
+      seriesPosition: book.seriesPosition || '',
       // Legacy format support
       author: authors.length > 0 ? authors[0].name : '',
       coverImage: book.imageUrl || '',

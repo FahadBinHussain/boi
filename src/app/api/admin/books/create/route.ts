@@ -142,18 +142,9 @@ export async function POST(req: NextRequest) {
     const seriesPositionStr = formData.get('seriesPosition') as string || undefined;
     console.log('Raw seriesPosition from form:', seriesPositionStr);
     
-    // For schema compatibility, we need to extract numbers for the seriesPosition array field
-    let seriesPositionNums: number[] = [];
-    
     if (seriesPositionStr && seriesName) {
-      // Extract numbers for the seriesPosition array field (required for schema compatibility)
-      const numberMatches = seriesPositionStr.match(/\d+(\.\d+)?/g);
-      if (numberMatches) {
-        seriesPositionNums = numberMatches.map(n => parseFloat(n)).filter(n => !isNaN(n));
-      }
-      
       console.log('Series name:', seriesName);
-      console.log('Series position numbers:', seriesPositionNums);
+      console.log('Series position:', seriesPositionStr);
     }
     
     // Get the PDF file or URL
@@ -326,7 +317,7 @@ export async function POST(req: NextRequest) {
         characters: characters,
         language: language,
         series: seriesName,
-        seriesPosition: seriesPositionNums,
+        seriesPosition: seriesPositionStr, // Use the string directly
         pdfUrl: fileUrl,
         // Author relation
         authors: {

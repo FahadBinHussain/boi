@@ -27,7 +27,7 @@ interface Book {
   language?: string;
   pdfUrl?: string;
   seriesName?: string;
-  seriesPosition?: number[];
+  seriesPosition?: string;
   publicationDate?: string;
   seriesId?: string;
   // Legacy fields
@@ -189,8 +189,8 @@ export default function BookDetailPage() {
                   >
                     {book.seriesName}
                   </Link>
-                  {book.seriesPosition && book.seriesPosition.length > 0 && (
-                    <span> (Book {book.seriesPosition.join(', ')})</span>
+                  {book.seriesPosition && (
+                    <span> (Book {book.seriesPosition})</span>
                   )}
                 </div>
               )}
