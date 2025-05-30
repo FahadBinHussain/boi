@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FiUser, FiBookOpen, FiLoader } from 'react-icons/fi';
@@ -19,7 +19,7 @@ interface Book {
   authors: Author[];
 }
 
-export default function AuthorsPage() {
+function AuthorsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [activeAuthor, setActiveAuthor] = useState<string | null>(null);
@@ -248,5 +248,28 @@ export default function AuthorsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function AuthorsPage() {
+  return (
+    <Suspense fallback={
+      <div className="bg-gray-50 min-h-screen py-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-10">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">Authors</h1>
+            <p className="text-lg text-gray-600">
+              Browse our collection of books by author
+            </p>
+          </div>
+          <div className="flex justify-center items-center py-12">
+            <FiLoader className="animate-spin h-8 w-8 text-indigo-600" />
+            <span className="ml-2 text-lg text-gray-600">Loading authors...</span>
+          </div>
+        </div>
+      </div>
+    }>
+      <AuthorsContent />
+    </Suspense>
   );
 } 

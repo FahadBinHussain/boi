@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FiGrid, FiBookOpen, FiLoader } from 'react-icons/fi';
@@ -25,7 +25,7 @@ interface Book {
   genres: string[];
 }
 
-export default function GenresPage() {
+function GenresContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [activeGenre, setActiveGenre] = useState<string | null>(null);
@@ -250,12 +250,35 @@ export default function GenresPage() {
             {!activeGenre && (
               <div className="bg-white rounded-lg shadow-sm p-8 text-center">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Select a genre</h2>
-                <p className="text-gray-600">Click on a genre above to view related books.</p>
+                <p className="text-gray-600">Click on a genre above to view books in that category.</p>
               </div>
             )}
           </>
         )}
       </div>
     </div>
+  );
+}
+
+export default function GenresPage() {
+  return (
+    <Suspense fallback={
+      <div className="bg-gray-50 min-h-screen py-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-10">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">Genres</h1>
+            <p className="text-lg text-gray-600">
+              Browse our extensive collection of books by genre
+            </p>
+          </div>
+          <div className="flex justify-center items-center py-12">
+            <FiLoader className="animate-spin h-8 w-8 text-indigo-600" />
+            <span className="ml-2 text-lg text-gray-600">Loading genres...</span>
+          </div>
+        </div>
+      </div>
+    }>
+      <GenresContent />
+    </Suspense>
   );
 } 

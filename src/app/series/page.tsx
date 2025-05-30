@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FiLayers, FiBookOpen, FiLoader } from 'react-icons/fi';
@@ -26,7 +26,7 @@ interface Book {
   seriesPosition?: number[];
 }
 
-export default function SeriesPage() {
+function SeriesContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [activeSeries, setActiveSeries] = useState<string | null>(null);
@@ -259,12 +259,35 @@ export default function SeriesPage() {
             {!activeSeries && (
               <div className="bg-white rounded-lg shadow-sm p-8 text-center">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Select a series</h2>
-                <p className="text-gray-600">Click on a series above to view its books.</p>
+                <p className="text-gray-600">Click on a series above to view books in that collection.</p>
               </div>
             )}
           </>
         )}
       </div>
     </div>
+  );
+}
+
+export default function SeriesPage() {
+  return (
+    <Suspense fallback={
+      <div className="bg-gray-50 min-h-screen py-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-10">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">Series</h1>
+            <p className="text-lg text-gray-600">
+              Browse our collection of book series
+            </p>
+          </div>
+          <div className="flex justify-center items-center py-12">
+            <FiLoader className="animate-spin h-8 w-8 text-indigo-600" />
+            <span className="ml-2 text-lg text-gray-600">Loading series...</span>
+          </div>
+        </div>
+      </div>
+    }>
+      <SeriesContent />
+    </Suspense>
   );
 } 
