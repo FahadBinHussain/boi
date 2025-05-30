@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma';
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
     // Authenticate the admin
@@ -18,7 +18,7 @@ export async function DELETE(
       }, { status: 401 });
     }
 
-    const bookId = params.id;
+    const bookId = context.params.id;
     
     if (!bookId) {
       return NextResponse.json({ 
