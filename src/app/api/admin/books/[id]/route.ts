@@ -3,9 +3,15 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
 
+type Params = {
+  params: {
+    id: string;
+  };
+};
+
 export async function DELETE(
-  req: NextRequest,
-  context: { params: { id: string } }
+  request: NextRequest,
+  { params }: Params
 ) {
   try {
     // Authenticate the admin
@@ -18,7 +24,7 @@ export async function DELETE(
       }, { status: 401 });
     }
 
-    const bookId = context.params.id;
+    const bookId = params.id;
     
     if (!bookId) {
       return NextResponse.json({ 
