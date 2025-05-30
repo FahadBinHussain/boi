@@ -137,6 +137,9 @@ export async function POST(req: NextRequest) {
     const characters = charactersJson ? JSON.parse(charactersJson) as string[] : [];
     const language = formData.get('language') as string || undefined;
     
+    // Get scraper URL if provided
+    const scraperUrl = formData.get('scraperUrl') as string || undefined;
+    
     // Get series information
     const seriesName = formData.get('series') as string || undefined;
     const seriesPositionStr = formData.get('seriesPosition') as string || undefined;
@@ -319,6 +322,7 @@ export async function POST(req: NextRequest) {
         series: seriesName,
         seriesPosition: seriesPositionStr, // Use the string directly
         pdfUrl: fileUrl,
+        scraperUrl: scraperUrl, // Add the scraper URL
         // Author relation
         authors: {
           connect: authorIds.map(id => ({ id }))

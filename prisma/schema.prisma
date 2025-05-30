@@ -84,6 +84,7 @@ model Book {
   pdfUrl          String?
   series          String?   // Keep this for backward compatibility
   seriesPosition  String?   // Changed from Float[] to String? to store exact format like "1/1"
+  scraperUrl      String?   // URL used to scrape the book data
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   authors         Author[]

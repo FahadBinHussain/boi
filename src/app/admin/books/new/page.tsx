@@ -252,6 +252,9 @@ export default function AddNewBook() {
       if (language) formData.append('language', language);
       if (series) formData.append('series', series);
       
+      // Add scraper URL if it was used
+      if (metadataUrl) formData.append('scraperUrl', metadataUrl);
+      
       // Handle series position data
       if (seriesPosition) {
         console.log("Series position data to send:", seriesPosition);

@@ -7304,6 +7304,7 @@ export namespace Prisma {
     pdfUrl: string | null
     series: string | null
     seriesPosition: string | null
+    scraperUrl: string | null
     createdAt: Date | null
     updatedAt: Date | null
     seriesId: string | null
@@ -7323,6 +7324,7 @@ export namespace Prisma {
     pdfUrl: string | null
     series: string | null
     seriesPosition: string | null
+    scraperUrl: string | null
     createdAt: Date | null
     updatedAt: Date | null
     seriesId: string | null
@@ -7344,6 +7346,7 @@ export namespace Prisma {
     pdfUrl: number
     series: number
     seriesPosition: number
+    scraperUrl: number
     createdAt: number
     updatedAt: number
     seriesId: number
@@ -7377,6 +7380,7 @@ export namespace Prisma {
     pdfUrl?: true
     series?: true
     seriesPosition?: true
+    scraperUrl?: true
     createdAt?: true
     updatedAt?: true
     seriesId?: true
@@ -7396,6 +7400,7 @@ export namespace Prisma {
     pdfUrl?: true
     series?: true
     seriesPosition?: true
+    scraperUrl?: true
     createdAt?: true
     updatedAt?: true
     seriesId?: true
@@ -7417,6 +7422,7 @@ export namespace Prisma {
     pdfUrl?: true
     series?: true
     seriesPosition?: true
+    scraperUrl?: true
     createdAt?: true
     updatedAt?: true
     seriesId?: true
@@ -7525,6 +7531,7 @@ export namespace Prisma {
     pdfUrl: string | null
     series: string | null
     seriesPosition: string | null
+    scraperUrl: string | null
     createdAt: Date
     updatedAt: Date
     seriesId: string | null
@@ -7565,6 +7572,7 @@ export namespace Prisma {
     pdfUrl?: boolean
     series?: boolean
     seriesPosition?: boolean
+    scraperUrl?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     seriesId?: boolean
@@ -7590,6 +7598,7 @@ export namespace Prisma {
     pdfUrl?: boolean
     series?: boolean
     seriesPosition?: boolean
+    scraperUrl?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     seriesId?: boolean
@@ -7612,6 +7621,7 @@ export namespace Prisma {
     pdfUrl?: boolean
     series?: boolean
     seriesPosition?: boolean
+    scraperUrl?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     seriesId?: boolean
@@ -7634,12 +7644,13 @@ export namespace Prisma {
     pdfUrl?: boolean
     series?: boolean
     seriesPosition?: boolean
+    scraperUrl?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     seriesId?: boolean
   }
 
-  export type BookOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "imageUrl" | "publicationDate" | "summary" | "publisher" | "genres" | "ratings" | "averageRating" | "numberOfPages" | "characters" | "language" | "pdfUrl" | "series" | "seriesPosition" | "createdAt" | "updatedAt" | "seriesId", ExtArgs["result"]["book"]>
+  export type BookOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "imageUrl" | "publicationDate" | "summary" | "publisher" | "genres" | "ratings" | "averageRating" | "numberOfPages" | "characters" | "language" | "pdfUrl" | "series" | "seriesPosition" | "scraperUrl" | "createdAt" | "updatedAt" | "seriesId", ExtArgs["result"]["book"]>
   export type BookInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     authors?: boolean | Book$authorsArgs<ExtArgs>
     bookGenres?: boolean | Book$bookGenresArgs<ExtArgs>
@@ -7676,6 +7687,7 @@ export namespace Prisma {
       pdfUrl: string | null
       series: string | null
       seriesPosition: string | null
+      scraperUrl: string | null
       createdAt: Date
       updatedAt: Date
       seriesId: string | null
@@ -8120,6 +8132,7 @@ export namespace Prisma {
     readonly pdfUrl: FieldRef<"Book", 'String'>
     readonly series: FieldRef<"Book", 'String'>
     readonly seriesPosition: FieldRef<"Book", 'String'>
+    readonly scraperUrl: FieldRef<"Book", 'String'>
     readonly createdAt: FieldRef<"Book", 'DateTime'>
     readonly updatedAt: FieldRef<"Book", 'DateTime'>
     readonly seriesId: FieldRef<"Book", 'String'>
@@ -12834,6 +12847,7 @@ export namespace Prisma {
     pdfUrl: 'pdfUrl',
     series: 'series',
     seriesPosition: 'seriesPosition',
+    scraperUrl: 'scraperUrl',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
     seriesId: 'seriesId'
@@ -13309,6 +13323,7 @@ export namespace Prisma {
     pdfUrl?: StringNullableFilter<"Book"> | string | null
     series?: StringNullableFilter<"Book"> | string | null
     seriesPosition?: StringNullableFilter<"Book"> | string | null
+    scraperUrl?: StringNullableFilter<"Book"> | string | null
     createdAt?: DateTimeFilter<"Book"> | Date | string
     updatedAt?: DateTimeFilter<"Book"> | Date | string
     seriesId?: StringNullableFilter<"Book"> | string | null
@@ -13333,6 +13348,7 @@ export namespace Prisma {
     pdfUrl?: SortOrderInput | SortOrder
     series?: SortOrderInput | SortOrder
     seriesPosition?: SortOrderInput | SortOrder
+    scraperUrl?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     seriesId?: SortOrderInput | SortOrder
@@ -13360,6 +13376,7 @@ export namespace Prisma {
     pdfUrl?: StringNullableFilter<"Book"> | string | null
     series?: StringNullableFilter<"Book"> | string | null
     seriesPosition?: StringNullableFilter<"Book"> | string | null
+    scraperUrl?: StringNullableFilter<"Book"> | string | null
     createdAt?: DateTimeFilter<"Book"> | Date | string
     updatedAt?: DateTimeFilter<"Book"> | Date | string
     seriesId?: StringNullableFilter<"Book"> | string | null
@@ -13384,6 +13401,7 @@ export namespace Prisma {
     pdfUrl?: SortOrderInput | SortOrder
     series?: SortOrderInput | SortOrder
     seriesPosition?: SortOrderInput | SortOrder
+    scraperUrl?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     seriesId?: SortOrderInput | SortOrder
@@ -13413,6 +13431,7 @@ export namespace Prisma {
     pdfUrl?: StringNullableWithAggregatesFilter<"Book"> | string | null
     series?: StringNullableWithAggregatesFilter<"Book"> | string | null
     seriesPosition?: StringNullableWithAggregatesFilter<"Book"> | string | null
+    scraperUrl?: StringNullableWithAggregatesFilter<"Book"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Book"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Book"> | Date | string
     seriesId?: StringNullableWithAggregatesFilter<"Book"> | string | null
@@ -13951,6 +13970,7 @@ export namespace Prisma {
     pdfUrl?: string | null
     series?: string | null
     seriesPosition?: string | null
+    scraperUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     authors?: AuthorCreateNestedManyWithoutBooksInput
@@ -13974,6 +13994,7 @@ export namespace Prisma {
     pdfUrl?: string | null
     series?: string | null
     seriesPosition?: string | null
+    scraperUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     seriesId?: string | null
@@ -13997,6 +14018,7 @@ export namespace Prisma {
     pdfUrl?: NullableStringFieldUpdateOperationsInput | string | null
     series?: NullableStringFieldUpdateOperationsInput | string | null
     seriesPosition?: NullableStringFieldUpdateOperationsInput | string | null
+    scraperUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     authors?: AuthorUpdateManyWithoutBooksNestedInput
@@ -14020,6 +14042,7 @@ export namespace Prisma {
     pdfUrl?: NullableStringFieldUpdateOperationsInput | string | null
     series?: NullableStringFieldUpdateOperationsInput | string | null
     seriesPosition?: NullableStringFieldUpdateOperationsInput | string | null
+    scraperUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seriesId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -14043,6 +14066,7 @@ export namespace Prisma {
     pdfUrl?: string | null
     series?: string | null
     seriesPosition?: string | null
+    scraperUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     seriesId?: string | null
@@ -14064,6 +14088,7 @@ export namespace Prisma {
     pdfUrl?: NullableStringFieldUpdateOperationsInput | string | null
     series?: NullableStringFieldUpdateOperationsInput | string | null
     seriesPosition?: NullableStringFieldUpdateOperationsInput | string | null
+    scraperUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -14084,6 +14109,7 @@ export namespace Prisma {
     pdfUrl?: NullableStringFieldUpdateOperationsInput | string | null
     series?: NullableStringFieldUpdateOperationsInput | string | null
     seriesPosition?: NullableStringFieldUpdateOperationsInput | string | null
+    scraperUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seriesId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -14698,6 +14724,7 @@ export namespace Prisma {
     pdfUrl?: SortOrder
     series?: SortOrder
     seriesPosition?: SortOrder
+    scraperUrl?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     seriesId?: SortOrder
@@ -14723,6 +14750,7 @@ export namespace Prisma {
     pdfUrl?: SortOrder
     series?: SortOrder
     seriesPosition?: SortOrder
+    scraperUrl?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     seriesId?: SortOrder
@@ -14742,6 +14770,7 @@ export namespace Prisma {
     pdfUrl?: SortOrder
     series?: SortOrder
     seriesPosition?: SortOrder
+    scraperUrl?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     seriesId?: SortOrder
@@ -15975,6 +16004,7 @@ export namespace Prisma {
     pdfUrl?: string | null
     series?: string | null
     seriesPosition?: string | null
+    scraperUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     bookGenres?: GenreCreateNestedManyWithoutBooksInput
@@ -15997,6 +16027,7 @@ export namespace Prisma {
     pdfUrl?: string | null
     series?: string | null
     seriesPosition?: string | null
+    scraperUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     seriesId?: string | null
@@ -16043,6 +16074,7 @@ export namespace Prisma {
     pdfUrl?: StringNullableFilter<"Book"> | string | null
     series?: StringNullableFilter<"Book"> | string | null
     seriesPosition?: StringNullableFilter<"Book"> | string | null
+    scraperUrl?: StringNullableFilter<"Book"> | string | null
     createdAt?: DateTimeFilter<"Book"> | Date | string
     updatedAt?: DateTimeFilter<"Book"> | Date | string
     seriesId?: StringNullableFilter<"Book"> | string | null
@@ -16064,6 +16096,7 @@ export namespace Prisma {
     pdfUrl?: string | null
     series?: string | null
     seriesPosition?: string | null
+    scraperUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     authors?: AuthorCreateNestedManyWithoutBooksInput
@@ -16086,6 +16119,7 @@ export namespace Prisma {
     pdfUrl?: string | null
     series?: string | null
     seriesPosition?: string | null
+    scraperUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     seriesId?: string | null
@@ -16129,6 +16163,7 @@ export namespace Prisma {
     pdfUrl?: string | null
     series?: string | null
     seriesPosition?: string | null
+    scraperUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     authors?: AuthorCreateNestedManyWithoutBooksInput
@@ -16151,6 +16186,7 @@ export namespace Prisma {
     pdfUrl?: string | null
     series?: string | null
     seriesPosition?: string | null
+    scraperUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     authors?: AuthorUncheckedCreateNestedManyWithoutBooksInput
@@ -16321,6 +16357,7 @@ export namespace Prisma {
     pdfUrl?: NullableStringFieldUpdateOperationsInput | string | null
     series?: NullableStringFieldUpdateOperationsInput | string | null
     seriesPosition?: NullableStringFieldUpdateOperationsInput | string | null
+    scraperUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bookGenres?: GenreUpdateManyWithoutBooksNestedInput
@@ -16343,6 +16380,7 @@ export namespace Prisma {
     pdfUrl?: NullableStringFieldUpdateOperationsInput | string | null
     series?: NullableStringFieldUpdateOperationsInput | string | null
     seriesPosition?: NullableStringFieldUpdateOperationsInput | string | null
+    scraperUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seriesId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -16365,6 +16403,7 @@ export namespace Prisma {
     pdfUrl?: NullableStringFieldUpdateOperationsInput | string | null
     series?: NullableStringFieldUpdateOperationsInput | string | null
     seriesPosition?: NullableStringFieldUpdateOperationsInput | string | null
+    scraperUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seriesId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -16386,6 +16425,7 @@ export namespace Prisma {
     pdfUrl?: NullableStringFieldUpdateOperationsInput | string | null
     series?: NullableStringFieldUpdateOperationsInput | string | null
     seriesPosition?: NullableStringFieldUpdateOperationsInput | string | null
+    scraperUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     authors?: AuthorUpdateManyWithoutBooksNestedInput
@@ -16408,6 +16448,7 @@ export namespace Prisma {
     pdfUrl?: NullableStringFieldUpdateOperationsInput | string | null
     series?: NullableStringFieldUpdateOperationsInput | string | null
     seriesPosition?: NullableStringFieldUpdateOperationsInput | string | null
+    scraperUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seriesId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -16430,6 +16471,7 @@ export namespace Prisma {
     pdfUrl?: NullableStringFieldUpdateOperationsInput | string | null
     series?: NullableStringFieldUpdateOperationsInput | string | null
     seriesPosition?: NullableStringFieldUpdateOperationsInput | string | null
+    scraperUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seriesId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -16451,6 +16493,7 @@ export namespace Prisma {
     pdfUrl?: string | null
     series?: string | null
     seriesPosition?: string | null
+    scraperUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -16471,6 +16514,7 @@ export namespace Prisma {
     pdfUrl?: NullableStringFieldUpdateOperationsInput | string | null
     series?: NullableStringFieldUpdateOperationsInput | string | null
     seriesPosition?: NullableStringFieldUpdateOperationsInput | string | null
+    scraperUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     authors?: AuthorUpdateManyWithoutBooksNestedInput
@@ -16493,6 +16537,7 @@ export namespace Prisma {
     pdfUrl?: NullableStringFieldUpdateOperationsInput | string | null
     series?: NullableStringFieldUpdateOperationsInput | string | null
     seriesPosition?: NullableStringFieldUpdateOperationsInput | string | null
+    scraperUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     authors?: AuthorUncheckedUpdateManyWithoutBooksNestedInput
@@ -16515,6 +16560,7 @@ export namespace Prisma {
     pdfUrl?: NullableStringFieldUpdateOperationsInput | string | null
     series?: NullableStringFieldUpdateOperationsInput | string | null
     seriesPosition?: NullableStringFieldUpdateOperationsInput | string | null
+    scraperUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

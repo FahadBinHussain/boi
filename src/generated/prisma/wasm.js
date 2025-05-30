@@ -181,6 +181,7 @@ exports.Prisma.BookScalarFieldEnum = {
   pdfUrl: 'pdfUrl',
   series: 'series',
   seriesPosition: 'seriesPosition',
+  scraperUrl: 'scraperUrl',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   seriesId: 'seriesId'
