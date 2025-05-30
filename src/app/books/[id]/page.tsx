@@ -261,12 +261,30 @@ export default function BookDetailPage() {
                 )}
                 
                 {/* Average Rating */}
-                {book.averageRating && (
+                {typeof book.averageRating === 'number' && book.averageRating > 0 && (
                   <div className="flex items-start gap-2">
                     <FiStar className="text-gray-500 mt-1" />
                     <div>
                       <h3 className="text-sm font-medium text-gray-900">Rating</h3>
-                      <p className="text-gray-700">{book.averageRating} / 5 ({book.ratings} ratings)</p>
+                      <div className="flex items-center">
+                        <div className="flex text-yellow-400 mr-1">
+                          {[...Array(5)].map((_, i) => (
+                            <span key={i}>
+                              {i < Math.floor(book.averageRating || 0) ? (
+                                <FiStar className="fill-current" />
+                              ) : i < Math.ceil(book.averageRating || 0) && (book.averageRating || 0) % 1 > 0 ? (
+                                <FiStar className="fill-current opacity-60" />
+                              ) : (
+                                <FiStar className="stroke-current fill-transparent" />
+                              )}
+                            </span>
+                          ))}
+                        </div>
+                        <span className="text-gray-700">{(book.averageRating || 0).toFixed(1)} / 5</span>
+                        {typeof book.ratings === 'number' && book.ratings > 0 && (
+                          <span className="text-gray-500 ml-1">({book.ratings} ratings)</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 )}
@@ -294,7 +312,7 @@ export default function BookDetailPage() {
               </div>
               
               {/* Characters */}
-              {book.characters && book.characters.length > 0 && (
+              {Array.isArray(book.characters) && book.characters.length > 0 && (
                 <div className="mb-6">
                   <h2 className="text-lg font-semibold text-gray-900 mb-2">Characters</h2>
                   <div className="flex flex-wrap gap-2">
