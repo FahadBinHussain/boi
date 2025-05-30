@@ -1,13 +1,16 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-// Simple GET handler with no type annotations
-export async function GET(request, context) {
+// Add proper type annotations for Next.js 15
+export async function GET(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
-    const bookId = context.params.id;
+    const { id } = await context.params;
     
     const book = await prisma.book.findUnique({
-      where: { id: bookId },
+      where: { id },
       include: {
         authors: true,
         bookGenres: true,

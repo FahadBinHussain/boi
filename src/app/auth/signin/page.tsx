@@ -11,9 +11,9 @@ export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
   
   // Get error from URL if present
-  const errorParam = searchParams.get("error");
+  const errorParam = searchParams?.get("error") || null;
   // Get callbackUrl from URL parameters or default to /admin
-  const callbackUrl = searchParams.get("callbackUrl") || "/admin";
+  const callbackUrl = searchParams?.get("callbackUrl") || "/admin";
 
   useEffect(() => {
     if (errorParam) {

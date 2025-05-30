@@ -1,13 +1,16 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
-// Most basic implementation with no type annotations
-export async function DELETE(request, context) {
+// Add proper type annotations for Next.js 15
+export async function DELETE(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
     // Get the book ID from the URL params
-    const bookId = context.params.id;
+    const { id } = await context.params;
     
     // Authenticate the admin
     const session = await getServerSession(authOptions);
@@ -20,7 +23,7 @@ export async function DELETE(request, context) {
     
     // Delete the book from the database
     const deletedBook = await prisma.book.delete({
-      where: { id: bookId }
+      where: { id }
     });
     
     return NextResponse.json({ 
