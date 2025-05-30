@@ -1,61 +1,32 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-type Params = {
-  params: {
-    id: string;
-  };
-};
-
-export async function DELETE(
-  request: NextRequest,
-  { params }: Params
+// Simple GET handler for fetching a single book
+export async function GET(
+  request: Request,
+  { params }: { params: { id: string } }
 ) {
   try {
-    // Authenticate the admin
-    const session = await getServerSession(authOptions);
-    
-    if (!session || !session.user || session.user.role !== 'ADMIN') {
-      return NextResponse.json({ 
-        error: 'Unauthorized: Only administrators can delete books',
-        details: 'Authentication failed or user is not an admin'
-      }, { status: 401 });
-    }
-
     const bookId = params.id;
     
-    if (!bookId) {
-      return NextResponse.json({ 
-        error: 'Missing book ID',
-        details: 'Book ID is required to delete a book'
-      }, { status: 400 });
-    }
-
-    console.log(`Deleting book with ID: ${bookId}`);
-
-    // Delete the book from the database
-    const deletedBook = await prisma.book.delete({
-      where: {
-        id: bookId
+    const book = await prisma.book.findUnique({
+      where: { id: bookId },
+      include: {
+        authors: true,
+        bookGenres: true,
+        bookSeries: true
       }
     });
-
-    console.log(`Book deleted successfully: ${deletedBook.title}`);
-
-    return NextResponse.json({ 
-      success: true,
-      message: 'Book deleted successfully',
-      deletedBook
-    });
+    
+    if (!book) {
+      return NextResponse.json({ error: 'Book not found' }, { status: 404 });
+    }
+    
+    return NextResponse.json(book);
   } catch (error) {
-    console.error('Error deleting book:', error);
+    console.error('Error fetching book:', error);
     return NextResponse.json(
-      { 
-        error: 'Failed to delete book', 
-        details: error instanceof Error ? error.message : 'Unknown error' 
-      },
+      { error: 'Failed to fetch book' },
       { status: 500 }
     );
   }
