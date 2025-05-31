@@ -2,6 +2,8 @@
 const config = {
   plugins: {
     tailwindcss: {},
+    autoprefixer: {},
+    'postcss-color-rgba-fallback': {},
   },
 };
 
