@@ -5,8 +5,52 @@
  * the interface and adds type safety for use in our application.
  */
 
-// Import directly from the submodule path
-const { scrapeGoodreads } = require('../scrapers/Goodreads-Scraper');
+// Import directly from the submodule path with robust path resolution
+import path from 'path';
+// Make sure to handle both ESM and CommonJS imports
+let scrapeGoodreads: (url: string) => Promise<any>;
+try {
+  // Try to import directly from the index file
+  const goodreadsScraperModule = require('../scrapers/Goodreads-Scraper/index');
+  scrapeGoodreads = goodreadsScraperModule.scrapeGoodreads;
+  
+  // Validate that the scraper function exists
+  if (typeof scrapeGoodreads !== 'function') {
+    throw new Error('scrapeGoodreads is not a function in the imported module');
+  }
+  console.log('Successfully loaded goodreads-scraper from index.js');
+} catch (error) {
+  console.warn('Failed to import from index.js, trying direct import from scraper.js:', error);
+  try {
+    // Fallback to importing from the scraper.js file directly
+    const scraperModule = require('../scrapers/Goodreads-Scraper/src/scraper');
+    scrapeGoodreads = scraperModule.scrapeGoodreads;
+    
+    // Validate that the scraper function exists
+    if (typeof scrapeGoodreads !== 'function') {
+      throw new Error('scrapeGoodreads is not a function in the scraperModule');
+    }
+    console.log('Successfully loaded goodreads-scraper from src/scraper.js');
+  } catch (secondError) {
+    console.error('Failed to import from both paths, trying fallback implementation:', secondError);
+    try {
+      // Try our own fallback implementation
+      const fallbackModule = require('./goodreads-fallback');
+      scrapeGoodreads = fallbackModule.scrapeGoodreads;
+      
+      if (typeof scrapeGoodreads !== 'function') {
+        throw new Error('scrapeGoodreads is not a function in the fallback module');
+      }
+      console.log('Successfully loaded goodreads-scraper from fallback implementation');
+    } catch (fallbackError) {
+      console.error('All import attempts failed:', fallbackError);
+      // Provide a dummy implementation to prevent crashes
+      scrapeGoodreads = async (url: string) => {
+        throw new Error('Goodreads scraper module could not be loaded. Please check dependencies and module paths.');
+      };
+    }
+  }
+}
 
 /**
  * The structure of book data returned by the scraper
