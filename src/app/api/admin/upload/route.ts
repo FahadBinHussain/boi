@@ -159,14 +159,43 @@ export async function POST(req: NextRequest) {
         console.error('Error cleaning up temporary file:', cleanupError);
       }
       
+      // Check for specific network errors
+      const errorMessage = uploadError.message || 'Unknown upload error';
+      let status = 500;
+      let userFriendlyMessage = errorMessage;
+      
+      // Handle specific error types with more user-friendly messages
+      if (errorMessage.includes('ECONNRESET') || errorMessage.includes('Connection reset')) {
+        userFriendlyMessage = 'The connection to the upload server was interrupted. This could be due to network issues or server load. Please try again with a smaller file or try later.';
+        status = 503; // Service Unavailable
+      } else if (errorMessage.includes('ETIMEDOUT') || errorMessage.includes('timeout')) {
+        userFriendlyMessage = 'The upload timed out. This could be due to a slow connection or the file being too large. Please try again with a smaller file or on a faster connection.';
+        status = 504; // Gateway Timeout
+      }
+      
       return NextResponse.json({
         error: 'Upload Error',
-        details: uploadError.message || 'Unknown upload error'
-      }, { status: 500 });
+        details: userFriendlyMessage,
+        retryable: status === 503 || status === 504, // Indicate if the error is likely temporary
+        originalError: errorMessage
+      }, { status });
     }
   } catch (error) {
     console.error('Error in upload handler:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    
+    // Clean up any temporary files if they exist
+    try {
+      if (tempFilePath && fs.existsSync(tempFilePath)) {
+        fs.unlinkSync(tempFilePath);
+      }
+      if (tempDir && fs.existsSync(tempDir)) {
+        fs.rmdirSync(tempDir);
+      }
+    } catch (cleanupError) {
+      console.error('Error cleaning up after general error:', cleanupError);
+    }
+    
     return NextResponse.json(
       { error: 'Internal Server Error', details: errorMessage },
       { status: 500 },

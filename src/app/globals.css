@@ -8,16 +8,30 @@
   --input-text: #333333;
   --input-border: #d1d5db;
   --input-bg: #ffffff;
+  --card-bg: #ffffff;
+  --card-border: #e5e7eb;
+  --accent-primary: #4f46e5;
+  --accent-primary-hover: #4338ca;
+  --accent-secondary: #10b981;
+  --accent-secondary-hover: #059669;
+  --muted: #9ca3af;
+  --muted-hover: #6b7280;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --input-text: #ededed;
-    --input-border: #4b5563;
-    --input-bg: #1f2937;
-  }
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --input-text: #ededed;
+  --input-border: #4b5563;
+  --input-bg: #1f2937;
+  --card-bg: #111827;
+  --card-border: #374151;
+  --accent-primary: #6366f1;
+  --accent-primary-hover: #818cf8;
+  --accent-secondary: #10b981;
+  --accent-secondary-hover: #34d399;
+  --muted: #6b7280;
+  --muted-hover: #9ca3af;
 }
 
 /* Direct styling without classes to avoid hydration issues */
@@ -62,8 +76,39 @@ select {
 input::placeholder,
 textarea::placeholder {
   opacity: 0.7 !important;
-  color: #6b7280 !important;
+  color: var(--muted) !important;
   font-weight: normal !important;
+}
+
+/* Dark mode transition */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 200ms;
+}
+
+/* Card styling */
+.card {
+  background-color: var(--card-bg);
+  border-color: var(--card-border);
+}
+
+/* Button styling */
+.btn-primary {
+  background-color: var(--accent-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-primary-hover);
+}
+
+.btn-secondary {
+  background-color: var(--accent-secondary);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: var(--accent-secondary-hover);
 }
 
 /* Animation utilities */
@@ -106,7 +151,7 @@ textarea::placeholder {
 
 /* Add gradient animation for hero */
 .hero-gradient {
-  background: linear-gradient(120deg, #4f46e5, #7c3aed, #3b82f6);
+  background: linear-gradient(120deg, var(--accent-primary), var(--accent-primary-hover), var(--accent-secondary));
   background-size: 300% 300%;
   animation: gradientAnimation 15s ease infinite;
 }

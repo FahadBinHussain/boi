@@ -2,78 +2,78 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { FiX, FiFilter } from 'react-icons/fi';
 
 interface GenreFilterProps {
   genres: string[];
   selectedGenres: string[];
-  onGenreChange: (genre: string) => void;
+  onGenreToggle: (genre: string) => void;
+  onClearFilters: () => void;
 }
 
-const GenreFilter = ({
-  genres,
-  selectedGenres,
-  onGenreChange,
-}: GenreFilterProps) => {
+const GenreFilter = ({ genres, selectedGenres, onGenreToggle, onClearFilters }: GenreFilterProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const displayCount = 8; // Number of genres to display before "Show More"
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-      <h3 className="text-gray-900 font-medium mb-3">Genres</h3>
-      
-      <div className="space-y-2">
-        {genres.slice(0, isExpanded ? genres.length : displayCount).map((genre) => (
-          <div key={genre} className="flex items-center">
+    <div className="mb-8">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Filter by Genre</h2>
+        <div className="flex items-center gap-2">
+          {selectedGenres.length > 0 && (
             <button
-              onClick={() => onGenreChange(genre)}
-              className="group flex items-center w-full text-left"
+              onClick={onClearFilters}
+              className="text-xs flex items-center gap-1 px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
             >
-              <div 
-                className={`w-4 h-4 mr-2 rounded flex items-center justify-center border ${
-                  selectedGenres.includes(genre)
-                    ? 'bg-indigo-600 border-indigo-600'
-                    : 'border-gray-300 bg-white'
-                }`}
-              >
-                {selectedGenres.includes(genre) && (
-                  <svg 
-                    width="10" 
-                    height="10" 
-                    viewBox="0 0 10 10" 
-                    fill="none" 
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path 
-                      d="M8.33334 2.5L3.75001 7.08333L1.66667 5" 
-                      stroke="white" 
-                      strokeWidth="1.5" 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                )}
-              </div>
-              <span className={`text-sm ${
-                selectedGenres.includes(genre)
-                  ? 'text-indigo-600 font-medium'
-                  : 'text-gray-700 group-hover:text-gray-900'
-              }`}>
-                {genre}
-              </span>
+              <FiX size={14} />
+              Clear filters
             </button>
-          </div>
-        ))}
+          )}
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="md:hidden flex items-center gap-1 text-sm text-gray-700 dark:text-gray-300"
+          >
+            <FiFilter size={16} />
+            {isExpanded ? 'Hide' : 'Show'} filters
+          </button>
+        </div>
       </div>
-      
-      {genres.length > displayCount && (
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="mt-4 text-indigo-600 text-sm font-medium hover:text-indigo-700 transition-colors focus:outline-none"
-        >
-          {isExpanded ? 'Show Less' : 'Show More'}
-        </button>
-      )}
+
+      <div className={`md:block ${isExpanded ? 'block' : 'hidden'}`}>
+        <div className="flex flex-wrap gap-2">
+          {genres.map((genre) => (
+            <GenreButton
+              key={genre}
+              genre={genre}
+              isSelected={selectedGenres.includes(genre)}
+              onToggle={() => onGenreToggle(genre)}
+            />
+          ))}
+        </div>
+      </div>
     </div>
+  );
+};
+
+interface GenreButtonProps {
+  genre: string;
+  isSelected: boolean;
+  onToggle: () => void;
+}
+
+const GenreButton = ({ genre, isSelected, onToggle }: GenreButtonProps) => {
+  return (
+    <motion.button
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      onClick={onToggle}
+      className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
+        isSelected
+          ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-700'
+          : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700'
+      }`}
+    >
+      {genre}
+    </motion.button>
   );
 };
 

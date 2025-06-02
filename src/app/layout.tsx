@@ -37,15 +37,29 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <Script id="prevent-hydration-mismatch" strategy="beforeInteractive">
+        <Script id="theme-script" strategy="beforeInteractive">
           {`
             (function() {
-              // Ensure consistent rendering by removing any classes that might cause hydration mismatches
-              if (typeof window !== 'undefined') {
-                document.documentElement.className = '';
+              try {
+                // Check for stored theme preference
+                const storedTheme = localStorage.getItem('theme');
+                const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                
+                // Determine which theme to use
+                let theme;
+                if (storedTheme === 'dark' || storedTheme === 'light') {
+                  theme = storedTheme;
+                } else if (storedTheme === 'system') {
+                  theme = systemPrefersDark ? 'dark' : 'light';
+                } else {
+                  theme = systemPrefersDark ? 'dark' : 'light';
+                }
+                
+                // Apply theme class immediately to avoid flash
+                document.documentElement.classList.remove('light', 'dark');
+                document.documentElement.classList.add(theme);
                 
                 // Fix for date and time hydration mismatches
-                // Store the initial time at page load for components that need to use time
                 window.__INITIAL_TIME__ = {
                   now: Date.now(),
                   date: new Date().toISOString()
@@ -60,6 +74,9 @@ export default function RootLayout({
                     window.__HYDRATING__ = false;
                   }, 0);
                 });
+              } catch (e) {
+                // Fallback if localStorage is not available
+                console.error('Error accessing localStorage:', e);
               }
             })();
           `}
@@ -71,7 +88,7 @@ export default function RootLayout({
       >
         <Providers>
           <Header />
-          <main className="flex-grow">
+          <main className="flex-grow bg-background text-foreground">
             {children}
           </main>
           <Footer />
@@ -80,20 +97,22 @@ export default function RootLayout({
             toastOptions={{
               duration: 4000,
               style: {
-                background: '#333',
-                color: '#fff',
+                background: 'var(--card-bg)',
+                color: 'var(--foreground)',
                 boxShadow: '0 3px 10px rgba(0,0,0,0.2)',
                 padding: '16px',
                 borderRadius: '8px',
               },
               success: {
                 style: {
-                  background: '#10B981',
+                  background: 'var(--accent-secondary)',
+                  color: 'white',
                 },
               },
               error: {
                 style: {
                   background: '#EF4444',
+                  color: 'white',
                 },
               },
             }}
