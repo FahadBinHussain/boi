@@ -42,9 +42,22 @@ export const authOptions = {
       console.log("SignIn callback triggered", { 
         email: profile?.email,
         id: user?.id,
+        userEmail: user?.email,
         accountType: account?.provider
       });
-      
+      if (user?.email) {
+        try {
+          const updated = await prisma.user.update({
+            where: { email: user.email },
+            data: { lastLogin: new Date() }
+          });
+          console.log('lastLogin updated for user:', updated.email, updated.lastLogin);
+        } catch (e) {
+          console.error('Failed to update lastLogin:', e);
+        }
+      } else {
+        console.warn('No user.email found in signIn callback');
+      }
       // Always allow sign-in (avoid any logic that might reject valid users)
       return true;
     },

@@ -18,6 +18,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   settings      UserSettings?
+  lastLogin     DateTime?
 }
 
 model Account {

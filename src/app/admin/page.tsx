@@ -55,6 +55,7 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState({
     totalBooks: '-',
     totalUsers: '-',
+    activeUsers: '-',
   });
 
   // Redirect regular users to the add book page
@@ -127,6 +128,7 @@ export default function AdminDashboard() {
           setStats({
             totalBooks: data.totalBooks,
             totalUsers: data.totalUsers,
+            activeUsers: data.activeUsers,
           });
         }
       } catch (e) {
@@ -228,7 +230,11 @@ export default function AdminDashboard() {
             <div className="relative h-48 w-48">
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-gray-800">78%</div>
+                  <div className="text-3xl font-bold text-gray-800">
+                    {typeof stats.activeUsers === 'number' && typeof stats.totalUsers === 'number' && stats.totalUsers > 0
+                      ? `${Math.round((stats.activeUsers / stats.totalUsers) * 100)}%`
+                      : '-'}
+                  </div>
                   <div className="text-sm text-gray-500">Active Users</div>
                 </div>
               </div>
@@ -241,17 +247,21 @@ export default function AdminDashboard() {
                   stroke="#E5E7EB"
                   strokeWidth="10"
                 />
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="40"
-                  fill="none"
-                  stroke="#4F46E5"
-                  strokeWidth="10"
-                  strokeDasharray="251.2"
-                  strokeDashoffset="55.264"
-                  transform="rotate(-90 50 50)"
-                />
+                {typeof stats.activeUsers === 'number' && typeof stats.totalUsers === 'number' && stats.totalUsers > 0 && (
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    fill="none"
+                    stroke="#4F46E5"
+                    strokeWidth="10"
+                    strokeDasharray="251.2"
+                    strokeDashoffset={
+                      251.2 - (251.2 * stats.activeUsers) / stats.totalUsers
+                    }
+                    transform="rotate(-90 50 50)"
+                  />
+                )}
               </svg>
             </div>
           </div>
