@@ -27,11 +27,7 @@ interface User {
 // Empty arrays instead of mock data
 const recentBooks: Book[] = [];
 
-const recentUsers: User[] = [
-  { id: 1, name: "Alex Johnson", email: "alex@example.com", joined: "2023-05-15", downloads: 28 },
-  { id: 2, name: "Sarah Miller", email: "sarah@example.com", joined: "2023-05-18", downloads: 12 },
-  { id: 3, name: "David Clark", email: "david@example.com", joined: "2023-05-22", downloads: 5 },
-];
+const recentUsers: User[] = [];
 
 // Stat card component
 function StatCard({ title, value, icon, color }: { title: string; value: string; icon: React.ReactNode; color: string }) {
