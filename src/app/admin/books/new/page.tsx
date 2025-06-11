@@ -246,7 +246,7 @@ export default function AddNewBook() {
       if (genres.length > 0) formData.append('genres', JSON.stringify(genres));
       if (ratings !== undefined) formData.append('ratings', ratings.toString());
       if (averageRating !== undefined) formData.append('averageRating', averageRating.toString());
-      if (numberOfPages !== undefined) formData.append('numberOfPages', numberOfPages.toString());
+      if (numberOfPages != null) formData.append('numberOfPages', numberOfPages.toString());
       if (characters.length > 0) formData.append('characters', JSON.stringify(characters));
       if (language) formData.append('language', language);
       if (series) formData.append('series', series);
