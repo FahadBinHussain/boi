@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { FiBook, FiUsers, FiTrendingUp, FiDownload, FiPlusCircle, FiAlertCircle } from "react-icons/fi";
 import gsap from "gsap";
@@ -51,6 +51,12 @@ export default function AdminDashboard() {
   const { isAdmin, isLoading } = useAdmin();
   const router = useRouter();
   
+  // Add state for real stats
+  const [stats, setStats] = useState({
+    totalBooks: '-',
+    totalUsers: '-',
+  });
+
   // Redirect regular users to the add book page
   useEffect(() => {
     if (!isLoading && !isAdmin) {
@@ -112,6 +118,24 @@ export default function AdminDashboard() {
     }
   }, [isAdmin, isLoading]);
   
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const res = await fetch('/api/admin/dashboard-stats');
+        if (res.ok) {
+          const data = await res.json();
+          setStats({
+            totalBooks: data.totalBooks,
+            totalUsers: data.totalUsers,
+          });
+        }
+      } catch (e) {
+        // ignore error, keep dashes
+      }
+    }
+    fetchStats();
+  }, []);
+  
   // If loading or not admin, don't render the dashboard yet
   if (isLoading || !isAdmin) {
     return null;
@@ -136,13 +160,13 @@ export default function AdminDashboard() {
       <div className="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard 
           title="Total Books" 
-          value="-" 
+          value={stats.totalBooks} 
           icon={<FiBook className="h-6 w-6 text-white" />} 
           color="bg-blue-500"
         />
         <StatCard 
           title="Total Users" 
-          value="-" 
+          value={stats.totalUsers} 
           icon={<FiUsers className="h-6 w-6 text-white" />} 
           color="bg-green-500"
         />
