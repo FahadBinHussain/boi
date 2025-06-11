@@ -17,6 +17,7 @@ interface Book {
   title: string;
   imageUrl?: string;
   authors: Author[];
+  publicationDate?: string;
 }
 
 function AuthorsContent() {
@@ -27,6 +28,7 @@ function AuthorsContent() {
   const [books, setBooks] = useState<Book[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sortOption, setSortOption] = useState<'name' | 'date'>('name');
 
   // Fetch authors and books from the API
   useEffect(() => {
@@ -79,12 +81,21 @@ function AuthorsContent() {
     router.push(`/authors?id=${authorId}`);
   };
 
-  // Get books for the active author
+  // Get books for the active author, sorted
   const getAuthorBooks = () => {
     if (!activeAuthor) return [];
-    return books.filter(book => 
+    let authorBooks = books.filter(book => 
       book.authors.some(author => author.id === activeAuthor)
     );
+    if (sortOption === 'name') {
+      authorBooks = authorBooks.sort((a, b) => a.title.localeCompare(b.title));
+    } else if (sortOption === 'date') {
+      authorBooks = authorBooks.sort((a, b) => {
+        // Newest first; fallback to empty string if no publicationDate
+        return (b.publicationDate || '').localeCompare(a.publicationDate || '');
+      });
+    }
+    return authorBooks;
   };
 
   // Get active author name
@@ -170,15 +181,27 @@ function AuthorsContent() {
                   <h2 className="text-2xl font-bold text-gray-900">
                     Books by <span className="text-indigo-600">{getActiveAuthorName()}</span>
                   </h2>
-                  <button 
-                    onClick={() => {
-                      setActiveAuthor(null);
-                      router.push('/authors');
-                    }}
-                    className="text-sm text-gray-600 hover:text-indigo-600"
-                  >
-                    Clear selection
-                  </button>
+                  <div className="flex items-center gap-4">
+                    <label htmlFor="sort" className="text-sm text-gray-600 mr-2">Sort by:</label>
+                    <select
+                      id="sort"
+                      value={sortOption}
+                      onChange={e => setSortOption(e.target.value as 'name' | 'date')}
+                      className="rounded-md border-gray-300 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                    >
+                      <option value="name">Name (A-Z)</option>
+                      <option value="date">Publication Date (Newest)</option>
+                    </select>
+                    <button 
+                      onClick={() => {
+                        setActiveAuthor(null);
+                        router.push('/authors');
+                      }}
+                      className="text-sm text-gray-600 hover:text-indigo-600"
+                    >
+                      Clear selection
+                    </button>
+                  </div>
                 </div>
 
                 {/* Books Grid */}
