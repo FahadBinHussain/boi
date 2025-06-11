@@ -136,25 +136,25 @@ export default function AdminDashboard() {
       <div className="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard 
           title="Total Books" 
-          value="0" 
+          value="-" 
           icon={<FiBook className="h-6 w-6 text-white" />} 
           color="bg-blue-500"
         />
         <StatCard 
           title="Total Users" 
-          value="5,624" 
+          value="-" 
           icon={<FiUsers className="h-6 w-6 text-white" />} 
           color="bg-green-500"
         />
         <StatCard 
           title="Downloads Today" 
-          value="842" 
+          value="-" 
           icon={<FiDownload className="h-6 w-6 text-white" />} 
           color="bg-purple-500"
         />
         <StatCard 
           title="Growth Rate" 
-          value="+12.5%" 
+          value="-" 
           icon={<FiTrendingUp className="h-6 w-6 text-white" />} 
           color="bg-orange-500"
         />
