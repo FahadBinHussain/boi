@@ -1,5 +1,9 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+<img src="https://wakapi-qt1b.onrender.com/api/badge/fahad/interval:any/project:boi" 
+     alt="Wakapi Time Tracking" 
+     title="Spent more than that amount of time spent on this project">
+
 ## Getting Started
 
 First, run the development server:
@@ -35,6 +39,4 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
-<img src="https://wakapi-qt1b.onrender.com/api/badge/fahad/interval:any/project:boi" 
-     alt="Wakapi Time Tracking" 
-     title="Spent more than that amount of time spent on this project">
+
