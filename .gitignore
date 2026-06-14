@@ -1,0 +1,85 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+/next-env.d.ts
+.next-cache/
+*.tsbuildinfo
+
+# production
+/build
+/dist
+/public/dataset-assets/exports
+
+# misc
+.DS_Store
+*.pem
+Thumbs.db
+.cache/
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.pnpm-store/
+/.pnpm-store/
+
+# env files - IMPORTANT: never commit sensitive environment variables
+.env
+.env.*
+.env.local
+.env.development
+.env.test
+.env.production
+!.env.example
+
+# dataset generated artifacts
+/dataset/main/generated/
+/public/dataset-assets/
+
+# Dataset files - stored separately from git
+/dataset/main/
+/dataset/archive/
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# Prisma
+/prisma/migrations/
+/prisma/*.db
+/prisma/generated/
+/src/generated/
+
+# IDE / editors
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+logs
+*.log
+
+# OS generated
+.DS_Store*
+ehthumbs.db

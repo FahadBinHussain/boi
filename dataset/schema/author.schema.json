@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://boi.local/schema/author.schema.json",
+  "title": "Author",
+  "type": "object",
+  "required": ["id", "aliases", "source_refs", "confidence"],
+  "additionalProperties": true,
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "name_bn": { "type": ["string", "null"] },
+    "name_en": { "type": ["string", "null"] },
+    "aliases": { "type": "array", "items": { "type": "string" } },
+    "birth_year": { "type": ["integer", "null"] },
+    "death_year": { "type": ["integer", "null"] },
+    "country_or_region": { "type": ["string", "null"] },
+    "notes": { "type": ["string", "null"] },
+    "source_refs": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "name": "bangla-books-master-dataset",
+  "created": "2026-05-21",
+  "status": "draft",
+  "canonical_format": "jsonl",
+  "encoding": "utf-8",
+  "tables": [
+    "main/authors.jsonl",
+    "main/works/manifest.json",
+    "main/editions/manifest.json",
+    "main/contributions/manifest.json",
+    "main/source_records/manifest.json"
+  ],
+  "generated_candidate_views": [
+    "main/generated/candidates/authors.jsonl",
+    "main/generated/candidates/books.jsonl"
+  ],
+  "generated_exports": [
+    "main/generated/exports/works-manifest.json",
+    "main/generated/exports/works/pages",
+    "main/generated/exports/candidate-books.json",
+    "main/generated/exports/candidate-books-manifest.json",
+    "main/generated/exports/candidate-books/pages",
+    "main/generated/exports/references-manifest.json",
+    "main/generated/exports/references/pages",
+    "main/generated/exports/dataset-summary.json"
+  ],
+  "archive_folders": [
+    "archive/rokomaribg",
+    "archive/authors-com-bd",
+    "archive/books-com-bd",
+    "archive/nbil",
+    "archive/openlibrary",
+    "archive/internet-archive",
+    "archive/wikidata"
+  ],
+  "scripts": [
+    "scripts/validate-dataset.js",
+    "scripts/generate-exports.js",
+    "scripts/import-public-sources.js",
+    "scripts/import-rokomaribg.js"
+  ]
+}

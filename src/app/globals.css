@@ -1,0 +1,265 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --input-text: #333333;
+  --input-border: #d1d5db;
+  --input-bg: #ffffff;
+  --card-bg: #ffffff;
+  --card-border: #e5e7eb;
+  --accent-primary: #4f46e5;
+  --accent-primary-hover: #4338ca;
+  --accent-secondary: #10b981;
+  --accent-secondary-hover: #059669;
+  --muted: #9ca3af;
+  --muted-hover: #6b7280;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --input-text: #ededed;
+  --input-border: #4b5563;
+  --input-bg: #1f2937;
+  --card-bg: #111827;
+  --card-border: #374151;
+  --accent-primary: #6366f1;
+  --accent-primary-hover: #818cf8;
+  --accent-secondary: #10b981;
+  --accent-secondary-hover: #34d399;
+  --muted: #6b7280;
+  --muted-hover: #9ca3af;
+}
+
+/* Hardware acceleration for all animated elements */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  will-change: transform, opacity;
+}
+
+/* Custom scrollbar */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #776954 #eee4d4;
+}
+
+.dark {
+  scrollbar-color: #a89167 #1b2230;
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #eee4d4;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #776954;
+  border: 2px solid #eee4d4;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4f4638;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #1b2230;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #a89167;
+  border-color: #1b2230;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #d5bd8b;
+}
+
+.dataset-table-scroll {
+  scrollbar-gutter: stable;
+  padding-bottom: 12px;
+}
+
+.dataset-table-scroll::-webkit-scrollbar {
+  height: 16px;
+}
+
+.dataset-table-scroll::-webkit-scrollbar-track {
+  background: #e7dfd2;
+  border-top: 1px solid #d8d0c2;
+}
+
+.dataset-table-scroll::-webkit-scrollbar-thumb {
+  background: #5f5447;
+  border: 3px solid #e7dfd2;
+  border-radius: 0;
+}
+
+.dataset-table-scroll::-webkit-scrollbar-thumb:hover {
+  background: #171510;
+}
+
+/* Direct styling without classes to avoid hydration issues */
+html {
+  background: transparent;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+/* Form input styling to fix transparency issues */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+input[type="url"],
+input[type="tel"],
+input[type="search"],
+input[type="date"],
+textarea,
+select {
+  color: var(--input-text) !important;
+  opacity: 1 !important;
+  font-weight: 500 !important;
+  background-color: var(--input-bg) !important;
+  border-color: var(--input-border) !important;
+  box-shadow: none !important;
+}
+
+/* Specific styling for form inputs */
+.form-group input,
+.form-group textarea,
+.form-group select {
+  color: var(--input-text) !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.01em !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  opacity: 0.7 !important;
+  color: var(--muted) !important;
+  font-weight: normal !important;
+}
+
+/* Dark mode transition */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 200ms;
+}
+
+/* Card styling */
+.card {
+  background-color: var(--card-bg);
+  border-color: var(--card-border);
+}
+
+/* Button styling */
+.btn-primary {
+  background-color: var(--accent-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-primary-hover);
+}
+
+.btn-secondary {
+  background-color: var(--accent-secondary);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: var(--accent-secondary-hover);
+}
+
+/* Animation utilities */
+.reveal-text {
+  clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+  transition: clip-path 1s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.reveal-text.revealed {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+}
+
+/* For smooth parallax effects */
+.parallax-container {
+  perspective: 1000px;
+  overflow: hidden;
+}
+
+.parallax-element {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* For staggered animation containers */
+.stagger-container > * {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.stagger-container > *.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Smooth transitions for hover states */
+.feature-box {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+/* Add gradient animation for hero */
+.hero-gradient {
+  background: linear-gradient(120deg, var(--accent-primary), var(--accent-primary-hover), var(--accent-secondary));
+  background-size: 300% 300%;
+  animation: gradientAnimation 15s ease infinite;
+}
+
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* For smooth page transitions */
+.page-transition-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #4f46e5;
+  z-index: 9999;
+  transform: translateY(0);
+  transition: transform 0.7s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.page-transition-overlay.hidden {
+  transform: translateY(-100%);
+}

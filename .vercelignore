@@ -1,0 +1,9 @@
+.next
+node_modules
+public/dataset-assets/exports
+dataset/candidates
+dataset/normalized
+dataset/raw
+dataset/reports
+research_boi_*
+*.log
