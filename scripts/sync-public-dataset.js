@@ -6,7 +6,8 @@ const sourceDir = path.join(rootDir, 'dataset', 'main', 'generated', 'exports');
 const targetDir = path.join(rootDir, 'public', 'dataset-assets', 'exports');
 
 if (!fs.existsSync(sourceDir)) {
-  throw new Error(`Dataset exports directory not found: ${sourceDir}`);
+  console.warn(`Dataset exports directory not found: ${sourceDir} — skipping sync`);
+  process.exit(0);
 }
 
 fs.rmSync(targetDir, { recursive: true, force: true });
