@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { FiSearch, FiArrowRight, FiDownload, FiBook, FiBookmark, FiLogIn } from 'react-icons/fi';
+import { FiSearch, FiArrowRight, FiDownload, FiBookmark, FiLogIn } from 'react-icons/fi';
+import { BookIcon } from '@/components/ui/AnimatedBookIcon';
 import { useSession } from 'next-auth/react';
 import { signIn } from 'next-auth/react';
 import { useEffect, useRef, useState } from 'react';
@@ -248,7 +249,7 @@ const HeroSection = () => {
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-30 bg-white/20 translate-y-full group-hover:translate-y-0 transition-all duration-700"></div>
                 <div className="absolute -inset-px bg-gradient-to-r from-pink-500/50 to-indigo-500/50 opacity-0 group-hover:opacity-100 rounded-xl blur transition-all duration-1000 group-hover:duration-500"></div>
                 <div className="relative px-7 py-3.5 flex items-center gap-2">
-                  <FiBook className="text-white" size={18} />
+                  <BookIcon className="text-white" size={18} />
                   <span className="font-medium text-white">Explore Library</span>
                   <FiArrowRight className="text-white transform group-hover:translate-x-1 transition-transform duration-300" />
                 </div>
@@ -301,7 +302,7 @@ const HeroSection = () => {
                     <div className="aspect-[2/3] bg-gradient-to-br from-violet-600 to-indigo-700 flex items-center justify-center p-6 group-hover:from-violet-500 group-hover:to-indigo-600 transition-all duration-500">
                       <div className="text-center text-white">
                         <div className="w-20 h-20 rounded-full bg-white/20 mx-auto mb-5 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                          <FiBook size={32} className="text-white group-hover:rotate-12 transition-transform duration-500" />
+                          <BookIcon size={32} className="text-white" />
                         </div>
                         <h3 className="text-2xl font-bold mb-3">Science Fiction</h3>
                         <p className="text-white/80">Explore futuristic worlds and mind-bending concepts</p>
@@ -322,7 +323,7 @@ const HeroSection = () => {
                     <div className="aspect-[2/3] bg-gradient-to-br from-pink-600 to-purple-700 flex items-center justify-center p-5 group-hover:from-pink-500 group-hover:to-purple-600 transition-all duration-500">
                       <div className="text-center text-white">
                         <div className="w-14 h-14 rounded-full bg-white/20 mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                          <FiBook size={24} className="text-white group-hover:rotate-12 transition-transform duration-500" />
+                          <BookIcon size={24} className="text-white" />
                         </div>
                         <h3 className="text-xl font-bold mb-2">Biography</h3>
                         <p className="text-sm text-white/80">Real stories of extraordinary people</p>
@@ -339,7 +340,7 @@ const HeroSection = () => {
                     <div className="aspect-[2/3] bg-gradient-to-br from-blue-600 to-cyan-700 flex items-center justify-center p-5 group-hover:from-blue-500 group-hover:to-cyan-600 transition-all duration-500">
                       <div className="text-center text-white">
                         <div className="w-14 h-14 rounded-full bg-white/20 mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                          <FiBook size={24} className="text-white group-hover:rotate-12 transition-transform duration-500" />
+                          <BookIcon size={24} className="text-white" />
                         </div>
                         <h3 className="text-xl font-bold mb-2">Psychology</h3>
                         <p className="text-sm text-white/80">Understand the human mind</p>
