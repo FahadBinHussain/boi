@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { FiArrowRight, FiBookOpen, FiClock, FiGrid, FiTrendingUp, FiChevronRight } from 'react-icons/fi';
+import { FiArrowRight, FiChevronRight } from 'react-icons/fi';
+import { BookOpenIcon, TrendingUpIcon, ClockIcon, GridIcon, type AnimatedIconHandle } from '@/components/ui/AnimatedLandingIcons';
 import { genres as allGenres } from '@/lib/books';
 
 type ApiBook = {
@@ -56,6 +57,7 @@ export default function Home() {
   const [books, setBooks] = useState<ApiBook[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const statRefs = useRef<(AnimatedIconHandle | null)[]>([]);
   const { scrollYProgress } = useScroll();
   const heroOpacity = useTransform(scrollYProgress, [0, 0.25], [1, 0]);
   const heroScale = useTransform(scrollYProgress, [0, 0.25], [1, 0.98]);
@@ -183,11 +185,13 @@ export default function Home() {
             <div className="grid grid-cols-2 gap-4 lg:gap-5">
               <motion.div 
                 whileHover={{ y: -4, scale: 1.02 }}
+                onMouseEnter={() => statRefs.current[0]?.startAnimation()}
+                onMouseLeave={() => statRefs.current[0]?.stopAnimation()}
                 transition={{ duration: 0.4 }}
                 className="rounded-[2rem] border border-white/[0.08] bg-white/[0.02] p-6 backdrop-blur-2xl shadow-[0_30px_80px_-30px_rgba(0,0,0,0.5)]"
               >
                 <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-[#14b8a6]/20 to-[#14b8a6]/5 flex items-center justify-center mb-5">
-                  <FiBookOpen className="text-xl text-[#5eead4]" />
+                  <BookOpenIcon ref={(el) => { statRefs.current[0] = el; }} className="text-xl text-[#5eead4]" />
                 </div>
                 <p className="font-[var(--font-geist-mono)] text-4xl font-light text-white">12k+</p>
                 <p className="mt-2 text-sm text-white/50">Titles indexed</p>
@@ -195,11 +199,13 @@ export default function Home() {
               
               <motion.div 
                 whileHover={{ y: -4, scale: 1.02 }}
+                onMouseEnter={() => statRefs.current[1]?.startAnimation()}
+                onMouseLeave={() => statRefs.current[1]?.stopAnimation()}
                 transition={{ duration: 0.4 }}
                 className="translate-y-10 rounded-[2rem] border border-white/[0.08] bg-white/[0.02] p-6 backdrop-blur-2xl shadow-[0_30px_80px_-30px_rgba(0,0,0,0.5)]"
               >
                 <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-[#a855f7]/20 to-[#a855f7]/5 flex items-center justify-center mb-5">
-                  <FiTrendingUp className="text-xl text-[#c084fc]" />
+                  <TrendingUpIcon ref={(el) => { statRefs.current[1] = el; }} className="text-xl text-[#c084fc]" />
                 </div>
                 <p className="font-[var(--font-geist-mono)] text-4xl font-light text-white">94%</p>
                 <p className="mt-2 text-sm text-white/50">Return readers</p>
@@ -207,11 +213,13 @@ export default function Home() {
               
               <motion.div 
                 whileHover={{ y: -4, scale: 1.02 }}
+                onMouseEnter={() => statRefs.current[2]?.startAnimation()}
+                onMouseLeave={() => statRefs.current[2]?.stopAnimation()}
                 transition={{ duration: 0.4 }}
                 className="rounded-[2rem] border border-white/[0.08] bg-white/[0.02] p-6 backdrop-blur-2xl shadow-[0_30px_80px_-30px_rgba(0,0,0,0.5)]"
               >
                 <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-[#3b82f6]/20 to-[#3b82f6]/5 flex items-center justify-center mb-5">
-                  <FiClock className="text-xl text-[#60a5fa]" />
+                  <ClockIcon ref={(el) => { statRefs.current[2] = el; }} className="text-xl text-[#60a5fa]" />
                 </div>
                 <p className="font-[var(--font-geist-mono)] text-4xl font-light text-white">&lt;300ms</p>
                 <p className="mt-2 text-sm text-white/50">Search response</p>
@@ -219,11 +227,13 @@ export default function Home() {
               
               <motion.div 
                 whileHover={{ y: -4, scale: 1.02 }}
+                onMouseEnter={() => statRefs.current[3]?.startAnimation()}
+                onMouseLeave={() => statRefs.current[3]?.stopAnimation()}
                 transition={{ duration: 0.4 }}
                 className="translate-y-10 rounded-[2rem] border border-white/[0.08] bg-white/[0.02] p-6 backdrop-blur-2xl shadow-[0_30px_80px_-30px_rgba(0,0,0,0.5)]"
               >
                 <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-[#f59e0b]/20 to-[#f59e0b]/5 flex items-center justify-center mb-5">
-                  <FiGrid className="text-xl text-[#fbbf24]" />
+                  <GridIcon ref={(el) => { statRefs.current[3] = el; }} className="text-xl text-[#fbbf24]" />
                 </div>
                 <p className="font-[var(--font-geist-mono)] text-4xl font-light text-white">38</p>
                 <p className="mt-2 text-sm text-white/50">Genre clusters</p>
