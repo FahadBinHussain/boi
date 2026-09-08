@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { FiSearch, FiArrowRight, FiDownload, FiBookmark, FiLogIn } from 'react-icons/fi';
-import { BookIcon } from '@/components/ui/AnimatedBookIcon';
+import { BookIcon, type AnimatedIconHandle } from '@/components/ui/AnimatedBookIcon';
 import { useSession } from 'next-auth/react';
 import { signIn } from 'next-auth/react';
 import { useEffect, useRef, useState } from 'react';
@@ -15,6 +15,7 @@ const HeroSection = () => {
   const heroRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const bookIconRefs = useRef<(AnimatedIconHandle | null)[]>([]);
   const [particles, setParticles] = useState<Array<{
     id: number;
     width: string;
@@ -244,12 +245,14 @@ const HeroSection = () => {
               <Link 
                 href="/books" 
                 className="group relative overflow-hidden rounded-xl"
+                onMouseEnter={() => bookIconRefs.current[3]?.startAnimation()}
+                onMouseLeave={() => bookIconRefs.current[3]?.stopAnimation()}
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-indigo-600 group-hover:from-violet-700 group-hover:to-indigo-700 transition-all duration-500"></div>
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-30 bg-white/20 translate-y-full group-hover:translate-y-0 transition-all duration-700"></div>
                 <div className="absolute -inset-px bg-gradient-to-r from-pink-500/50 to-indigo-500/50 opacity-0 group-hover:opacity-100 rounded-xl blur transition-all duration-1000 group-hover:duration-500"></div>
                 <div className="relative px-7 py-3.5 flex items-center gap-2">
-                  <BookIcon className="text-white" size={18} />
+                  <BookIcon className="text-white" size={18} ref={(el) => { bookIconRefs.current[3] = el; }} />
                   <span className="font-medium text-white">Explore Library</span>
                   <FiArrowRight className="text-white transform group-hover:translate-x-1 transition-transform duration-300" />
                 </div>
@@ -295,14 +298,17 @@ const HeroSection = () => {
           <div className="w-full lg:w-1/2 hidden lg:block h-full relative">
             <div className="hero-showcase absolute inset-0 perspective-[1200px]">
               {/* Central hovering display */}
-              <div className="hero-showcase-item absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 transition-all duration-500 hover:z-50">
+              <div className="hero-showcase-item absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 transition-all duration-500 hover:z-50"
+                onMouseEnter={() => bookIconRefs.current[0]?.startAnimation()}
+                onMouseLeave={() => bookIconRefs.current[0]?.stopAnimation()}
+              >
                 <div className="relative w-[280px] transition-transform duration-500 hover:scale-110 hover:translate-y-[-10px] group">
                   {/* Main featured book */}
                   <div className="relative rounded-2xl overflow-hidden shadow-2xl transform -rotate-3 transition-all duration-500 hover:rotate-0 hover:shadow-[0_20px_50px_rgba(76,29,149,0.4)]">
                     <div className="aspect-[2/3] bg-gradient-to-br from-violet-600 to-indigo-700 flex items-center justify-center p-6 group-hover:from-violet-500 group-hover:to-indigo-600 transition-all duration-500">
                       <div className="text-center text-white">
                         <div className="w-20 h-20 rounded-full bg-white/20 mx-auto mb-5 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                          <BookIcon size={32} className="text-white" />
+                          <BookIcon size={32} className="text-white" ref={(el) => { bookIconRefs.current[0] = el; }} />
                         </div>
                         <h3 className="text-2xl font-bold mb-3">Science Fiction</h3>
                         <p className="text-white/80">Explore futuristic worlds and mind-bending concepts</p>
@@ -317,13 +323,16 @@ const HeroSection = () => {
               </div>
               
               {/* Orbit elements - floating books and decorative items */}
-              <div className="hero-showcase-item hero-float absolute top-[20%] right-[15%] transform rotate-6 z-10 transition-all duration-500 hover:z-50">
+              <div className="hero-showcase-item hero-float absolute top-[20%] right-[15%] transform rotate-6 z-10 transition-all duration-500 hover:z-50"
+                onMouseEnter={() => bookIconRefs.current[1]?.startAnimation()}
+                onMouseLeave={() => bookIconRefs.current[1]?.stopAnimation()}
+              >
                 <div className="relative w-[180px] transition-transform duration-500 hover:scale-110 hover:translate-y-[-10px] group">
                   <div className="rounded-2xl overflow-hidden shadow-xl transition-all duration-500 hover:shadow-[0_15px_40px_rgba(168,85,247,0.4)] hover:rotate-0">
                     <div className="aspect-[2/3] bg-gradient-to-br from-pink-600 to-purple-700 flex items-center justify-center p-5 group-hover:from-pink-500 group-hover:to-purple-600 transition-all duration-500">
                       <div className="text-center text-white">
                         <div className="w-14 h-14 rounded-full bg-white/20 mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                          <BookIcon size={24} className="text-white" />
+                          <BookIcon size={24} className="text-white" ref={(el) => { bookIconRefs.current[1] = el; }} />
                         </div>
                         <h3 className="text-xl font-bold mb-2">Biography</h3>
                         <p className="text-sm text-white/80">Real stories of extraordinary people</p>
@@ -334,13 +343,16 @@ const HeroSection = () => {
                 </div>
               </div>
               
-              <div className="hero-showcase-item hero-float absolute bottom-[25%] left-[20%] transform -rotate-6 z-10 transition-all duration-500 hover:z-50">
+              <div className="hero-showcase-item hero-float absolute bottom-[25%] left-[20%] transform -rotate-6 z-10 transition-all duration-500 hover:z-50"
+                onMouseEnter={() => bookIconRefs.current[2]?.startAnimation()}
+                onMouseLeave={() => bookIconRefs.current[2]?.stopAnimation()}
+              >
                 <div className="relative w-[200px] transition-transform duration-500 hover:scale-110 hover:translate-y-[-10px] group">
                   <div className="rounded-2xl overflow-hidden shadow-xl transition-all duration-500 hover:shadow-[0_15px_40px_rgba(37,99,235,0.4)] hover:rotate-0">
                     <div className="aspect-[2/3] bg-gradient-to-br from-blue-600 to-cyan-700 flex items-center justify-center p-5 group-hover:from-blue-500 group-hover:to-cyan-600 transition-all duration-500">
                       <div className="text-center text-white">
                         <div className="w-14 h-14 rounded-full bg-white/20 mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                          <BookIcon size={24} className="text-white" />
+                          <BookIcon size={24} className="text-white" ref={(el) => { bookIconRefs.current[2] = el; }} />
                         </div>
                         <h3 className="text-xl font-bold mb-2">Psychology</h3>
                         <p className="text-sm text-white/80">Understand the human mind</p>
