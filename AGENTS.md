@@ -22,6 +22,17 @@ When a record is not a normal book, preserve the material type in metadata, espe
 ## Tooling
 
 - Prefer `pnpm` for project commands.
+- Lockfile gotchas (`pnpm-lock.yaml`):
+  - a pnpm major bump mostly rewrites metadata, not deps: `libc: [glibc]/[musl]`
+    on linux platform binaries (sharp, `@next/swc`, `@unrs`), `deprecated:`
+    notes, recomputed eslint peer hashes. Big diff, no real change.
+  - a rewrite can still silently change a resolution (autoprefixer went
+    10.5.0 -> 10.4.18 while `package.json` stayed `^10.4.18` with no
+    overrides), so diff the `snapshots:` section for the real change.
+  - validate before committing: `pnpm install --frozen-lockfile` (exit 0 =
+    lock matches `package.json` + `node_modules`; ~100ms when clean).
+  - commit the lock as-is when it matches what is installed; reverting it
+    desyncs `node_modules` and the next install just rewrites it again.
 - After dataset or app changes, run the relevant verification command before saying the work is done.
 - For dataset research/import work, the normal finish flow is:
   - `pnpm dataset:apply:candidate-research`
