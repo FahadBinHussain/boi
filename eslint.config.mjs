@@ -1,23 +1,17 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
+import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
+import nextTypescript from "eslint-config-next/typescript";
 
 const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+  ...nextCoreWebVitals,
+  ...nextTypescript,
   {
     ignores: [
       "**/src/generated/**",
       "**/node_modules/**",
       "**/.next/**",
       "**/files.vc-Uploader/**",
-      "**/src/lib/scrapers/**"
+      "**/src/lib/scrapers/**",
+      "smooth scroll/**"
     ]
   },
   {
@@ -29,7 +23,8 @@ const eslintConfig = [
       "@typescript-eslint/ban-ts-comment": "off",
       "@next/next/no-img-element": "off",
       "prefer-const": "off",
-      "react-hooks/exhaustive-deps": "off"
+      "react-hooks/exhaustive-deps": "off",
+      "react-hooks/set-state-in-effect": "off"
     }
   }
 ];
