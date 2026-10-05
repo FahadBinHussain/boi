@@ -22,6 +22,13 @@ When a record is not a normal book, preserve the material type in metadata, espe
 ## Tooling
 
 - Prefer `pnpm` for project commands.
+- Lint is broken as of 2026-10-05 (verify with tsc + build instead):
+  - `pnpm lint` runs `next lint`, removed in Next 16 - it treats `lint` as an app
+    directory and fails with "Invalid project directory provided". use
+    `node_modules\.bin\tsc.cmd --noEmit` for type errors.
+  - raw `eslint <file>` also crashes ("Converting circular structure to JSON"):
+    both `eslint.config.mjs` (flat) and `.eslintrc.json` (legacy) exist and the flat
+    config pulls an eslintrc-era preset. settle on one config format before linting.
 - Lockfile gotchas (`pnpm-lock.yaml`):
   - a pnpm major bump mostly rewrites metadata, not deps: `libc: [glibc]/[musl]`
     on linux platform binaries (sharp, `@next/swc`, `@unrs`), `deprecated:`

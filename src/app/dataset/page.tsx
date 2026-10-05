@@ -248,6 +248,30 @@ export const metadata = {
   description: 'Source-backed Bangla books dataset status and exports.',
 };
 
+function DatasetExportError({ detail }: { detail: string }) {
+  return (
+    <div className="min-h-screen bg-[#f6f3ec] text-[#171510] dark:bg-[#0c1017] dark:text-white">
+      <section className="border-b-4 border-[#b3261e] bg-[#fdecea] px-4 py-8 sm:px-6 lg:px-8 dark:bg-[#2a1210]">
+        <div className="mx-auto max-w-3xl">
+          <p className="inline-flex items-center gap-2 border border-[#b3261e] bg-[#b3261e] px-3 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-white">
+            <FiDatabase aria-hidden="true" />
+            Dataset exports unavailable
+          </p>
+          <h1 className="mt-4 text-2xl font-semibold tracking-tight text-[#7a1a14] dark:text-red-300 sm:text-3xl">
+            /dataset cannot load its export assets
+          </h1>
+          <pre className="mt-4 overflow-x-auto border border-[#b3261e]/40 bg-white p-4 text-sm text-[#7a1a14] dark:bg-black/40 dark:text-red-200">{detail}</pre>
+          <p className="mt-4 text-sm text-[#7a1a14] dark:text-red-200">
+            Expected files under <code className="font-semibold">/dataset-assets/exports/</code> (copied at build time by
+            <code className="font-semibold"> scripts/sync-public-dataset.js</code> from the gitignored <code className="font-semibold">dataset/main/generated/exports</code>).
+            Fix locally with <code className="font-semibold">pnpm dataset:export &amp;&amp; pnpm build</code>, or restore <code className="font-semibold">dataset/main</code> first.
+          </p>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 export default async function DatasetPage({
   searchParams,
 }: {
@@ -259,10 +283,26 @@ export default async function DatasetPage({
   const sort = isSortKey(params?.sort) ? params.sort : 'title';
   const direction = isSortDirection(params?.dir) ? params.dir : 'asc';
   const datasetName = view === 'candidates' ? 'candidate-books' : 'works';
-  const manifest = await readJson<DatasetPageManifest>(`${datasetName}-manifest.json`);
-  const totalWorkPages = Math.max(1, manifest.page_count);
-  const safeCurrentPage = Math.min(currentPage, totalWorkPages);
-  const pageData = await readJson<DatasetPageExport>(`${datasetName}/pages/${sort}/${direction}/${pageFileName(safeCurrentPage)}`);
+
+  let manifest: DatasetPageManifest;
+  let pageData: DatasetPageExport;
+  let safeCurrentPage: number;
+  let totalWorkPages: number;
+  try {
+    manifest = await readJson<DatasetPageManifest>(`${datasetName}-manifest.json`);
+    totalWorkPages = Math.max(1, manifest.page_count);
+    safeCurrentPage = Math.min(currentPage, totalWorkPages);
+    pageData = await readJson<DatasetPageExport>(`${datasetName}/pages/${sort}/${direction}/${pageFileName(safeCurrentPage)}`);
+  } catch (error) {
+    const detail = [
+      `view=${view}`,
+      `missing or unreadable export assets under ${datasetAssetBasePath}/`,
+      '',
+      error instanceof Error ? error.message : String(error),
+    ].join('\n');
+    return <DatasetExportError detail={detail} />;
+  }
+
   const referencesById = new Map((pageData.references || []).map((reference) => [reference.id, reference]));
   const visibleWorks = pageData.rows;
   const totalRows = manifest.total;
