@@ -40,6 +40,7 @@ When a record is not a normal book, preserve the material type in metadata, espe
     lock matches `package.json` + `node_modules`; ~100ms when clean).
   - commit the lock as-is when it matches what is installed; reverting it
     desyncs `node_modules` and the next install just rewrites it again.
+- `dataset/main/` is gitignored (not present on Vercel/CI clones), so `scripts/sync-public-dataset.js` (run in `prebuild`) must warn and exit `0` when `dataset/main/generated/exports` is absent; exiting `1` breaks every Vercel build before `/dataset` can render its loud `DatasetExportError` banner.
 - After dataset or app changes, run the relevant verification command before saying the work is done.
 - For dataset research/import work, the normal finish flow is:
   - `pnpm dataset:apply:candidate-research`
