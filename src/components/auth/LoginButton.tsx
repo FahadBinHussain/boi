@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import { FiLogIn, FiLogOut, FiUser, FiPlusCircle } from 'react-icons/fi';
+import MotionIcon from '../ui/MotionIcon';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
@@ -43,7 +44,9 @@ const LoginButton = () => {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <FiUser className="text-indigo-600" size={18} />
+              <MotionIcon animation="bounce">
+                <FiUser className="text-indigo-600" size={18} />
+              </MotionIcon>
             )}
           </div>
           <span className="hidden md:inline text-sm font-medium">
@@ -72,7 +75,9 @@ const LoginButton = () => {
                 className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 onClick={() => setIsDropdownOpen(false)}
               >
-                <FiPlusCircle className="mr-2 h-4 w-4" />
+                <MotionIcon animation="spin" className="mr-2">
+                  <FiPlusCircle className="h-4 w-4" />
+                </MotionIcon>
                 Add Book
               </Link>
             )}
@@ -103,7 +108,9 @@ const LoginButton = () => {
       onClick={() => signIn('google', { callbackUrl: '/' })}
       className="flex items-center space-x-2 text-gray-700 hover:text-indigo-600 transition-colors focus:outline-none"
     >
-      <FiLogIn size={20} />
+      <MotionIcon animation="float">
+        <FiLogIn size={20} />
+      </MotionIcon>
       <span className="hidden md:inline">Sign in</span>
     </button>
   );

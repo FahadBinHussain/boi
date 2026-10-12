@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion } from 'framer-motion';
 import { FiBook, FiUsers, FiTrendingUp, FiDownload, FiPlusCircle, FiAlertCircle, FiChevronRight } from "react-icons/fi";
+import MotionIcon from "@/components/ui/MotionIcon";
 import gsap from "gsap";
 import { useAdmin } from "@/lib/hooks/useAdmin";
 import { useRouter } from "next/navigation";
@@ -175,7 +176,9 @@ export default function AdminDashboard() {
             href="/admin/books/new" 
             className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-medium text-[#0a0a0f] transition-all duration-500 hover:-translate-y-0.5 hover:shadow-[0_0_60px_-15px_rgba(20,184,166,0.4)]"
           >
-            <FiPlusCircle className="transition-transform duration-300 group-hover:scale-110" />
+            <MotionIcon animation="bounce" trigger="hover">
+              <FiPlusCircle className="transition-transform duration-300 group-hover:scale-110" />
+            </MotionIcon>
             Add Book
           </Link>
         </motion.div>
@@ -190,28 +193,44 @@ export default function AdminDashboard() {
           <StatCard 
             title="Total Books" 
             value={stats.totalBooks} 
-            icon={<FiBook className="h-6 w-6 text-white" />} 
+            icon={
+              <MotionIcon animation="float" trigger="always">
+                <FiBook className="h-6 w-6 text-white" />
+              </MotionIcon>
+            } 
             gradient="#14b8a6, #0d9488"
             accent="#5eead4"
           />
           <StatCard 
             title="Total Users" 
             value={stats.totalUsers} 
-            icon={<FiUsers className="h-6 w-6 text-white" />} 
+            icon={
+              <MotionIcon animation="bounce" trigger="always">
+                <FiUsers className="h-6 w-6 text-white" />
+              </MotionIcon>
+            } 
             gradient="#3b82f6, #1d4ed8"
             accent="#60a5fa"
           />
           <StatCard 
             title="Downloads Today" 
             value="-" 
-            icon={<FiDownload className="h-6 w-6 text-white" />} 
+            icon={
+              <MotionIcon animation="bounce" trigger="always">
+                <FiDownload className="h-6 w-6 text-white" />
+              </MotionIcon>
+            } 
             gradient="#a855f7, #7c3aed"
             accent="#c084fc"
           />
           <StatCard 
             title="Growth Rate" 
             value="-" 
-            icon={<FiTrendingUp className="h-6 w-6 text-white" />} 
+            icon={
+              <MotionIcon animation="pulse" trigger="always">
+                <FiTrendingUp className="h-6 w-6 text-white" />
+              </MotionIcon>
+            } 
             gradient="#f59e0b, #d97706"
             accent="#fbbf24"
           />
@@ -336,7 +355,9 @@ export default function AdminDashboard() {
                 </table>
               ) : (
                 <div className="py-16 text-center">
-                  <FiBook className="mx-auto h-14 w-14 text-white/20" />
+                  <MotionIcon animation="float" trigger="always">
+                    <FiBook className="mx-auto h-14 w-14 text-white/20" />
+                  </MotionIcon>
                   <h3 className="mt-4 text-sm font-medium">No books yet</h3>
                   <p className="mt-2 text-sm text-white/50">Get started by adding your first book.</p>
                   <div className="mt-8">
@@ -344,7 +365,9 @@ export default function AdminDashboard() {
                       href="/admin/books/new"
                       className="group inline-flex items-center gap-2 rounded-full bg-white/10 px-5 py-3 text-sm font-medium transition-all hover:bg-white/15"
                     >
-                      <FiPlusCircle />
+                      <MotionIcon animation="bounce" trigger="hover">
+                        <FiPlusCircle />
+                      </MotionIcon>
                       Add Book
                     </Link>
                   </div>
@@ -354,7 +377,9 @@ export default function AdminDashboard() {
             <div className="border-t border-white/[0.08] px-8 py-5">
               <Link href="/admin/books" className="group flex items-center gap-2 text-sm text-[#5eead4] hover:text-[#2dd4bf]">
                 View all books
-                <FiChevronRight className="transition-transform duration-300 group-hover:translate-x-1" />
+                <MotionIcon animation="float" trigger="hover">
+                  <FiChevronRight className="transition-transform duration-300 group-hover:translate-x-1" />
+                </MotionIcon>
               </Link>
             </div>
           </motion.div>
@@ -402,7 +427,9 @@ export default function AdminDashboard() {
             <div className="border-t border-white/[0.08] px-8 py-5">
               <Link href="/admin/users" className="group flex items-center gap-2 text-sm text-[#5eead4] hover:text-[#2dd4bf]">
                 View all users
-                <FiChevronRight className="transition-transform duration-300 group-hover:translate-x-1" />
+                <MotionIcon animation="float" trigger="hover">
+                  <FiChevronRight className="transition-transform duration-300 group-hover:translate-x-1" />
+                </MotionIcon>
               </Link>
             </div>
           </motion.div>
@@ -417,7 +444,9 @@ export default function AdminDashboard() {
         >
           <div className="flex gap-4">
             <div className="flex-shrink-0 rounded-full bg-[#f59e0b]/20 p-3">
-              <FiAlertCircle className="h-5 w-5 text-[#fbbf24]" />
+              <MotionIcon animation="wiggle" trigger="always">
+                <FiAlertCircle className="h-5 w-5 text-[#fbbf24]" />
+              </MotionIcon>
             </div>
             <div>
               <h3 className="font-medium text-[#fbbf24]">System Notice</h3>

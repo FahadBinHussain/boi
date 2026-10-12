@@ -10,8 +10,7 @@ const eslintConfig = [
       "**/node_modules/**",
       "**/.next/**",
       "**/files.vc-Uploader/**",
-      "**/src/lib/scrapers/**",
-      "smooth scroll/**"
+      "**/src/lib/scrapers/**"
     ]
   },
   {

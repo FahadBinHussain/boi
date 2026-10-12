@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { FiArrowRight, FiChevronRight } from 'react-icons/fi';
+import MotionIcon from '@/components/ui/MotionIcon';
 import { BookOpenIcon, TrendingUpIcon, ClockIcon, GridIcon, type AnimatedIconHandle } from '@/components/ui/AnimatedLandingIcons';
 import { genres as allGenres } from '@/lib/books';
 
@@ -167,7 +168,9 @@ export default function Home() {
             <motion.div variants={fadeInUp} className="mt-12 flex flex-wrap items-center gap-4">
               <Link href="/books" className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full bg-white px-7 py-4 text-sm font-medium text-[#0a0a0f] transition-all duration-500 hover:-translate-y-0.5 hover:shadow-[0_0_60px_-15px_rgba(20,184,166,0.4)]">
                 <span className="relative z-10">Browse collection</span>
-                <FiArrowRight className="relative z-10 transition-transform duration-500 group-hover:translate-x-1" />
+                <MotionIcon animation="float" trigger="hover" className="relative z-10">
+                  <FiArrowRight className="transition-transform duration-500 group-hover:translate-x-1" />
+                </MotionIcon>
                 <div className="absolute inset-0 bg-gradient-to-r from-[#5eead4] to-[#14b8a6] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
               </Link>
               <Link href="/genres" className="inline-flex items-center gap-3 rounded-full border border-white/[0.12] bg-white/[0.03] px-7 py-4 text-sm font-medium text-white backdrop-blur-xl transition-all duration-300 hover:border-white/20 hover:bg-white/[0.06]">
@@ -254,7 +257,9 @@ export default function Home() {
             animate={{ y: [0, 8, 0] }}
             transition={{ duration: 2, repeat: Infinity }}
           >
-            <FiChevronRight className="rotate-90" />
+            <MotionIcon animation="bounce" trigger="always">
+              <FiChevronRight className="rotate-90" />
+            </MotionIcon>
           </motion.div>
         </motion.div>
       </section>
@@ -274,7 +279,9 @@ export default function Home() {
           </div>
           <Link href="/books" className="group flex items-center gap-2 text-sm text-[#5eead4] transition hover:text-[#2dd4bf]">
             View all
-            <FiArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
+            <MotionIcon animation="float" trigger="hover">
+              <FiArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
+            </MotionIcon>
           </Link>
         </motion.div>
 
@@ -387,7 +394,9 @@ export default function Home() {
               </div>
               <Link href="/auth/signin" className="group inline-flex w-fit items-center gap-3 rounded-full bg-white px-8 py-4 text-sm font-medium text-[#0a0a0f] transition-all duration-500 hover:-translate-y-0.5 hover:shadow-[0_0_80px_-20px_rgba(255,255,255,0.3)]">
                 Continue
-                <FiArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
+                <MotionIcon animation="float" trigger="hover">
+                  <FiArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
+                </MotionIcon>
               </Link>
             </div>
           </div>

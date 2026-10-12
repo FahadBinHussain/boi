@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { FiArrowLeft, FiSave, FiImage, FiCalendar, FiUsers, FiBook, FiFileText, FiCheckCircle, FiLink, FiLoader, FiDownload, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import MotionIcon from "@/components/ui/MotionIcon";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import toast from "react-hot-toast";
 
@@ -79,9 +80,11 @@ const BookThumbnail = ({
       
       {hasError && (
         <div className="flex flex-col items-center justify-center text-center p-2">
-          <svg className="h-8 w-8 text-gray-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-          </svg>
+          <MotionIcon animation="wiggle" trigger="always">
+            <svg className="h-8 w-8 text-gray-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+            </svg>
+          </MotionIcon>
           <span className="text-xs text-gray-500">Image not available</span>
         </div>
       )}
@@ -761,7 +764,9 @@ export default function AddNewBook() {
             href="/admin/books"
             className="mr-4 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition-colors"
           >
-            <FiArrowLeft className="mr-2 h-4 w-4" />
+            <MotionIcon animation="bounce" trigger="hover" className="mr-2">
+              <FiArrowLeft className="h-4 w-4" />
+            </MotionIcon>
             Back to Books
           </Link>
           <h1 className="text-2xl font-bold text-gray-900">
@@ -809,7 +814,9 @@ export default function AddNewBook() {
               <div className="flex rounded-md shadow-sm">
                 <div className="relative flex flex-grow items-stretch focus-within:z-10">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                    <FiLink className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                    <MotionIcon animation="wiggle" trigger="hover">
+                      <FiLink className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                    </MotionIcon>
                   </div>
                   <input
                     type="text"
@@ -837,7 +844,9 @@ export default function AddNewBook() {
                     </>
                   ) : (
                     <>
-                      <FiDownload className="mr-2 h-4 w-4" />
+                      <MotionIcon animation="bounce" trigger="hover" className="mr-2">
+                        <FiDownload className="h-4 w-4" />
+                      </MotionIcon>
                       Fetch Data
                     </>
                   )}
@@ -847,9 +856,11 @@ export default function AddNewBook() {
             
             {scrapingError && (
               <div className="mt-3 flex items-center rounded-md bg-red-50 p-3 text-red-700">
-                <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" clipRule="evenodd" />
-                </svg>
+                <MotionIcon animation="wiggle" trigger="always" className="mr-2">
+                  <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" clipRule="evenodd" />
+                  </svg>
+                </MotionIcon>
                 <span>{scrapingError}</span>
               </div>
             )}
@@ -863,7 +874,9 @@ export default function AddNewBook() {
               <div className="form-group">
                 <label htmlFor="bookName" className="block text-sm font-medium text-gray-700 mb-2">
                   <div className="flex items-center">
-                    <FiBook className="mr-2 h-4 w-4 text-indigo-500" />
+                    <MotionIcon animation="float" trigger="hover" className="mr-2">
+                      <FiBook className="h-4 w-4 text-indigo-500" />
+                    </MotionIcon>
                     Book Name <span className="text-red-500 ml-1">*</span>
                   </div>
                 </label>
@@ -885,7 +898,9 @@ export default function AddNewBook() {
               <div className="form-group">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <div className="flex items-center">
-                    <FiUsers className="mr-2 h-4 w-4 text-indigo-500" />
+                    <MotionIcon animation="wiggle" trigger="hover" className="mr-2">
+                      <FiUsers className="h-4 w-4 text-indigo-500" />
+                    </MotionIcon>
                     Authors <span className="text-red-500 ml-1">*</span>
                   </div>
                 </label>
@@ -907,9 +922,11 @@ export default function AddNewBook() {
                           className="ml-2 p-1.5 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
                           aria-label="Remove author"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                          </svg>
+                          <MotionIcon animation="wiggle" trigger="hover">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                            </svg>
+                          </MotionIcon>
                         </button>
                       )}
                     </div>
@@ -920,9 +937,11 @@ export default function AddNewBook() {
                   onClick={addAuthor}
                   className="mt-3 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="-ml-0.5 mr-2 h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
-                  </svg>
+                  <MotionIcon animation="bounce" trigger="hover" className="-ml-0.5 mr-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
+                    </svg>
+                  </MotionIcon>
                   Add Author
                 </button>
                 {formErrors.authors && (
@@ -934,7 +953,9 @@ export default function AddNewBook() {
               <div className="form-group">
                 <label htmlFor="summary" className="block text-sm font-medium text-gray-700 mb-2">
                   <div className="flex items-center">
-                    <FiFileText className="mr-2 h-4 w-4 text-indigo-500" />
+                    <MotionIcon animation="float" trigger="hover" className="mr-2">
+                      <FiFileText className="h-4 w-4 text-indigo-500" />
+                    </MotionIcon>
                     Book Summary
                   </div>
                 </label>
@@ -963,7 +984,9 @@ export default function AddNewBook() {
               <div className="form-group">
                 <label htmlFor="thumbnailUrl" className="block text-sm font-medium text-gray-700 mb-2">
                   <div className="flex items-center">
-                    <FiImage className="mr-2 h-4 w-4 text-indigo-500" />
+                    <MotionIcon animation="pulse" trigger="hover" className="mr-2">
+                      <FiImage className="h-4 w-4 text-indigo-500" />
+                    </MotionIcon>
                     Thumbnail URL <span className="text-red-500 ml-1">*</span>
                   </div>
                 </label>
@@ -995,7 +1018,9 @@ export default function AddNewBook() {
                       />
                     ) : (
                       <div className="h-48 w-32 border-2 border-dashed border-gray-300 rounded-md flex flex-col items-center justify-center text-gray-400">
-                        <FiImage className="h-10 w-10 mb-2" />
+                        <MotionIcon animation="pulse" trigger="always" className="mb-2">
+                          <FiImage className="h-10 w-10" />
+                        </MotionIcon>
                         <span className="text-xs text-center px-2">Cover preview will appear here</span>
                       </div>
                     )}
@@ -1007,16 +1032,20 @@ export default function AddNewBook() {
               <div className="form-group">
                 <label htmlFor="bookPdf" className="block text-sm font-medium text-gray-700 mb-2">
                   <div className="flex items-center">
-                    <FiFileText className="mr-2 h-4 w-4 text-indigo-500" />
+                    <MotionIcon animation="float" trigger="hover" className="mr-2">
+                      <FiFileText className="h-4 w-4 text-indigo-500" />
+                    </MotionIcon>
                     Book File (PDF) <span className="text-red-500 ml-1">*</span>
                   </div>
                 </label>
                 <div className="mt-1 bg-gray-50 border border-gray-300 border-dashed rounded-md p-4">
                   <div className="flex justify-center">
                     <div className="space-y-2 text-center">
-                      <svg className="mx-auto h-10 w-10 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H8m36-12h-4m4 0H20" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
+                      <MotionIcon animation="bounce" trigger="hover">
+                        <svg className="mx-auto h-10 w-10 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                          <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H8m36-12h-4m4 0H20" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </MotionIcon>
                       <div className="flex text-sm text-gray-600">
                         <label htmlFor="bookPdf" className="relative cursor-pointer rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
                           <span>Upload a PDF file</span>
@@ -1040,9 +1069,11 @@ export default function AddNewBook() {
                   {bookPdfFile && (
                     <div className="mt-4 flex items-center justify-between bg-white p-3 rounded-md border border-gray-200">
                       <div className="flex items-center">
-                        <svg className="h-8 w-8 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
-                        </svg>
+                        <MotionIcon animation="float" trigger="always">
+                          <svg className="h-8 w-8 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+                          </svg>
+                        </MotionIcon>
                         <div className="ml-3">
                           <p className="text-sm font-medium text-gray-900">{bookPdfFile.name}</p>
                           <p className="text-sm text-gray-500">{(bookPdfFile.size / 1024 / 1024).toFixed(2)} MB</p>
@@ -1054,9 +1085,11 @@ export default function AddNewBook() {
                         className="text-gray-400 hover:text-gray-500"
                         disabled={singleBookUploadStatus === 'uploading'}
                       >
-                        <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                        </svg>
+                        <MotionIcon animation="wiggle" trigger="hover">
+                          <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                          </svg>
+                        </MotionIcon>
                       </button>
                     </div>
                   )}
@@ -1091,7 +1124,9 @@ export default function AddNewBook() {
                 {/* Success message */}
                 {singleBookUploadStatus === 'success' && singleBookPdfUrl && (
                   <div className="mt-3 flex items-center rounded-md bg-green-50 p-3 text-green-700">
-                    <FiCheckCircle className="mr-2 h-5 w-5" />
+                    <MotionIcon animation="bounce" trigger="always" className="mr-2">
+                      <FiCheckCircle className="h-5 w-5" />
+                    </MotionIcon>
                     <div>
                       <span className="font-medium">Upload successful!</span>
                       <button 
@@ -1108,9 +1143,11 @@ export default function AddNewBook() {
                 {/* Error message */}
                 {singleBookUploadStatus === 'error' && singleBookUploadError && (
                   <div className="mt-3 flex items-center rounded-md bg-red-50 p-3 text-red-700">
-                    <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                    </svg>
+                    <MotionIcon animation="wiggle" trigger="always" className="mr-2">
+                      <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                    </MotionIcon>
                     <span>{singleBookUploadError}</span>
                   </div>
                 )}
@@ -1131,7 +1168,9 @@ export default function AddNewBook() {
                 <label htmlFor="publicationDate" className="block text-sm font-medium text-gray-700 mb-2">
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-center">
-                      <FiCalendar className="mr-2 h-4 w-4 text-indigo-500" />
+                      <MotionIcon animation="wiggle" trigger="hover" className="mr-2">
+                        <FiCalendar className="h-4 w-4 text-indigo-500" />
+                      </MotionIcon>
                       Publication Date
                     </div>
                   </div>
@@ -1240,9 +1279,11 @@ export default function AddNewBook() {
                       onChange={(e) => setNumberOfPages(parseInt(e.target.value) || undefined)}
                     />
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
-                      </svg>
+                      <MotionIcon animation="float" trigger="hover">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+                        </svg>
+                      </MotionIcon>
                     </div>
                   </div>
                 </div>
@@ -1262,9 +1303,11 @@ export default function AddNewBook() {
                       onChange={(e) => setRatings(parseInt(e.target.value) || undefined)}
                     />
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
+                      <MotionIcon animation="bounce" trigger="hover">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      </MotionIcon>
                     </div>
                   </div>
                 </div>
@@ -1287,9 +1330,11 @@ export default function AddNewBook() {
                       onChange={(e) => setAverageRating(parseFloat(e.target.value) || undefined)}
                     />
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
+                      <MotionIcon animation="spin" trigger="hover">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      </MotionIcon>
                     </div>
                   </div>
                   <p className="mt-1 text-xs text-gray-500">Average rating out of 5</p>
@@ -1356,7 +1401,9 @@ export default function AddNewBook() {
                   </>
                 ) : (
                   <>
-                    <FiSave className="mr-2 h-4 w-4" />
+                    <MotionIcon animation="float" trigger="hover" className="mr-2">
+                      <FiSave className="h-4 w-4" />
+                    </MotionIcon>
                     Save Book
                   </>
                 )}

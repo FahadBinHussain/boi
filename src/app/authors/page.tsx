@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FiUser, FiBookOpen, FiLoader } from 'react-icons/fi';
+import MotionIcon from '@/components/ui/MotionIcon';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 
@@ -134,7 +135,9 @@ function AuthorsContent() {
         {/* Loading State */}
         {isLoading && (
           <div className="flex justify-center items-center py-12">
-            <FiLoader className="animate-spin h-8 w-8 text-indigo-600" />
+            <MotionIcon animation="spin" trigger="always">
+              <FiLoader className="h-8 w-8 text-indigo-600" />
+            </MotionIcon>
             <span className="ml-2 text-lg text-gray-600">Loading authors...</span>
           </div>
         )}
@@ -164,10 +167,12 @@ function AuthorsContent() {
                   whileTap={{ scale: 0.95 }}
                 >
                   <div className="flex flex-col items-center">
-                    <FiUser 
-                      size={24} 
-                      className={`mb-3 ${activeAuthor === author.id ? 'text-white' : 'text-indigo-500'}`} 
-                    />
+                    <MotionIcon animation="bounce">
+                      <FiUser 
+                        size={24} 
+                        className={`mb-3 ${activeAuthor === author.id ? 'text-white' : 'text-indigo-500'}`} 
+                      />
+                    </MotionIcon>
                     <span className="font-medium">{author.name}</span>
                   </div>
                 </motion.button>
@@ -228,7 +233,9 @@ function AuthorsContent() {
                                 />
                               ) : (
                                 <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                                  <FiBookOpen size={48} className="text-gray-400" />
+                                  <MotionIcon animation="float">
+                                    <FiBookOpen size={48} className="text-gray-400" />
+                                  </MotionIcon>
                                 </div>
                               )}
                             </div>
@@ -242,7 +249,9 @@ function AuthorsContent() {
                             </p>
                             
                             <div className="mt-4 flex items-center gap-2 text-indigo-600 text-sm font-medium">
-                              <FiBookOpen size={16} />
+                              <MotionIcon animation="float">
+                                <FiBookOpen size={16} />
+                              </MotionIcon>
                               <span>View Details</span>
                             </div>
                           </div>

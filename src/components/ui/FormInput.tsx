@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { FiAlertCircle } from 'react-icons/fi';
+import MotionIcon from './MotionIcon';
 
 interface FormInputProps {
   id: string;
@@ -68,7 +69,9 @@ const FormInput = ({
         />
         {error && (
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <FiAlertCircle className="h-5 w-5 text-red-500 dark:text-red-400" />
+            <MotionIcon animation="wiggle">
+              <FiAlertCircle className="h-5 w-5 text-red-500 dark:text-red-400" />
+            </MotionIcon>
           </div>
         )}
       </div>

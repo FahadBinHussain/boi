@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { FiPlusCircle, FiSearch, FiEdit2, FiTrash2, FiFilter, FiDownload, FiChevronLeft, FiChevronRight, FiBook, FiLoader } from "react-icons/fi";
+import MotionIcon from "@/components/ui/MotionIcon";
 import gsap from "gsap";
 import toast from "react-hot-toast";
 import { useAdmin } from "@/lib/hooks/useAdmin";
@@ -197,7 +198,9 @@ export default function BooksManagement() {
             href="/admin/books/new"
             className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
-            <FiPlusCircle className="mr-2 h-4 w-4" />
+            <MotionIcon animation="bounce" trigger="hover" className="mr-2">
+              <FiPlusCircle className="h-4 w-4" />
+            </MotionIcon>
             Add New Book
           </Link>
         </div>
@@ -209,7 +212,9 @@ export default function BooksManagement() {
           <div className="flex flex-1 flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
             <div className="relative flex-1">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <FiSearch className="h-5 w-5 text-gray-400" />
+                <MotionIcon animation="wiggle" trigger="hover">
+                  <FiSearch className="h-5 w-5 text-gray-400" />
+                </MotionIcon>
               </div>
               <input
                 type="text"
@@ -222,7 +227,9 @@ export default function BooksManagement() {
             
             <div className="flex items-center space-x-2">
               <div className="inline-flex items-center">
-                <FiFilter className="mr-2 h-5 w-5 text-gray-400" />
+                <MotionIcon animation="wiggle" trigger="hover" className="mr-2">
+                  <FiFilter className="h-5 w-5 text-gray-400" />
+                </MotionIcon>
                 <select
                   className="rounded-md border-0 py-1.5 pl-2 pr-8 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
                   value={filter}
@@ -243,7 +250,9 @@ export default function BooksManagement() {
                 onClick={deleteSelected}
                 className="inline-flex items-center rounded-md bg-red-100 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-200"
               >
-                <FiTrash2 className="mr-1 h-4 w-4" />
+                <MotionIcon animation="wiggle" trigger="hover" className="mr-1">
+                  <FiTrash2 className="h-4 w-4" />
+                </MotionIcon>
                 Delete
               </button>
             </div>
@@ -390,7 +399,9 @@ export default function BooksManagement() {
                             href={`/admin/books/${book.id}`}
                             className="rounded bg-blue-100 p-1.5 text-blue-600 hover:bg-blue-200 focus:outline-none"
                           >
-                            <FiEdit2 className="h-4 w-4" />
+                            <MotionIcon animation="float" trigger="hover">
+                              <FiEdit2 className="h-4 w-4" />
+                            </MotionIcon>
                             <span className="sr-only">Edit</span>
                           </Link>
                           <button
@@ -420,7 +431,9 @@ export default function BooksManagement() {
                             }}
                             className="rounded bg-red-100 p-1.5 text-red-600 hover:bg-red-200 focus:outline-none"
                           >
-                            <FiTrash2 className="h-4 w-4" />
+                            <MotionIcon animation="wiggle" trigger="hover">
+                              <FiTrash2 className="h-4 w-4" />
+                            </MotionIcon>
                             <span className="sr-only">Delete</span>
                           </button>
                         </div>
@@ -456,7 +469,9 @@ export default function BooksManagement() {
                         }`}
                       >
                         <span className="sr-only">Previous</span>
-                        <FiChevronLeft className="h-5 w-5" aria-hidden="true" />
+                        <MotionIcon animation="bounce" trigger="hover">
+                          <FiChevronLeft className="h-5 w-5" aria-hidden="true" />
+                        </MotionIcon>
                       </button>
                       
                       {/* Page numbers */}
@@ -482,7 +497,9 @@ export default function BooksManagement() {
                         }`}
                       >
                         <span className="sr-only">Next</span>
-                        <FiChevronRight className="h-5 w-5" aria-hidden="true" />
+                        <MotionIcon animation="bounce" trigger="hover">
+                          <FiChevronRight className="h-5 w-5" aria-hidden="true" />
+                        </MotionIcon>
                       </button>
                     </nav>
                   </div>
@@ -492,7 +509,9 @@ export default function BooksManagement() {
           </div>
         ) : (
           <div className="py-12 text-center bg-white rounded-lg shadow-md">
-            <FiBook className="mx-auto h-12 w-12 text-gray-300" />
+            <MotionIcon animation="float" trigger="always">
+              <FiBook className="mx-auto h-12 w-12 text-gray-300" />
+            </MotionIcon>
             <h3 className="mt-2 text-sm font-medium text-gray-900">No books yet</h3>
             <p className="mt-1 text-sm text-gray-500">Get started by adding your first book to your collection.</p>
             <div className="mt-6">
@@ -500,7 +519,9 @@ export default function BooksManagement() {
                 href="/admin/books/new"
                 className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700"
               >
-                <FiPlusCircle className="-ml-0.5 mr-1.5 h-4 w-4" aria-hidden="true" />
+                <MotionIcon animation="bounce" trigger="hover" className="-ml-0.5 mr-1.5">
+                  <FiPlusCircle className="h-4 w-4" aria-hidden="true" />
+                </MotionIcon>
                 Add New Book
               </Link>
             </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { FiSave, FiSettings, FiLock, FiCheck, FiLoader, FiRefreshCw, FiAlertCircle, FiCheckCircle } from "react-icons/fi";
+import MotionIcon from "@/components/ui/MotionIcon";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
@@ -124,14 +125,18 @@ export default function AdminSettings() {
       case 'success':
         return (
           <div className="flex items-center text-green-600">
-            <FiCheck className="mr-1 h-4 w-4" />
+            <MotionIcon animation="bounce" trigger="always" className="mr-1">
+              <FiCheck className="h-4 w-4" />
+            </MotionIcon>
             <span>Synced</span>
           </div>
         );
       case 'error':
         return (
           <div className="flex items-center text-red-600">
-            <FiLoader className="mr-1 h-4 w-4" />
+            <MotionIcon animation="spin" trigger="always" className="mr-1">
+              <FiLoader className="h-4 w-4" />
+            </MotionIcon>
             <span>Sync failed</span>
           </div>
         );
@@ -149,7 +154,9 @@ export default function AdminSettings() {
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8 flex items-center justify-between">
         <div className="flex items-center">
-          <FiSettings className="mr-3 h-6 w-6 text-gray-700" />
+          <MotionIcon animation="spin" trigger="hover" className="mr-3">
+            <FiSettings className="h-6 w-6 text-gray-700" />
+          </MotionIcon>
           <h1 className="text-2xl font-bold text-gray-900">Admin Settings</h1>
         </div>
         {getSyncStatusIndicator()}
@@ -182,7 +189,9 @@ export default function AdminSettings() {
           {/* Files.vc API Key */}
           <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="mb-4 flex items-center text-lg font-medium text-gray-900">
-              <FiLock className="mr-2 h-5 w-5 text-gray-700" />
+              <MotionIcon animation="wiggle" trigger="hover" className="mr-2">
+                <FiLock className="h-5 w-5 text-gray-700" />
+              </MotionIcon>
               Files.vc Integration
             </h2>
             
@@ -242,7 +251,9 @@ export default function AdminSettings() {
                 </>
               ) : (
                 <>
-                  <FiSave className="mr-2 h-4 w-4" />
+                  <MotionIcon animation="float" trigger="hover" className="mr-2">
+                    <FiSave className="h-4 w-4" />
+                  </MotionIcon>
                   Save Settings
                 </>
               )}

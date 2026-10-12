@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { headers } from 'next/headers';
 import { FiArchive, FiBookOpen, FiChevronLeft, FiChevronRight, FiDatabase, FiDownloadCloud } from 'react-icons/fi';
+import MotionIcon from '@/components/ui/MotionIcon';
 
 type DatasetWork = {
   id: string;
@@ -254,7 +255,9 @@ function DatasetExportError({ detail }: { detail: string }) {
       <section className="border-b-4 border-[#b3261e] bg-[#fdecea] px-4 py-8 sm:px-6 lg:px-8 dark:bg-[#2a1210]">
         <div className="mx-auto max-w-3xl">
           <p className="inline-flex items-center gap-2 border border-[#b3261e] bg-[#b3261e] px-3 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-white">
-            <FiDatabase aria-hidden="true" />
+            <MotionIcon animation="wiggle" trigger="always">
+              <FiDatabase aria-hidden="true" />
+            </MotionIcon>
             Dataset exports unavailable
           </p>
           <h1 className="mt-4 text-2xl font-semibold tracking-tight text-[#7a1a14] dark:text-red-300 sm:text-3xl">
@@ -319,7 +322,9 @@ export default async function DatasetPage({
           <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <div className="min-w-0">
               <div className="mb-2 inline-flex items-center gap-2 border border-[#d7cdbd] bg-white px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-[#6b5d48] dark:border-white/10 dark:bg-white/5 dark:text-white/55">
-                <FiDatabase aria-hidden="true" />
+                <MotionIcon animation="pulse" trigger="hover">
+                  <FiDatabase aria-hidden="true" />
+                </MotionIcon>
                 Books Dataset
               </div>
               <h1 className="text-2xl font-semibold tracking-tight text-[#171510] dark:text-white sm:text-3xl">Source-backed Bangla books</h1>
@@ -333,14 +338,18 @@ export default async function DatasetPage({
                   href={`/dataset?view=books&sort=${sort}&dir=${direction}`}
                   className={`inline-flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold transition ${view === 'books' ? 'bg-[#171510] text-white dark:bg-white dark:text-[#111722]' : 'text-[#5f5447] hover:bg-white hover:text-[#171510] dark:text-white/65 dark:hover:bg-white/10 dark:hover:text-white'}`}
                 >
-                  <FiBookOpen aria-hidden="true" />
+                  <MotionIcon animation="float" trigger="hover">
+                    <FiBookOpen aria-hidden="true" />
+                  </MotionIcon>
                   Books
                 </Link>
                 <Link
                   href={`/dataset?view=candidates&sort=${sort}&dir=${direction}`}
                   className={`inline-flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold transition ${view === 'candidates' ? 'bg-[#171510] text-white dark:bg-white dark:text-[#111722]' : 'text-[#5f5447] hover:bg-white hover:text-[#171510] dark:text-white/65 dark:hover:bg-white/10 dark:hover:text-white'}`}
                 >
-                  <FiArchive aria-hidden="true" />
+                  <MotionIcon animation="wiggle" trigger="hover">
+                    <FiArchive aria-hidden="true" />
+                  </MotionIcon>
                   Candidates
                 </Link>
               </div>
@@ -352,7 +361,9 @@ export default async function DatasetPage({
                     href={file.href}
                     className="inline-flex items-center gap-2 border border-[#c9bfaf] bg-[#fbfaf6] px-3 py-2 text-xs font-semibold text-[#171510] transition hover:border-[#7c6e58] hover:bg-[#f2eadc] dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
                   >
-                    <FiDownloadCloud aria-hidden="true" />
+                    <MotionIcon animation="bounce" trigger="hover">
+                      <FiDownloadCloud aria-hidden="true" />
+                    </MotionIcon>
                     {file.label}
                   </Link>
                 ))}
@@ -363,7 +374,9 @@ export default async function DatasetPage({
                   href={`/dataset?${pageQuery}&page=${Math.max(1, safeCurrentPage - 1)}`}
                   className={`inline-flex items-center justify-center gap-2 border px-3 py-2 text-xs font-semibold ${safeCurrentPage === 1 ? 'pointer-events-none border-[#e7dfd2] text-[#a89b8a] dark:border-white/10 dark:text-white/30' : 'border-[#c9bfaf] bg-[#fbfaf6] text-[#171510] hover:bg-[#f2eadc] dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10'}`}
                 >
-                  <FiChevronLeft aria-hidden="true" />
+                  <MotionIcon animation="bounce" trigger="hover">
+                    <FiChevronLeft aria-hidden="true" />
+                  </MotionIcon>
                   Previous
                 </Link>
                 <Link
@@ -371,7 +384,9 @@ export default async function DatasetPage({
                   className={`inline-flex items-center justify-center gap-2 border px-3 py-2 text-xs font-semibold ${safeCurrentPage === totalWorkPages ? 'pointer-events-none border-[#e7dfd2] text-[#a89b8a] dark:border-white/10 dark:text-white/30' : 'border-[#c9bfaf] bg-[#fbfaf6] text-[#171510] hover:bg-[#f2eadc] dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10'}`}
                 >
                   Next
-                  <FiChevronRight aria-hidden="true" />
+                  <MotionIcon animation="bounce" trigger="hover">
+                    <FiChevronRight aria-hidden="true" />
+                  </MotionIcon>
                 </Link>
               </div>
             </nav>

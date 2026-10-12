@@ -3,6 +3,7 @@
 import { useTheme } from "@/contexts/ThemeContext";
 import { useEffect, useState } from "react";
 import { SunIcon, MoonIcon, ComputerDesktopIcon } from "@heroicons/react/24/outline";
+import MotionIcon from "@/components/ui/MotionIcon";
 
 export default function ThemeToggle() {
   const { theme, setTheme } = useTheme();
@@ -29,7 +30,9 @@ export default function ThemeToggle() {
         title="Light mode"
         aria-label="Use light mode"
       >
-        <SunIcon className="w-5 h-5" />
+        <MotionIcon animation="spin">
+          <SunIcon className="w-5 h-5" />
+        </MotionIcon>
       </button>
       
       <button
@@ -42,7 +45,9 @@ export default function ThemeToggle() {
         title="Dark mode"
         aria-label="Use dark mode"
       >
-        <MoonIcon className="w-5 h-5" />
+        <MotionIcon animation="wiggle">
+          <MoonIcon className="w-5 h-5" />
+        </MotionIcon>
       </button>
       
       <button
@@ -55,7 +60,9 @@ export default function ThemeToggle() {
         title="System preference"
         aria-label="Use system theme preference"
       >
-        <ComputerDesktopIcon className="w-5 h-5" />
+        <MotionIcon animation="float">
+          <ComputerDesktopIcon className="w-5 h-5" />
+        </MotionIcon>
       </button>
     </div>
   );

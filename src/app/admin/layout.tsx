@@ -18,6 +18,7 @@ import {
   FiRefreshCw,
   FiPlusCircle
 } from "react-icons/fi";
+import MotionIcon from "@/components/ui/MotionIcon";
 import gsap from "gsap";
 
 export default function AdminLayout({
@@ -57,13 +58,13 @@ export default function AdminLayout({
 
   const navItems = isAdmin 
     ? [
-        { name: "Dashboard", href: "/admin", icon: <FiHome className="h-5 w-5" /> },
-        { name: "Books", href: "/admin/books", icon: <FiBook className="h-5 w-5" /> },
-        { name: "Users", href: "/admin/users", icon: <FiUsers className="h-5 w-5" /> },
-        { name: "Settings", href: "/admin/settings", icon: <FiSettings className="h-5 w-5" /> },
+        { name: "Dashboard", href: "/admin", icon: <MotionIcon animation="bounce" trigger="hover"><FiHome className="h-5 w-5" /></MotionIcon> },
+        { name: "Books", href: "/admin/books", icon: <MotionIcon animation="float" trigger="hover"><FiBook className="h-5 w-5" /></MotionIcon> },
+        { name: "Users", href: "/admin/users", icon: <MotionIcon animation="wiggle" trigger="hover"><FiUsers className="h-5 w-5" /></MotionIcon> },
+        { name: "Settings", href: "/admin/settings", icon: <MotionIcon animation="spin" trigger="hover"><FiSettings className="h-5 w-5" /></MotionIcon> },
       ]
     : [
-        { name: "Add Book", href: "/admin/books/new", icon: <FiPlusCircle className="h-5 w-5" /> },
+        { name: "Add Book", href: "/admin/books/new", icon: <MotionIcon animation="bounce" trigger="hover"><FiPlusCircle className="h-5 w-5" /></MotionIcon> },
       ];
 
   return (
@@ -74,7 +75,11 @@ export default function AdminLayout({
           className="rounded-xl bg-white/[0.06] border border-white/[0.1] p-3 text-white/80 backdrop-blur-xl hover:bg-white/[0.1] transition-all"
           onClick={() => setSidebarOpen(!sidebarOpen)}
         >
-          {sidebarOpen ? <FiX size={20} /> : <FiMenu size={20} />}
+          {sidebarOpen ? (
+            <MotionIcon animation="spin" trigger="hover"><FiX size={20} /></MotionIcon>
+          ) : (
+            <MotionIcon animation="wiggle" trigger="hover"><FiMenu size={20} /></MotionIcon>
+          )}
         </button>
       </div>
 
@@ -89,7 +94,9 @@ export default function AdminLayout({
           <div className="flex h-24 items-center justify-between px-8 border-b border-white/[0.08]">
             <Link href="/admin" className="flex items-center gap-3">
               <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-[#14b8a6] to-[#0d9488] flex items-center justify-center">
-                <FiBook className="h-5 w-5 text-white" />
+                <MotionIcon animation="float" trigger="always">
+                  <FiBook className="h-5 w-5 text-white" />
+                </MotionIcon>
               </div>
               <span className="text-xl font-semibold">Admin</span>
             </Link>
@@ -148,7 +155,9 @@ export default function AdminLayout({
               onClick={() => signOut({ callbackUrl: "/" })}
               className="sidebar-item group flex w-full items-center gap-4 rounded-xl px-4 py-3.5 text-sm font-medium text-white/60 hover:bg-white/[0.04] hover:text-white transition-all duration-300"
             >
-              <FiLogOut className="h-5 w-5 text-white/50 group-hover:text-white/70" />
+              <MotionIcon animation="float" trigger="hover">
+                <FiLogOut className="h-5 w-5 text-white/50 group-hover:text-white/70" />
+              </MotionIcon>
               Sign Out
             </button>
           </div>

@@ -4,6 +4,7 @@ import { useSession } from 'next-auth/react';
 import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 import { FiLogIn } from 'react-icons/fi';
+import MotionIcon from '../ui/MotionIcon';
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
@@ -108,7 +109,9 @@ const AuthCTA = () => {
             onClick={() => signIn('google')}
             className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-700 text-white font-bold rounded-lg hover:bg-indigo-800 transition-colors shadow-lg border border-indigo-500 hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200"
           >
-            <FiLogIn size={20} />
+            <MotionIcon animation="float">
+              <FiLogIn size={20} />
+            </MotionIcon>
             Sign in with Google
           </motion.button>
         </div>

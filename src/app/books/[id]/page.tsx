@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { FiDownload, FiArrowLeft, FiCalendar, FiFileText, FiTag, FiBook, FiUsers, FiLayers, FiStar, FiGlobe, FiHash, FiExternalLink } from 'react-icons/fi';
 import { FaGoodreads, FaWikipediaW, FaAmazon } from 'react-icons/fa';
 import { SiWikipedia } from 'react-icons/si';
+import MotionIcon from '@/components/ui/MotionIcon';
 import { motion } from 'framer-motion';
 
 interface Author {
@@ -177,7 +178,9 @@ export default function BookDetailPage() {
           href="/books" 
           className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 mb-6"
         >
-          <FiArrowLeft size={16} />
+          <MotionIcon animation="bounce">
+            <FiArrowLeft size={16} />
+          </MotionIcon>
           Back to all books
         </Link>
         
@@ -195,7 +198,9 @@ export default function BookDetailPage() {
                   />
                 ) : (
                   <div className="w-full h-full bg-gray-200 rounded flex items-center justify-center">
-                    <FiBook size={64} className="text-gray-400" />
+                    <MotionIcon animation="float">
+                      <FiBook size={64} className="text-gray-400" />
+                    </MotionIcon>
                   </div>
                 )}
               </div>
@@ -237,7 +242,9 @@ export default function BookDetailPage() {
                 {/* Series information if available */}
                 {book.seriesName && (
                   <div className="flex items-start gap-2">
-                    <FiBook className="text-gray-500 mt-1" />
+                    <MotionIcon animation="float">
+                      <FiBook className="text-gray-500 mt-1" />
+                    </MotionIcon>
                     <div>
                       <h3 className="text-sm font-medium text-gray-900">Series</h3>
                       <p className="text-gray-700">
@@ -255,7 +262,9 @@ export default function BookDetailPage() {
                 {/* Series Position if available */}
                 {book.seriesPosition && (
                   <div className="flex items-start gap-2">
-                    <FiHash className="text-gray-500 mt-1" />
+                    <MotionIcon animation="wiggle">
+                      <FiHash className="text-gray-500 mt-1" />
+                    </MotionIcon>
                     <div>
                       <h3 className="text-sm font-medium text-gray-900">Position in Series</h3>
                       <p className="text-gray-700">{book.seriesPosition}</p>
@@ -266,7 +275,9 @@ export default function BookDetailPage() {
                 {/* Publication Date */}
                 {(book.publicationDate) && (
                   <div className="flex items-start gap-2">
-                    <FiCalendar className="text-gray-500 mt-1" />
+                    <MotionIcon animation="bounce">
+                      <FiCalendar className="text-gray-500 mt-1" />
+                    </MotionIcon>
                     <div>
                       <h3 className="text-sm font-medium text-gray-900">Publication Date</h3>
                       <p className="text-gray-700">{book.publicationDate}</p>
@@ -277,7 +288,9 @@ export default function BookDetailPage() {
                 {/* Publisher */}
                 {book.publisher && (
                   <div className="flex items-start gap-2">
-                    <FiFileText className="text-gray-500 mt-1" />
+                    <MotionIcon animation="float">
+                      <FiFileText className="text-gray-500 mt-1" />
+                    </MotionIcon>
                     <div>
                       <h3 className="text-sm font-medium text-gray-900">Publisher</h3>
                       <p className="text-gray-700">{book.publisher}</p>
@@ -288,7 +301,9 @@ export default function BookDetailPage() {
                 {/* Language */}
                 {book.language && (
                   <div className="flex items-start gap-2">
-                    <FiGlobe className="text-gray-500 mt-1" />
+                    <MotionIcon animation="spin">
+                      <FiGlobe className="text-gray-500 mt-1" />
+                    </MotionIcon>
                     <div>
                       <h3 className="text-sm font-medium text-gray-900">Language</h3>
                       <p className="text-gray-700">{book.language}</p>
@@ -299,7 +314,9 @@ export default function BookDetailPage() {
                 {/* Number of Pages */}
                 {book.numberOfPages && (
                   <div className="flex items-start gap-2">
-                    <FiLayers className="text-gray-500 mt-1" />
+                    <MotionIcon animation="bounce">
+                      <FiLayers className="text-gray-500 mt-1" />
+                    </MotionIcon>
                     <div>
                       <h3 className="text-sm font-medium text-gray-900">Pages</h3>
                       <p className="text-gray-700">{book.numberOfPages}</p>
@@ -310,20 +327,24 @@ export default function BookDetailPage() {
                 {/* Average Rating */}
                 {typeof book.averageRating === 'number' && book.averageRating > 0 && (
                   <div className="flex items-start gap-2">
-                    <FiStar className="text-gray-500 mt-1" />
+                    <MotionIcon animation="pulse">
+                      <FiStar className="text-gray-500 mt-1" />
+                    </MotionIcon>
                     <div>
                       <h3 className="text-sm font-medium text-gray-900">Rating</h3>
                       <div className="flex items-center">
                         <div className="flex text-yellow-400 mr-1">
                           {[...Array(5)].map((_, i) => (
                             <span key={i}>
-                              {i < Math.floor(book.averageRating || 0) ? (
-                                <FiStar className="fill-current" />
-                              ) : i < Math.ceil(book.averageRating || 0) && (book.averageRating || 0) % 1 > 0 ? (
-                                <FiStar className="fill-current opacity-60" />
-                              ) : (
-                                <FiStar className="stroke-current fill-transparent" />
-                              )}
+                              <MotionIcon animation="pulse">
+                                {i < Math.floor(book.averageRating || 0) ? (
+                                  <FiStar className="fill-current" />
+                                ) : i < Math.ceil(book.averageRating || 0) && (book.averageRating || 0) % 1 > 0 ? (
+                                  <FiStar className="fill-current opacity-60" />
+                                ) : (
+                                  <FiStar className="stroke-current fill-transparent" />
+                                )}
+                              </MotionIcon>
                             </span>
                           ))}
                         </div>
@@ -339,7 +360,9 @@ export default function BookDetailPage() {
                 {/* Format and File Size (legacy fields) */}
                 {book.format && (
                   <div className="flex items-start gap-2">
-                    <FiFileText className="text-gray-500 mt-1" />
+                    <MotionIcon animation="float">
+                      <FiFileText className="text-gray-500 mt-1" />
+                    </MotionIcon>
                     <div>
                       <h3 className="text-sm font-medium text-gray-900">Format</h3>
                       <p className="text-gray-700">{book.format}</p>
@@ -349,7 +372,9 @@ export default function BookDetailPage() {
                 
                 {book.fileSize && (
                   <div className="flex items-start gap-2">
-                    <FiFileText className="text-gray-500 mt-1" />
+                    <MotionIcon animation="float">
+                      <FiFileText className="text-gray-500 mt-1" />
+                    </MotionIcon>
                     <div>
                       <h3 className="text-sm font-medium text-gray-900">File Size</h3>
                       <p className="text-gray-700">{book.fileSize}</p>
@@ -400,7 +425,9 @@ export default function BookDetailPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <FiDownload size={18} />
+                  <MotionIcon animation="bounce">
+                    <FiDownload size={18} />
+                  </MotionIcon>
                   Download Book
                 </a>
                 
@@ -428,7 +455,9 @@ export default function BookDetailPage() {
                         rel="noopener noreferrer"
                       >
                         <span className="absolute inset-0 opacity-10 bg-[radial-gradient(circle,_white_1px,_transparent_1px)] bg-[length:8px_8px]"></span>
-                        <SourceIcon size={20} className="relative z-10 transform transition-transform duration-300 group-hover:scale-110" />
+                        <MotionIcon animation="wiggle">
+                          <SourceIcon size={20} className="relative z-10 transform transition-transform duration-300 group-hover:scale-110" />
+                        </MotionIcon>
                         <span className="relative z-10">{sourceInfo.name}</span>
                       </a>
                       <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none">

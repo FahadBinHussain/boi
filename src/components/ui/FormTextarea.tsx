@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { FiAlertCircle } from 'react-icons/fi';
+import MotionIcon from './MotionIcon';
 
 interface FormTextareaProps {
   id: string;
@@ -61,7 +62,9 @@ const FormTextarea = ({
         />
         {error && (
           <div className="absolute top-2 right-2 flex items-center pointer-events-none">
-            <FiAlertCircle className="h-5 w-5 text-red-500 dark:text-red-400" />
+            <MotionIcon animation="wiggle">
+              <FiAlertCircle className="h-5 w-5 text-red-500 dark:text-red-400" />
+            </MotionIcon>
           </div>
         )}
       </div>

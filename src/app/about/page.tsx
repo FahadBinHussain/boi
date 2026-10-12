@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { FiBook, FiMail, FiHeart, FiInfo } from 'react-icons/fi';
+import MotionIcon from '@/components/ui/MotionIcon';
 
 export default function AboutPage() {
   return (
@@ -8,7 +9,9 @@ export default function AboutPage() {
         {/* Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-100 rounded-full text-indigo-600 mb-4">
-            <FiBook size={28} />
+            <MotionIcon animation="float">
+              <FiBook size={28} />
+            </MotionIcon>
           </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">About বই</h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
@@ -71,7 +74,10 @@ export default function AboutPage() {
             
             <div className="bg-amber-50 border border-amber-100 rounded-lg p-6 my-8">
               <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
-                <FiInfo className="mr-2 text-amber-700" /> Disclaimer
+                <MotionIcon animation="wiggle">
+                  <FiInfo className="mr-2 text-amber-700" />
+                </MotionIcon>
+                Disclaimer
               </h3>
               <p className="text-gray-700 leading-relaxed">
                 বই does not own or scan any books hosted on this site. All content is provided by third parties or is in the public domain. We make our best effort to ensure that all materials comply with copyright laws, but we rely on the information provided by our sources.
@@ -83,7 +89,9 @@ export default function AboutPage() {
         {/* Contact Section */}
         <div className="bg-indigo-50 rounded-xl overflow-hidden border border-indigo-100 p-8 text-center">
           <div className="inline-flex items-center justify-center w-12 h-12 bg-indigo-100 rounded-full text-indigo-600 mb-4">
-            <FiMail size={20} />
+            <MotionIcon animation="float">
+              <FiMail size={20} />
+            </MotionIcon>
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Get In Touch</h2>
           <p className="text-gray-700 mb-6 max-w-2xl mx-auto">
@@ -100,7 +108,7 @@ export default function AboutPage() {
         {/* Thank You Note */}
         <div className="text-center mt-12">
           <p className="flex items-center justify-center text-gray-600 text-sm">
-            Made with <FiHeart className="mx-1 text-red-500" /> for book lovers worldwide
+            Made with <MotionIcon animation="pulse" trigger="always"><FiHeart className="mx-1 text-red-500" /></MotionIcon> for book lovers worldwide
           </p>
         </div>
       </div>

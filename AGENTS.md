@@ -36,6 +36,8 @@ When a record is not a normal book, preserve the material type in metadata, espe
   - commit the lock as-is when it matches what is installed; reverting it
     desyncs `node_modules` and the next install just rewrites it again.
 - `dataset/main/` is gitignored (not present on Vercel/CI clones), so `scripts/sync-public-dataset.js` (run in `prebuild`) must warn and exit `0` when `dataset/main/generated/exports` is absent; exiting `1` breaks every Vercel build before `/dataset` can render its loud `DatasetExportError` banner.
+- UI icon motion (Rule 10): all UI icons are wrapped with `@/components/ui/MotionIcon` (`bounce`, `spin`, `pulse`, `wiggle`, `float`, `hover`), which supports hover and persistent (`always`) motions. Never leave bare static icons in navigation, cards, tables, filters, or admin pages.
+- Stray demos: any standalone experiments/demos outside `src/` (such as `smooth scroll/`) should not be checked into the main repo.
 - After dataset or app changes, run the relevant verification command before saying the work is done.
 - For dataset research/import work, the normal finish flow is:
   - `pnpm dataset:apply:candidate-research`

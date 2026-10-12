@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { FiHeart, FiGithub, FiTwitter, FiMail } from 'react-icons/fi';
+import MotionIcon from '../ui/MotionIcon';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -108,13 +109,19 @@ const Footer = () => {
             </h3>
             <div className="flex space-x-4 mb-4">
               <a href="#" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-                <FiGithub size={20} />
+                <MotionIcon animation="bounce">
+                  <FiGithub size={20} />
+                </MotionIcon>
               </a>
               <a href="#" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-                <FiTwitter size={20} />
+                <MotionIcon animation="wiggle">
+                  <FiTwitter size={20} />
+                </MotionIcon>
               </a>
               <a href="mailto:contact@boi.com" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-                <FiMail size={20} />
+                <MotionIcon animation="float">
+                  <FiMail size={20} />
+                </MotionIcon>
               </a>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -131,7 +138,7 @@ const Footer = () => {
             &copy; {currentYear} বই. All rights reserved.
           </p>
           <p className="flex items-center text-xs text-gray-400 dark:text-gray-500">
-            Made with <FiHeart className="mx-1 text-red-500 dark:text-red-400" /> for book lovers worldwide
+            Made with <MotionIcon animation="pulse" trigger="always"><FiHeart className="mx-1 text-red-500 dark:text-red-400" /></MotionIcon> for book lovers worldwide
           </p>
         </div>
       </div>

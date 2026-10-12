@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { FiMenu, FiX, FiBook, FiSearch, FiArrowRight, FiHome, FiGrid, FiInfo, FiUsers, FiLayers, FiDatabase } from 'react-icons/fi';
+import MotionIcon from '../ui/MotionIcon';
 import LoginButton from '../auth/LoginButton';
 import ThemeToggle from '../theme/ThemeToggle';
 import gsap from 'gsap';
@@ -178,7 +179,9 @@ const Header = () => {
               onMouseLeave={hideIndicator}
             >
               <div className="flex items-center gap-1.5">
-                <FiHome size={16} className={activeLink === '/' ? 'text-indigo-500 dark:text-indigo-400' : 'text-gray-400 dark:text-gray-500 group-hover:text-indigo-500 dark:group-hover:text-indigo-400'} />
+                <MotionIcon animation="bounce">
+                  <FiHome size={16} className={activeLink === '/' ? 'text-indigo-500 dark:text-indigo-400' : 'text-gray-400 dark:text-gray-500 group-hover:text-indigo-500 dark:group-hover:text-indigo-400'} />
+                </MotionIcon>
                 <span>Home</span>
               </div>
             </Link>
@@ -192,7 +195,9 @@ const Header = () => {
               onMouseLeave={hideIndicator}
             >
               <div className="flex items-center gap-1.5">
-                <FiBook size={16} className={activeLink === '/books' ? 'text-indigo-500 dark:text-indigo-400' : 'text-gray-400 dark:text-gray-500 group-hover:text-indigo-500 dark:group-hover:text-indigo-400'} />
+                <MotionIcon animation="float">
+                  <FiBook size={16} className={activeLink === '/books' ? 'text-indigo-500 dark:text-indigo-400' : 'text-gray-400 dark:text-gray-500 group-hover:text-indigo-500 dark:group-hover:text-indigo-400'} />
+                </MotionIcon>
                 <span>Books</span>
               </div>
             </Link>
@@ -206,7 +211,9 @@ const Header = () => {
               onMouseLeave={hideIndicator}
             >
               <div className="flex items-center gap-1.5">
-                <FiGrid size={16} className={activeLink === '/genres' ? 'text-indigo-500 dark:text-indigo-400' : 'text-gray-400 dark:text-gray-500 group-hover:text-indigo-500 dark:group-hover:text-indigo-400'} />
+                <MotionIcon animation="wiggle">
+                  <FiGrid size={16} className={activeLink === '/genres' ? 'text-indigo-500 dark:text-indigo-400' : 'text-gray-400 dark:text-gray-500 group-hover:text-indigo-500 dark:group-hover:text-indigo-400'} />
+                </MotionIcon>
                 <span>Genres</span>
               </div>
             </Link>
@@ -220,7 +227,9 @@ const Header = () => {
               onMouseLeave={hideIndicator}
             >
               <div className="flex items-center gap-1.5">
-                <FiUsers size={16} className={activeLink === '/authors' ? 'text-indigo-500 dark:text-indigo-400' : 'text-gray-400 dark:text-gray-500 group-hover:text-indigo-500 dark:group-hover:text-indigo-400'} />
+                <MotionIcon animation="pulse">
+                  <FiUsers size={16} className={activeLink === '/authors' ? 'text-indigo-500 dark:text-indigo-400' : 'text-gray-400 dark:text-gray-500 group-hover:text-indigo-500 dark:group-hover:text-indigo-400'} />
+                </MotionIcon>
                 <span>Authors</span>
               </div>
             </Link>
@@ -234,7 +243,9 @@ const Header = () => {
               onMouseLeave={hideIndicator}
             >
               <div className="flex items-center gap-1.5">
-                <FiLayers size={16} className={activeLink === '/series' ? 'text-indigo-500 dark:text-indigo-400' : 'text-gray-400 dark:text-gray-500 group-hover:text-indigo-500 dark:group-hover:text-indigo-400'} />
+                <MotionIcon animation="bounce">
+                  <FiLayers size={16} className={activeLink === '/series' ? 'text-indigo-500 dark:text-indigo-400' : 'text-gray-400 dark:text-gray-500 group-hover:text-indigo-500 dark:group-hover:text-indigo-400'} />
+                </MotionIcon>
                 <span>Series</span>
               </div>
             </Link>
@@ -248,7 +259,9 @@ const Header = () => {
               onMouseLeave={hideIndicator}
             >
               <div className="flex items-center gap-1.5">
-                <FiDatabase size={16} className={activeLink === '/dataset' ? 'text-indigo-500 dark:text-indigo-400' : 'text-gray-400 dark:text-gray-500 group-hover:text-indigo-500 dark:group-hover:text-indigo-400'} />
+                <MotionIcon animation="pulse">
+                  <FiDatabase size={16} className={activeLink === '/dataset' ? 'text-indigo-500 dark:text-indigo-400' : 'text-gray-400 dark:text-gray-500 group-hover:text-indigo-500 dark:group-hover:text-indigo-400'} />
+                </MotionIcon>
                 <span>Dataset</span>
               </div>
             </Link>
@@ -267,7 +280,9 @@ const Header = () => {
               }`}
               aria-label="Search"
             >
-              <FiSearch size={20} />
+              <MotionIcon animation="spin">
+                <FiSearch size={20} />
+              </MotionIcon>
             </motion.button>
             
             <div className="hidden sm:block">
@@ -285,7 +300,9 @@ const Header = () => {
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label="Toggle menu"
             >
-              {isMenuOpen ? <FiX size={20} /> : <FiMenu size={20} />}
+              <MotionIcon animation="wiggle">
+                {isMenuOpen ? <FiX size={20} /> : <FiMenu size={20} />}
+              </MotionIcon>
             </motion.button>
           </div>
         </div>
@@ -304,7 +321,9 @@ const Header = () => {
                 autoFocus
               />
               <button className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-indigo-500 dark:bg-indigo-600 text-white p-2 rounded-lg hover:bg-indigo-600 dark:hover:bg-indigo-500 transition-colors">
-                <FiSearch size={18} />
+                <MotionIcon animation="spin">
+                  <FiSearch size={18} />
+                </MotionIcon>
               </button>
             </div>
           </div>
@@ -323,7 +342,9 @@ const Header = () => {
                   className="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <FiHome size={18} className="text-gray-400 dark:text-gray-500" />
+                  <MotionIcon animation="bounce">
+                    <FiHome size={18} className="text-gray-400 dark:text-gray-500" />
+                  </MotionIcon>
                   <span className="font-medium">Home</span>
                 </Link>
                 <Link 
@@ -331,7 +352,9 @@ const Header = () => {
                   className="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <FiBook size={18} className="text-gray-400 dark:text-gray-500" />
+                  <MotionIcon animation="float">
+                    <FiBook size={18} className="text-gray-400 dark:text-gray-500" />
+                  </MotionIcon>
                   <span className="font-medium">Books</span>
                 </Link>
                 <Link 
@@ -339,7 +362,9 @@ const Header = () => {
                   className="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <FiGrid size={18} className="text-gray-400 dark:text-gray-500" />
+                  <MotionIcon animation="wiggle">
+                    <FiGrid size={18} className="text-gray-400 dark:text-gray-500" />
+                  </MotionIcon>
                   <span className="font-medium">Genres</span>
                 </Link>
                 <Link 
@@ -347,7 +372,9 @@ const Header = () => {
                   className="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <FiUsers size={18} className="text-gray-400 dark:text-gray-500" />
+                  <MotionIcon animation="pulse">
+                    <FiUsers size={18} className="text-gray-400 dark:text-gray-500" />
+                  </MotionIcon>
                   <span className="font-medium">Authors</span>
                 </Link>
                 <Link 
@@ -355,7 +382,9 @@ const Header = () => {
                   className="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <FiLayers size={18} className="text-gray-400 dark:text-gray-500" />
+                  <MotionIcon animation="bounce">
+                    <FiLayers size={18} className="text-gray-400 dark:text-gray-500" />
+                  </MotionIcon>
                   <span className="font-medium">Series</span>
                 </Link>
                 <Link
@@ -363,7 +392,9 @@ const Header = () => {
                   className="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <FiDatabase size={18} className="text-gray-400 dark:text-gray-500" />
+                  <MotionIcon animation="pulse">
+                    <FiDatabase size={18} className="text-gray-400 dark:text-gray-500" />
+                  </MotionIcon>
                   <span className="font-medium">Dataset</span>
                 </Link>
                 

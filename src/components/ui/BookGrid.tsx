@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import BookCard from './BookCard';
 import { FiLoader } from 'react-icons/fi';
+import MotionIcon from './MotionIcon';
 import type { Book } from '@/lib/books';
 
 interface BookGridProps {
@@ -57,7 +58,9 @@ const BookGrid = ({ books, selectedGenres, isLoading = false, error = null, comp
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <FiLoader className="w-10 h-10 text-indigo-500 dark:text-indigo-400 animate-spin mb-4" />
+        <MotionIcon animation="spin" trigger="always" className="mb-4">
+          <FiLoader className="w-10 h-10 text-indigo-500 dark:text-indigo-400" />
+        </MotionIcon>
         <p className="text-gray-600 dark:text-gray-400">Loading books...</p>
       </div>
     );

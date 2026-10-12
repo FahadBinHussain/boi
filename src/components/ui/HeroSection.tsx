@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { FiSearch, FiArrowRight, FiDownload, FiBookmark, FiLogIn } from 'react-icons/fi';
+import MotionIcon from '@/components/ui/MotionIcon';
 import { BookIcon, type AnimatedIconHandle } from '@/components/ui/AnimatedBookIcon';
 import { useSession } from 'next-auth/react';
 import { signIn } from 'next-auth/react';
@@ -254,7 +255,9 @@ const HeroSection = () => {
                 <div className="relative px-7 py-3.5 flex items-center gap-2">
                   <BookIcon className="text-white" size={18} ref={(el) => { bookIconRefs.current[3] = el; }} />
                   <span className="font-medium text-white">Explore Library</span>
-                  <FiArrowRight className="text-white transform group-hover:translate-x-1 transition-transform duration-300" />
+                  <MotionIcon animation="float" trigger="hover">
+                    <FiArrowRight className="text-white transform group-hover:translate-x-1 transition-transform duration-300" />
+                  </MotionIcon>
                 </div>
               </Link>
               
@@ -265,7 +268,9 @@ const HeroSection = () => {
                 <div className="absolute inset-0 bg-white/10 backdrop-blur-md border border-white/20 group-hover:bg-white/15 transition-all duration-500"></div>
                 <div className="absolute -inset-px bg-gradient-to-r from-indigo-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 rounded-xl blur transition-all duration-700"></div>
                 <div className="relative px-7 py-3.5 flex items-center gap-2">
-                  <FiSearch className="text-white" size={18} />
+                  <MotionIcon animation="wiggle" trigger="hover">
+                    <FiSearch className="text-white" size={18} />
+                  </MotionIcon>
                   <span className="font-medium text-white">Browse Genres</span>
                 </div>
               </Link>
@@ -276,7 +281,9 @@ const HeroSection = () => {
               <motion.div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-5 max-w-md shadow-xl">
                 <div className="flex items-start gap-4">
                   <div className="h-10 w-10 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shrink-0">
-                    <FiBookmark className="text-white" size={18} />
+                    <MotionIcon animation="pulse" trigger="hover">
+                      <FiBookmark className="text-white" size={18} />
+                    </MotionIcon>
                   </div>
                   <div>
                     <p className="text-white font-medium mb-2">Create your personal library</p>
@@ -285,7 +292,9 @@ const HeroSection = () => {
                       onClick={() => signIn('google')}
                       className="flex items-center gap-2 text-indigo-300 hover:text-white font-medium transition-colors group"
                     >
-                      <FiLogIn size={18} className="group-hover:translate-x-1 transition-transform duration-300" />
+                      <MotionIcon animation="bounce" trigger="hover">
+                        <FiLogIn size={18} className="group-hover:translate-x-1 transition-transform duration-300" />
+                      </MotionIcon>
                       <span>Sign in with Google</span>
                     </button>
                   </div>
@@ -388,7 +397,9 @@ const HeroSection = () => {
               <div className="hero-showcase-item hero-float absolute top-[40%] left-[30%] z-10 transition-all duration-500 hover:z-50">
                 <div className="bg-white/10 backdrop-blur-lg rounded-full border border-white/20 px-5 py-2.5 shadow-xl flex items-center gap-3 transition-all duration-500 hover:scale-110 hover:bg-white/15 hover:border-white/30 hover:shadow-[0_10px_25px_rgba(99,102,241,0.3)] hover:translate-y-[-5px]">
                   <div className="w-8 h-8 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center">
-                    <FiDownload size={16} className="text-white" />
+                    <MotionIcon animation="bounce" trigger="always">
+                      <FiDownload size={16} className="text-white" />
+                    </MotionIcon>
                   </div>
                   <span className="text-white font-medium">Free Downloads</span>
                 </div>

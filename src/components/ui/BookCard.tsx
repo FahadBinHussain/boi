@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { FiDownload, FiInfo } from 'react-icons/fi';
+import MotionIcon from './MotionIcon';
 import type { Book } from '@/lib/books';
 import gsap from 'gsap';
 
@@ -146,7 +147,9 @@ const BookCard = ({ book, compact = false }: BookCardProps) => {
                   transition: { delay: 0.1, duration: 0.3 }
                 }}
               >
-                <FiInfo size={compact ? 14 : 16} />
+                <MotionIcon animation="bounce">
+                  <FiInfo size={compact ? 14 : 16} />
+                </MotionIcon>
                 Details
               </motion.button>
             </Link>
@@ -162,7 +165,9 @@ const BookCard = ({ book, compact = false }: BookCardProps) => {
                   transition: { delay: 0.2, duration: 0.3 }
                 }}
               >
-                <FiDownload size={compact ? 14 : 16} />
+                <MotionIcon animation="bounce">
+                  <FiDownload size={compact ? 14 : 16} />
+                </MotionIcon>
                 Download
               </motion.button>
             </a>

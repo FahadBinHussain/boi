@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FiX, FiFilter } from 'react-icons/fi';
+import MotionIcon from './MotionIcon';
 
 interface GenreFilterProps {
   genres: string[];
@@ -24,7 +25,9 @@ const GenreFilter = ({ genres, selectedGenres, onGenreToggle, onClearFilters }: 
               onClick={onClearFilters}
               className="text-xs flex items-center gap-1 px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
             >
-              <FiX size={14} />
+              <MotionIcon animation="spin">
+                <FiX size={14} />
+              </MotionIcon>
               Clear filters
             </button>
           )}
@@ -32,7 +35,9 @@ const GenreFilter = ({ genres, selectedGenres, onGenreToggle, onClearFilters }: 
             onClick={() => setIsExpanded(!isExpanded)}
             className="md:hidden flex items-center gap-1 text-sm text-gray-700 dark:text-gray-300"
           >
-            <FiFilter size={16} />
+            <MotionIcon animation="wiggle">
+              <FiFilter size={16} />
+            </MotionIcon>
             {isExpanded ? 'Hide' : 'Show'} filters
           </button>
         </div>

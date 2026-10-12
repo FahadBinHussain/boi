@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { FiSearch, FiFilter, FiMail, FiEye, FiUserX, FiUserCheck, FiChevronLeft, FiChevronRight, FiEdit2, FiTrash2, FiLoader, FiUsers } from "react-icons/fi";
+import MotionIcon from "@/components/ui/MotionIcon";
 import gsap from "gsap";
 import { useAdmin } from "@/lib/hooks/useAdmin";
 import { useRouter } from "next/navigation";
@@ -156,7 +157,9 @@ export default function UsersManagement() {
         <div className="rounded-lg bg-white p-5 shadow-md">
           <div className="flex items-center">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-              <FiUserCheck className="h-6 w-6 text-green-600" />
+              <MotionIcon animation="bounce" trigger="always">
+                <FiUserCheck className="h-6 w-6 text-green-600" />
+              </MotionIcon>
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-500">Active Users</p>
@@ -168,7 +171,9 @@ export default function UsersManagement() {
         <div className="rounded-lg bg-white p-5 shadow-md">
           <div className="flex items-center">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
-              <FiUserX className="h-6 w-6 text-red-600" />
+              <MotionIcon animation="wiggle" trigger="always">
+                <FiUserX className="h-6 w-6 text-red-600" />
+              </MotionIcon>
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-500">Inactive Users</p>
@@ -180,7 +185,9 @@ export default function UsersManagement() {
         <div className="rounded-lg bg-white p-5 shadow-md">
           <div className="flex items-center">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100">
-              <FiEye className="h-6 w-6 text-indigo-600" />
+              <MotionIcon animation="pulse" trigger="always">
+                <FiEye className="h-6 w-6 text-indigo-600" />
+              </MotionIcon>
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-500">Admin Users</p>
@@ -195,7 +202,9 @@ export default function UsersManagement() {
         <div className="flex flex-col space-y-4 md:flex-row md:items-center md:space-x-4 md:space-y-0">
           <div className="relative flex-1">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <FiSearch className="h-5 w-5 text-gray-400" />
+              <MotionIcon animation="wiggle" trigger="hover">
+                <FiSearch className="h-5 w-5 text-gray-400" />
+              </MotionIcon>
             </div>
             <input
               type="text"
@@ -208,7 +217,9 @@ export default function UsersManagement() {
           
           <div className="flex items-center space-x-2">
             <div className="inline-flex items-center">
-              <FiFilter className="mr-2 h-5 w-5 text-gray-400" />
+              <MotionIcon animation="wiggle" trigger="hover" className="mr-2">
+                <FiFilter className="h-5 w-5 text-gray-400" />
+              </MotionIcon>
               <select
                 className="rounded-md border-0 py-1.5 pl-2 pr-8 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
                 value={filter}
@@ -385,7 +396,9 @@ export default function UsersManagement() {
                           className="text-indigo-600 hover:text-indigo-900"
                           title="Send Email"
                         >
-                          <FiMail className="h-4 w-4" />
+                          <MotionIcon animation="bounce" trigger="hover">
+                            <FiMail className="h-4 w-4" />
+                          </MotionIcon>
                           <span className="sr-only">Email {user.name}</span>
                         </button>
                         <button
@@ -394,9 +407,13 @@ export default function UsersManagement() {
                           title={user.status === "active" ? "Deactivate User" : "Activate User"}
                         >
                           {user.status === "active" ? (
-                            <FiUserX className="h-4 w-4" />
+                            <MotionIcon animation="wiggle" trigger="hover">
+                              <FiUserX className="h-4 w-4" />
+                            </MotionIcon>
                           ) : (
-                            <FiUserCheck className="h-4 w-4" />
+                            <MotionIcon animation="bounce" trigger="hover">
+                              <FiUserCheck className="h-4 w-4" />
+                            </MotionIcon>
                           )}
                           <span className="sr-only">
                             {user.status === "active" ? "Deactivate" : "Activate"} {user.name}
@@ -440,7 +457,9 @@ export default function UsersManagement() {
                     }`}
                   >
                     <span className="sr-only">Previous</span>
-                    <FiChevronLeft className="h-5 w-5" aria-hidden="true" />
+                    <MotionIcon animation="bounce" trigger="hover">
+                      <FiChevronLeft className="h-5 w-5" aria-hidden="true" />
+                    </MotionIcon>
                   </button>
                   
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
@@ -465,7 +484,9 @@ export default function UsersManagement() {
                     }`}
                   >
                     <span className="sr-only">Next</span>
-                    <FiChevronRight className="h-5 w-5" aria-hidden="true" />
+                    <MotionIcon animation="bounce" trigger="hover">
+                      <FiChevronRight className="h-5 w-5" aria-hidden="true" />
+                    </MotionIcon>
                   </button>
                 </nav>
               </div>

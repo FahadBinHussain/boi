@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import BookGrid from '@/components/ui/BookGrid';
 import { FiSearch, FiLoader } from 'react-icons/fi';
+import MotionIcon from '@/components/ui/MotionIcon';
 import type { Book } from '@/lib/books';
 
 export default function BooksPage() {
@@ -68,7 +69,9 @@ export default function BooksPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
             <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500">
-              <FiSearch size={20} />
+              <MotionIcon animation="spin">
+                <FiSearch size={20} />
+              </MotionIcon>
             </div>
           </div>
         </div>
@@ -77,7 +80,9 @@ export default function BooksPage() {
         <div>
           {isLoading ? (
             <div className="flex justify-center items-center h-64">
-              <FiLoader className="animate-spin h-8 w-8 text-indigo-600" />
+              <MotionIcon animation="spin" trigger="always">
+                <FiLoader className="h-8 w-8 text-indigo-600" />
+              </MotionIcon>
               <span className="ml-2 text-lg text-gray-600">Loading books...</span>
             </div>
           ) : error ? (
