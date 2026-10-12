@@ -43,6 +43,7 @@ When a record is not a normal book, preserve the material type in metadata, espe
   - All styling across pages and components relies strictly on DaisyUI semantic classes (`bg-base-100`, `bg-base-200`, `bg-base-300`, `text-base-content`, `card`, `btn`, `badge`, `table`, etc.) rather than hardcoded palette colors (`bg-gray-*`, `text-indigo-*`, `bg-[#...]`).
   - Active theme is persisted via `localStorage` and set on `document.documentElement` (`data-theme="<name>"`), with an anti-flash script in `src/app/layout.tsx`.
   - Theme picker in `src/components/theme/ThemeToggle.tsx` presents live 4-color DaisyUI swatches for every theme.
+- Navigation Marker: Next.js App Router client-side `<Link>` transitions do not trigger page reloads or update mount-only `useEffect` state. Dynamic active route markers must use `usePathname()` from `next/navigation` and Framer Motion's `layoutId` (e.g. `layoutId="navbar-active-marker"`) so the indicator persists and smoothly glides between tabs across routes.
 - Stray demos: any standalone experiments/demos outside `src/` (such as `smooth scroll/`) should not be checked into the main repo.
 - After dataset or app changes, run the relevant verification command before saying the work is done.
 - For dataset research/import work, the normal finish flow is:

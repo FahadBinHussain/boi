@@ -2,18 +2,28 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { FiMenu, FiX, FiBook, FiSearch, FiArrowRight, FiHome, FiGrid, FiInfo, FiUsers, FiLayers, FiDatabase } from 'react-icons/fi';
+import { FiMenu, FiX, FiBook, FiSearch, FiHome, FiGrid, FiUsers, FiLayers, FiDatabase } from 'react-icons/fi';
 import MotionIcon from '../ui/MotionIcon';
 import LoginButton from '../auth/LoginButton';
 import ThemeToggle from '../theme/ThemeToggle';
 import gsap from 'gsap';
 
+const navItems = [
+  { href: '/', label: 'Home', icon: FiHome, animation: 'bounce' as const },
+  { href: '/books', label: 'Books', icon: FiBook, animation: 'float' as const },
+  { href: '/genres', label: 'Genres', icon: FiGrid, animation: 'wiggle' as const },
+  { href: '/authors', label: 'Authors', icon: FiUsers, animation: 'pulse' as const },
+  { href: '/series', label: 'Series', icon: FiLayers, animation: 'bounce' as const },
+  { href: '/dataset', label: 'Dataset', icon: FiDatabase, animation: 'pulse' as const },
+];
+
 const Header = () => {
+  const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [activeLink, setActiveLink] = useState('/');
   
   const headerRef = useRef<HTMLElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
@@ -21,7 +31,14 @@ const Header = () => {
   const actionsRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
-  const indicatorRef = useRef<HTMLDivElement>(null);
+  
+  const isLinkActive = (href: string) => {
+    if (!pathname) return href === '/';
+    if (href === '/') {
+      return pathname === '/';
+    }
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
   
   // Handle scroll event to change navbar appearance
   useEffect(() => {
@@ -34,12 +51,6 @@ const Header = () => {
     };
     
     window.addEventListener('scroll', handleScroll);
-    
-    // Set active link based on current path
-    if (typeof window !== 'undefined') {
-      setActiveLink(window.location.pathname);
-    }
-    
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
@@ -106,34 +117,6 @@ const Header = () => {
     }
   }, [isMenuOpen]);
   
-  // Animation for indicator
-  const animateIndicator = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (indicatorRef.current && e.currentTarget) {
-      const target = e.currentTarget;
-      const targetRect = target.getBoundingClientRect();
-      const navRect = navItemsRef.current?.getBoundingClientRect();
-      
-      if (navRect) {
-        gsap.to(indicatorRef.current, {
-          width: targetRect.width,
-          left: targetRect.left - navRect.left,
-          opacity: 1,
-          duration: 0.3,
-          ease: "power2.out"
-        });
-      }
-    }
-  };
-  
-  const hideIndicator = () => {
-    if (indicatorRef.current) {
-      gsap.to(indicatorRef.current, {
-        opacity: 0,
-        duration: 0.3
-      });
-    }
-  };
-  
   return (
     <header 
       ref={headerRef}
@@ -162,109 +145,45 @@ const Header = () => {
           {/* Desktop Navigation */}
           <div 
             ref={navItemsRef}
-            className="hidden md:flex items-center relative"
+            className="hidden md:flex items-center relative py-1"
           >
-            {/* Indicator Line */}
-            <div 
-              ref={indicatorRef}
-              className="absolute -bottom-2 h-1 bg-primary rounded-full opacity-0 transition-all duration-300"
-            />
-            
-            <Link 
-              href="/" 
-              className={`px-4 py-2 mx-1 rounded-lg font-medium transition-all duration-300 relative group ${
-                activeLink === '/' ? 'text-primary' : 'text-base-content/80 hover:text-primary'
-              }`}
-              onMouseEnter={animateIndicator}
-              onMouseLeave={hideIndicator}
-            >
-              <div className="flex items-center gap-1.5">
-                <MotionIcon animation="bounce">
-                  <FiHome size={16} className={activeLink === '/' ? 'text-primary' : 'text-base-content/60 group-hover:text-primary'} />
-                </MotionIcon>
-                <span>Home</span>
-              </div>
-            </Link>
-            
-            <Link 
-              href="/books" 
-              className={`px-4 py-2 mx-1 rounded-lg font-medium transition-all duration-300 relative group ${
-                activeLink === '/books' ? 'text-primary' : 'text-base-content/80 hover:text-primary'
-              }`}
-              onMouseEnter={animateIndicator}
-              onMouseLeave={hideIndicator}
-            >
-              <div className="flex items-center gap-1.5">
-                <MotionIcon animation="float">
-                  <FiBook size={16} className={activeLink === '/books' ? 'text-primary' : 'text-base-content/60 group-hover:text-primary'} />
-                </MotionIcon>
-                <span>Books</span>
-              </div>
-            </Link>
-            
-            <Link 
-              href="/genres" 
-              className={`px-4 py-2 mx-1 rounded-lg font-medium transition-all duration-300 relative group ${
-                activeLink === '/genres' ? 'text-primary' : 'text-base-content/80 hover:text-primary'
-              }`}
-              onMouseEnter={animateIndicator}
-              onMouseLeave={hideIndicator}
-            >
-              <div className="flex items-center gap-1.5">
-                <MotionIcon animation="wiggle">
-                  <FiGrid size={16} className={activeLink === '/genres' ? 'text-primary' : 'text-base-content/60 group-hover:text-primary'} />
-                </MotionIcon>
-                <span>Genres</span>
-              </div>
-            </Link>
-            
-            <Link 
-              href="/authors" 
-              className={`px-4 py-2 mx-1 rounded-lg font-medium transition-all duration-300 relative group ${
-                activeLink === '/authors' ? 'text-primary' : 'text-base-content/80 hover:text-primary'
-              }`}
-              onMouseEnter={animateIndicator}
-              onMouseLeave={hideIndicator}
-            >
-              <div className="flex items-center gap-1.5">
-                <MotionIcon animation="pulse">
-                  <FiUsers size={16} className={activeLink === '/authors' ? 'text-primary' : 'text-base-content/60 group-hover:text-primary'} />
-                </MotionIcon>
-                <span>Authors</span>
-              </div>
-            </Link>
-            
-            <Link 
-              href="/series" 
-              className={`px-4 py-2 mx-1 rounded-lg font-medium transition-all duration-300 relative group ${
-                activeLink === '/series' ? 'text-primary' : 'text-base-content/80 hover:text-primary'
-              }`}
-              onMouseEnter={animateIndicator}
-              onMouseLeave={hideIndicator}
-            >
-              <div className="flex items-center gap-1.5">
-                <MotionIcon animation="bounce">
-                  <FiLayers size={16} className={activeLink === '/series' ? 'text-primary' : 'text-base-content/60 group-hover:text-primary'} />
-                </MotionIcon>
-                <span>Series</span>
-              </div>
-            </Link>
+            {navItems.map((item) => {
+              const isActive = isLinkActive(item.href);
+              const Icon = item.icon;
 
-            <Link
-              href="/dataset"
-              className={`px-4 py-2 mx-1 rounded-lg font-medium transition-all duration-300 relative group ${
-                activeLink === '/dataset' ? 'text-primary' : 'text-base-content/80 hover:text-primary'
-              }`}
-              onMouseEnter={animateIndicator}
-              onMouseLeave={hideIndicator}
-            >
-              <div className="flex items-center gap-1.5">
-                <MotionIcon animation="pulse">
-                  <FiDatabase size={16} className={activeLink === '/dataset' ? 'text-primary' : 'text-base-content/60 group-hover:text-primary'} />
-                </MotionIcon>
-                <span>Dataset</span>
-              </div>
-            </Link>
+              return (
+                <Link 
+                  key={item.href}
+                  href={item.href}
+                  className={`px-4 py-2 mx-1 rounded-xl text-sm font-semibold transition-colors duration-200 relative group flex items-center gap-1.5 ${
+                    isActive 
+                      ? 'text-primary' 
+                      : 'text-base-content/75 hover:text-base-content hover:bg-base-200/60'
+                  }`}
+                >
+                  <MotionIcon animation={item.animation} trigger={isActive ? 'always' : 'hover'}>
+                    <Icon 
+                      size={16} 
+                      className={isActive ? 'text-primary' : 'text-base-content/60 group-hover:text-primary transition-colors'} 
+                    />
+                  </MotionIcon>
+                  <span>{item.label}</span>
+
+                  {/* Active navigation marker with smooth layoutId animation */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="navbar-active-marker"
+                      className="absolute -bottom-1.5 left-2 right-2 h-1 bg-primary rounded-full shadow-[0_2px_8px_rgba(var(--p),0.4)]"
+                      transition={{
+                        type: 'spring',
+                        stiffness: 450,
+                        damping: 32
+                      }}
+                    />
+                  )}
+                </Link>
+              );
+            })}
           </div>
 
           {/* Search, Login & Mobile Menu Button */}
@@ -337,66 +256,30 @@ const Header = () => {
           >
             <div className="bg-base-200/95 backdrop-blur-md rounded-box shadow-xl border border-base-300 p-4">
               <div className="flex flex-col space-y-1">
-                <Link 
-                  href="/" 
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-lg hover:bg-base-300 text-base-content transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <MotionIcon animation="bounce">
-                    <FiHome size={18} className="text-base-content/60" />
-                  </MotionIcon>
-                  <span className="font-medium">Home</span>
-                </Link>
-                <Link 
-                  href="/books" 
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-lg hover:bg-base-300 text-base-content transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <MotionIcon animation="float">
-                    <FiBook size={18} className="text-base-content/60" />
-                  </MotionIcon>
-                  <span className="font-medium">Books</span>
-                </Link>
-                <Link 
-                  href="/genres" 
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-lg hover:bg-base-300 text-base-content transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <MotionIcon animation="wiggle">
-                    <FiGrid size={18} className="text-base-content/60" />
-                  </MotionIcon>
-                  <span className="font-medium">Genres</span>
-                </Link>
-                <Link 
-                  href="/authors" 
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-lg hover:bg-base-300 text-base-content transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <MotionIcon animation="pulse">
-                    <FiUsers size={18} className="text-base-content/60" />
-                  </MotionIcon>
-                  <span className="font-medium">Authors</span>
-                </Link>
-                <Link 
-                  href="/series" 
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-lg hover:bg-base-300 text-base-content transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <MotionIcon animation="bounce">
-                    <FiLayers size={18} className="text-base-content/60" />
-                  </MotionIcon>
-                  <span className="font-medium">Series</span>
-                </Link>
-                <Link
-                  href="/dataset"
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-lg hover:bg-base-300 text-base-content transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <MotionIcon animation="pulse">
-                    <FiDatabase size={18} className="text-base-content/60" />
-                  </MotionIcon>
-                  <span className="font-medium">Dataset</span>
-                </Link>
+                {navItems.map((item) => {
+                  const isActive = isLinkActive(item.href);
+                  const Icon = item.icon;
+                  return (
+                    <Link 
+                      key={item.href}
+                      href={item.href} 
+                      className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl font-medium transition-colors ${
+                        isActive
+                          ? 'bg-primary/10 text-primary font-bold border-l-4 border-primary'
+                          : 'text-base-content/70 hover:bg-base-300 hover:text-base-content'
+                      }`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <MotionIcon animation={item.animation} trigger={isActive ? 'always' : 'hover'}>
+                        <Icon size={18} className={isActive ? 'text-primary' : 'text-base-content/60'} />
+                      </MotionIcon>
+                      <span>{item.label}</span>
+                      {isActive && (
+                        <span className="badge badge-primary badge-xs ml-auto">Active</span>
+                      )}
+                    </Link>
+                  );
+                })}
                 
                 {/* Mobile Theme Toggle */}
                 <div className="sm:hidden border-t border-base-300 mt-2 pt-3 flex justify-center">
