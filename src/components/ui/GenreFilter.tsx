@@ -18,14 +18,14 @@ const GenreFilter = ({ genres, selectedGenres, onGenreToggle, onClearFilters }: 
   return (
     <div className="mb-8">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Filter by Genre</h2>
+        <h2 className="text-lg font-bold text-base-content">Filter by Genre</h2>
         <div className="flex items-center gap-2">
           {selectedGenres.length > 0 && (
             <button
               onClick={onClearFilters}
-              className="text-xs flex items-center gap-1 px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              className="btn btn-ghost btn-xs rounded-full gap-1 border border-base-300 text-base-content"
             >
-              <MotionIcon animation="spin">
+              <MotionIcon animation="spin" trigger="hover">
                 <FiX size={14} />
               </MotionIcon>
               Clear filters
@@ -33,9 +33,9 @@ const GenreFilter = ({ genres, selectedGenres, onGenreToggle, onClearFilters }: 
           )}
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="md:hidden flex items-center gap-1 text-sm text-gray-700 dark:text-gray-300"
+            className="md:hidden btn btn-ghost btn-xs gap-1 text-base-content"
           >
-            <MotionIcon animation="wiggle">
+            <MotionIcon animation="wiggle" trigger="hover">
               <FiFilter size={16} />
             </MotionIcon>
             {isExpanded ? 'Hide' : 'Show'} filters
@@ -71,10 +71,10 @@ const GenreButton = ({ genre, isSelected, onToggle }: GenreButtonProps) => {
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       onClick={onToggle}
-      className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
+      className={`btn btn-sm rounded-full transition-all ${
         isSelected
-          ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-700'
-          : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700'
+          ? 'btn-primary shadow-sm'
+          : 'btn-ghost border border-base-300 bg-base-200/50 hover:bg-base-200 text-base-content'
       }`}
     >
       {genre}

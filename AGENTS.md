@@ -37,6 +37,12 @@ When a record is not a normal book, preserve the material type in metadata, espe
     desyncs `node_modules` and the next install just rewrites it again.
 - `dataset/main/` is gitignored (not present on Vercel/CI clones), so `scripts/sync-public-dataset.js` (run in `prebuild`) must warn and exit `0` when `dataset/main/generated/exports` is absent; exiting `1` breaks every Vercel build before `/dataset` can render its loud `DatasetExportError` banner.
 - UI icon motion (Rule 10): all UI icons are wrapped with `@/components/ui/MotionIcon` (`bounce`, `spin`, `pulse`, `wiggle`, `float`, `hover`), which supports hover and persistent (`always`) motions. Never leave bare static icons in navigation, cards, tables, filters, or admin pages.
+- DaisyUI & Theme System:
+  - DaisyUI 4 (`daisyui: { themes: true }`) is configured in `tailwind.config.ts`, enabling all 32 official themes (`light`, `dark`, `cupcake`, `bumblebee`, `emerald`, `corporate`, `synthwave`, `retro`, `cyberpunk`, `valentine`, `halloween`, `garden`, `forest`, `aqua`, `lofi`, `pastel`, `fantasy`, `wireframe`, `black`, `luxury`, `dracula`, `cmyk`, `autumn`, `business`, `acid`, `lemonade`, `night`, `coffee`, `winter`, `dim`, `nord`, `sunset`).
+  - `@tailwindcss/forms` uses `{ strategy: 'class' }` to prevent form resets from overriding DaisyUI `input`, `select`, `textarea`, `checkbox`.
+  - All styling across pages and components relies strictly on DaisyUI semantic classes (`bg-base-100`, `bg-base-200`, `bg-base-300`, `text-base-content`, `card`, `btn`, `badge`, `table`, etc.) rather than hardcoded palette colors (`bg-gray-*`, `text-indigo-*`, `bg-[#...]`).
+  - Active theme is persisted via `localStorage` and set on `document.documentElement` (`data-theme="<name>"`), with an anti-flash script in `src/app/layout.tsx`.
+  - Theme picker in `src/components/theme/ThemeToggle.tsx` presents live 4-color DaisyUI swatches for every theme.
 - Stray demos: any standalone experiments/demos outside `src/` (such as `smooth scroll/`) should not be checked into the main repo.
 - After dataset or app changes, run the relevant verification command before saying the work is done.
 - For dataset research/import work, the normal finish flow is:

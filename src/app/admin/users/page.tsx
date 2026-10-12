@@ -146,69 +146,69 @@ export default function UsersManagement() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Users Management</h1>
-        <p className="mt-2 text-sm text-gray-600">
+        <h1 className="text-2xl font-bold text-base-content">Users Management</h1>
+        <p className="mt-2 text-sm text-base-content/70">
           Manage your users, view activity, and control user access.
         </p>
       </div>
       
       {/* Stats */}
       <div className="mb-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="rounded-lg bg-white p-5 shadow-md">
+        <div className="card bg-base-200 border border-base-300 p-5 shadow-sm">
           <div className="flex items-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-success/15 text-success">
               <MotionIcon animation="bounce" trigger="always">
-                <FiUserCheck className="h-6 w-6 text-green-600" />
+                <FiUserCheck className="h-6 w-6" />
               </MotionIcon>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Active Users</p>
-              <p className="text-2xl font-bold text-gray-900">{totalActiveUsers}</p>
+              <p className="text-xs font-semibold text-base-content/60 uppercase tracking-wider">Active Users</p>
+              <p className="text-2xl font-black text-base-content">{totalActiveUsers}</p>
             </div>
           </div>
         </div>
         
-        <div className="rounded-lg bg-white p-5 shadow-md">
+        <div className="card bg-base-200 border border-base-300 p-5 shadow-sm">
           <div className="flex items-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-error/15 text-error">
               <MotionIcon animation="wiggle" trigger="always">
-                <FiUserX className="h-6 w-6 text-red-600" />
+                <FiUserX className="h-6 w-6" />
               </MotionIcon>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Inactive Users</p>
-              <p className="text-2xl font-bold text-gray-900">{totalInactiveUsers}</p>
+              <p className="text-xs font-semibold text-base-content/60 uppercase tracking-wider">Inactive Users</p>
+              <p className="text-2xl font-black text-base-content">{totalInactiveUsers}</p>
             </div>
           </div>
         </div>
         
-        <div className="rounded-lg bg-white p-5 shadow-md">
+        <div className="card bg-base-200 border border-base-300 p-5 shadow-sm">
           <div className="flex items-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/15 text-primary">
               <MotionIcon animation="pulse" trigger="always">
-                <FiEye className="h-6 w-6 text-indigo-600" />
+                <FiEye className="h-6 w-6" />
               </MotionIcon>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Admin Users</p>
-              <p className="text-2xl font-bold text-gray-900">{totalAdminUsers}</p>
+              <p className="text-xs font-semibold text-base-content/60 uppercase tracking-wider">Admin Users</p>
+              <p className="text-2xl font-black text-base-content">{totalAdminUsers}</p>
             </div>
           </div>
         </div>
       </div>
       
       {/* Filters and Search */}
-      <div className="mb-6 rounded-lg bg-white p-4 shadow-md">
+      <div className="card bg-base-200 border border-base-300 p-4 shadow-sm mb-6">
         <div className="flex flex-col space-y-4 md:flex-row md:items-center md:space-x-4 md:space-y-0">
           <div className="relative flex-1">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
               <MotionIcon animation="wiggle" trigger="hover">
-                <FiSearch className="h-5 w-5 text-gray-400" />
+                <FiSearch className="h-5 w-5 text-base-content/40" />
               </MotionIcon>
             </div>
             <input
               type="text"
-              className="block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
+              className="input input-bordered w-full pl-10 bg-base-100 text-base-content"
               placeholder="Search users..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -218,10 +218,10 @@ export default function UsersManagement() {
           <div className="flex items-center space-x-2">
             <div className="inline-flex items-center">
               <MotionIcon animation="wiggle" trigger="hover" className="mr-2">
-                <FiFilter className="h-5 w-5 text-gray-400" />
+                <FiFilter className="h-5 w-5 text-base-content/40" />
               </MotionIcon>
               <select
-                className="rounded-md border-0 py-1.5 pl-2 pr-8 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
+                className="select select-bordered bg-base-100 text-base-content"
                 value={filter}
                 onChange={(e) => setFilter(e.target.value as "all" | "active" | "pending")}
               >
@@ -233,7 +233,7 @@ export default function UsersManagement() {
             
             <div className="inline-flex items-center">
               <select
-                className="rounded-md border-0 py-1.5 pl-2 pr-8 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
+                className="select select-bordered bg-base-100 text-base-content"
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value as "all" | "admin" | "user")}
               >
@@ -247,27 +247,27 @@ export default function UsersManagement() {
       </div>
       
       {/* Users Table */}
-      <div className="overflow-hidden rounded-lg bg-white shadow">
+      <div className="card bg-base-200 border border-base-300 shadow-md overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="table table-zebra w-full">
+            <thead className="bg-base-300/40 text-base-content">
               <tr>
-                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                <th scope="col" className="px-3 py-3.5 text-left">
                   <input
                     type="checkbox"
-                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    className="checkbox checkbox-primary checkbox-sm"
                     checked={selectedUsers.length === currentUsers.length && currentUsers.length > 0}
                     onChange={toggleSelectAll}
                   />
                 </th>
                 <th 
                   scope="col" 
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer"
+                  className="px-3 py-3.5 text-left text-sm font-bold text-base-content cursor-pointer"
                   onClick={() => handleSort("name")}
                 >
-                  <div className="group inline-flex">
+                  <div className="group inline-flex items-center">
                     Name
-                    <span className="ml-2 flex-none rounded text-gray-400 group-hover:visible group-hover:text-gray-500">
+                    <span className="ml-2 text-base-content/50 group-hover:text-base-content">
                       {sort.field === "name" && (
                         sort.direction === "desc" ? "↓" : "↑"
                       )}
@@ -276,12 +276,12 @@ export default function UsersManagement() {
                 </th>
                 <th 
                   scope="col" 
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer"
+                  className="px-3 py-3.5 text-left text-sm font-bold text-base-content cursor-pointer"
                   onClick={() => handleSort("email")}
                 >
-                  <div className="group inline-flex">
+                  <div className="group inline-flex items-center">
                     Email
-                    <span className="ml-2 flex-none rounded text-gray-400 group-hover:visible group-hover:text-gray-500">
+                    <span className="ml-2 text-base-content/50 group-hover:text-base-content">
                       {sort.field === "email" && (
                         sort.direction === "desc" ? "↓" : "↑"
                       )}
@@ -290,12 +290,12 @@ export default function UsersManagement() {
                 </th>
                 <th 
                   scope="col" 
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer"
+                  className="px-3 py-3.5 text-left text-sm font-bold text-base-content cursor-pointer"
                   onClick={() => handleSort("role")}
                 >
-                  <div className="group inline-flex">
+                  <div className="group inline-flex items-center">
                     Role
-                    <span className="ml-2 flex-none rounded text-gray-400 group-hover:visible group-hover:text-gray-500">
+                    <span className="ml-2 text-base-content/50 group-hover:text-base-content">
                       {sort.field === "role" && (
                         sort.direction === "desc" ? "↓" : "↑"
                       )}
@@ -304,12 +304,12 @@ export default function UsersManagement() {
                 </th>
                 <th 
                   scope="col" 
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer"
+                  className="px-3 py-3.5 text-left text-sm font-bold text-base-content cursor-pointer"
                   onClick={() => handleSort("status")}
                 >
-                  <div className="group inline-flex">
+                  <div className="group inline-flex items-center">
                     Status
-                    <span className="ml-2 flex-none rounded text-gray-400 group-hover:visible group-hover:text-gray-500">
+                    <span className="ml-2 text-base-content/50 group-hover:text-base-content">
                       {sort.field === "status" && (
                         sort.direction === "desc" ? "↓" : "↑"
                       )}
@@ -318,12 +318,12 @@ export default function UsersManagement() {
                 </th>
                 <th 
                   scope="col" 
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer"
+                  className="px-3 py-3.5 text-left text-sm font-bold text-base-content cursor-pointer"
                   onClick={() => handleSort("lastLogin")}
                 >
-                  <div className="group inline-flex">
+                  <div className="group inline-flex items-center">
                     Last Login
-                    <span className="ml-2 flex-none rounded text-gray-400 group-hover:visible group-hover:text-gray-500">
+                    <span className="ml-2 text-base-content/50 group-hover:text-base-content">
                       {sort.field === "lastLogin" && (
                         sort.direction === "desc" ? "↓" : "↑"
                       )}
@@ -332,12 +332,12 @@ export default function UsersManagement() {
                 </th>
                 <th 
                   scope="col" 
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer"
+                  className="px-3 py-3.5 text-left text-sm font-bold text-base-content cursor-pointer"
                   onClick={() => handleSort("joined")}
                 >
-                  <div className="group inline-flex">
+                  <div className="group inline-flex items-center">
                     Joined
-                    <span className="ml-2 flex-none rounded text-gray-400 group-hover:visible group-hover:text-gray-500">
+                    <span className="ml-2 text-base-content/50 group-hover:text-base-content">
                       {sort.field === "joined" && (
                         sort.direction === "desc" ? "↓" : "↑"
                       )}
@@ -349,51 +349,51 @@ export default function UsersManagement() {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 bg-white">
+            <tbody>
               {currentUsers.length > 0 ? (
-                currentUsers.map((user, index) => (
-                  <tr key={user.id} className={`user-table-row ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-100`}>
+                currentUsers.map((user) => (
+                  <tr key={user.id} className="user-table-row hover:bg-base-300/30">
                     <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
                       <input
                         type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                        className="checkbox checkbox-primary checkbox-sm"
                         checked={selectedUsers.includes(user.id)}
                         onChange={() => toggleSelectUser(user.id)}
                       />
                     </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm">
-                      <div className="font-medium text-gray-900">{user.name}</div>
+                      <div className="font-bold text-base-content">{user.name}</div>
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{user.email}</td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-base-content/70">{user.email}</td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm">
-                      <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
+                      <span className={`badge badge-sm font-semibold ${
                         user.role === "admin" 
-                          ? "bg-indigo-100 text-indigo-800" 
-                          : "bg-gray-100 text-gray-800"
+                          ? "badge-primary" 
+                          : "badge-ghost"
                       }`}>
                         {user.role}
                       </span>
                     </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm">
-                      <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
+                      <span className={`badge badge-sm font-semibold ${
                         user.status === "active" 
-                          ? "bg-green-100 text-green-800" 
-                          : "bg-red-100 text-red-800"
+                          ? "badge-success" 
+                          : "badge-error"
                       }`}>
                         {user.status}
                       </span>
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-base-content/60">
                       {new Date(user.lastLogin).toLocaleDateString()}
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-base-content/60">
                       {new Date(user.joined).toLocaleDateString()}
                     </td>
                     <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                      <div className="flex items-center justify-end space-x-2">
+                      <div className="flex items-center justify-end space-x-1">
                         <button
                           onClick={() => sendEmail(user.email)}
-                          className="text-indigo-600 hover:text-indigo-900"
+                          className="btn btn-ghost btn-circle btn-xs text-primary"
                           title="Send Email"
                         >
                           <MotionIcon animation="bounce" trigger="hover">
@@ -403,7 +403,7 @@ export default function UsersManagement() {
                         </button>
                         <button
                           onClick={() => toggleUserStatus(user.id)}
-                          className={`${user.status === "active" ? "text-red-600 hover:text-red-900" : "text-green-600 hover:text-green-900"}`}
+                          className={`btn btn-ghost btn-circle btn-xs ${user.status === "active" ? "text-error" : "text-success"}`}
                           title={user.status === "active" ? "Deactivate User" : "Activate User"}
                         >
                           {user.status === "active" ? (
@@ -425,7 +425,7 @@ export default function UsersManagement() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={8} className="px-6 py-12 text-center text-sm text-gray-500">
+                  <td colSpan={8} className="px-6 py-12 text-center text-sm text-base-content/60">
                     No users found matching your criteria.
                   </td>
                 </tr>
@@ -436,29 +436,27 @@ export default function UsersManagement() {
         
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+          <div className="flex items-center justify-between border-t border-base-300 bg-base-200/50 px-4 py-3 sm:px-6">
             <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
               <div>
-                <p className="text-sm text-gray-700">
-                  Showing <span className="font-medium">{indexOfFirstUser + 1}</span> to{" "}
-                  <span className="font-medium">
+                <p className="text-sm text-base-content/70">
+                  Showing <span className="font-semibold text-base-content">{indexOfFirstUser + 1}</span> to{" "}
+                  <span className="font-semibold text-base-content">
                     {indexOfLastUser > filteredUsers.length ? filteredUsers.length : indexOfLastUser}
                   </span>{" "}
-                  of <span className="font-medium">{filteredUsers.length}</span> results
+                  of <span className="font-semibold text-base-content">{filteredUsers.length}</span> results
                 </p>
               </div>
               <div>
-                <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                <div className="join">
                   <button
                     onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                     disabled={currentPage === 1}
-                    className={`relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${
-                      currentPage === 1 ? "cursor-not-allowed" : "hover:text-gray-500"
-                    }`}
+                    className="join-item btn btn-sm btn-ghost border border-base-300"
                   >
                     <span className="sr-only">Previous</span>
                     <MotionIcon animation="bounce" trigger="hover">
-                      <FiChevronLeft className="h-5 w-5" aria-hidden="true" />
+                      <FiChevronLeft className="h-4 w-4" aria-hidden="true" />
                     </MotionIcon>
                   </button>
                   
@@ -466,10 +464,10 @@ export default function UsersManagement() {
                     <button
                       key={page}
                       onClick={() => setCurrentPage(page)}
-                      className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
+                      className={`join-item btn btn-sm ${
                         page === currentPage
-                          ? "z-10 bg-indigo-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                          : "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                          ? "btn-primary"
+                          : "btn-ghost border border-base-300 text-base-content"
                       }`}
                     >
                       {page}
@@ -479,16 +477,14 @@ export default function UsersManagement() {
                   <button
                     onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                     disabled={currentPage === totalPages}
-                    className={`relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${
-                      currentPage === totalPages ? "cursor-not-allowed" : "hover:text-gray-500"
-                    }`}
+                    className="join-item btn btn-sm btn-ghost border border-base-300"
                   >
                     <span className="sr-only">Next</span>
                     <MotionIcon animation="bounce" trigger="hover">
-                      <FiChevronRight className="h-5 w-5" aria-hidden="true" />
+                      <FiChevronRight className="h-4 w-4" aria-hidden="true" />
                     </MotionIcon>
                   </button>
-                </nav>
+                </div>
               </div>
             </div>
           </div>

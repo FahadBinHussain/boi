@@ -1,69 +1,125 @@
 "use client";
 
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme, DAISYUI_THEMES, type DaisyTheme } from "@/contexts/ThemeContext";
 import { useEffect, useState } from "react";
-import { SunIcon, MoonIcon, ComputerDesktopIcon } from "@heroicons/react/24/outline";
+import { FiCheck, FiChevronDown, FiDroplet, FiMonitor } from "react-icons/fi";
 import MotionIcon from "@/components/ui/MotionIcon";
 
 export default function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { theme, resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  // Avoid hydration mismatch by only rendering after mount
   useEffect(() => {
     setMounted(true);
   }, []);
 
   if (!mounted) {
-    return <div className="w-9 h-9"></div>; // Placeholder to avoid layout shift
+    return (
+      <div className="btn btn-ghost btn-sm gap-2 opacity-0 pointer-events-none">
+        <span className="w-4 h-4"></span>
+        <span>Theme</span>
+      </div>
+    );
   }
 
+  const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
   return (
-    <div className="flex items-center gap-2 p-1 rounded-lg bg-gray-100 dark:bg-gray-800">
-      <button
-        onClick={() => setTheme("light")}
-        className={`p-2 rounded-md ${
-          theme === "light" 
-            ? "bg-white text-yellow-500 shadow-sm" 
-            : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-        }`}
-        title="Light mode"
-        aria-label="Use light mode"
+    <div className="dropdown dropdown-end">
+      <div
+        tabIndex={0}
+        role="button"
+        className="btn btn-ghost btn-sm gap-2 border border-base-content/10 hover:border-base-content/20"
+        title="Change theme"
+        aria-label="Change theme"
       >
-        <MotionIcon animation="spin">
-          <SunIcon className="w-5 h-5" />
+        <MotionIcon animation="spin" trigger="hover">
+          <FiDroplet className="w-4 h-4 text-primary" />
         </MotionIcon>
-      </button>
-      
-      <button
-        onClick={() => setTheme("dark")}
-        className={`p-2 rounded-md ${
-          theme === "dark" 
-            ? "bg-gray-700 text-blue-400 shadow-sm" 
-            : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-        }`}
-        title="Dark mode"
-        aria-label="Use dark mode"
+        <span className="hidden sm:inline text-xs font-medium">
+          {theme === "system" ? `System (${capitalize(resolvedTheme)})` : capitalize(theme)}
+        </span>
+        <MotionIcon animation="bounce" trigger="hover">
+          <FiChevronDown className="w-3 h-3 opacity-60" />
+        </MotionIcon>
+      </div>
+
+      <ul
+        tabIndex={0}
+        className="dropdown-content z-[100] mt-2 p-2 shadow-2xl bg-base-200 text-base-content rounded-box w-60 max-h-96 overflow-y-auto menu menu-sm gap-1 border border-base-content/10"
       >
-        <MotionIcon animation="wiggle">
-          <MoonIcon className="w-5 h-5" />
-        </MotionIcon>
-      </button>
-      
-      <button
-        onClick={() => setTheme("system")}
-        className={`p-2 rounded-md ${
-          theme === "system" 
-            ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm" 
-            : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-        }`}
-        title="System preference"
-        aria-label="Use system theme preference"
-      >
-        <MotionIcon animation="float">
-          <ComputerDesktopIcon className="w-5 h-5" />
-        </MotionIcon>
-      </button>
+        <li className="menu-title text-xs font-bold uppercase tracking-wider px-2 py-1 text-base-content/60">
+          Preferences
+        </li>
+        <li>
+          <button
+            onClick={() => {
+              setTheme("system");
+              const elem = document.activeElement as HTMLElement | null;
+              elem?.blur();
+            }}
+            className={`flex items-center justify-between py-2 px-3 rounded-lg ${
+              theme === "system" ? "active font-bold" : ""
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <MotionIcon animation="pulse">
+                <FiMonitor className="w-4 h-4" />
+              </MotionIcon>
+              <span>System</span>
+            </div>
+            {theme === "system" && (
+              <MotionIcon animation="bounce">
+                <FiCheck className="w-4 h-4 text-primary" />
+              </MotionIcon>
+            )}
+          </button>
+        </li>
+
+        <li className="menu-title text-xs font-bold uppercase tracking-wider px-2 pt-3 pb-1 text-base-content/60">
+          DaisyUI Themes ({DAISYUI_THEMES.length})
+        </li>
+
+        {DAISYUI_THEMES.map((themeName: DaisyTheme) => {
+          const isSelected = theme === themeName;
+          return (
+            <li key={themeName}>
+              <button
+                onClick={() => {
+                  setTheme(themeName);
+                  const elem = document.activeElement as HTMLElement | null;
+                  elem?.blur();
+                }}
+                className={`flex items-center justify-between py-2 px-3 rounded-lg ${
+                  isSelected ? "active font-bold" : ""
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  {isSelected ? (
+                    <MotionIcon animation="bounce">
+                      <FiCheck className="w-4 h-4 text-primary" />
+                    </MotionIcon>
+                  ) : (
+                    <span className="w-4 h-4" />
+                  )}
+                  <span>{capitalize(themeName)}</span>
+                </div>
+
+                {/* DaisyUI theme color preview badge */}
+                <span
+                  data-theme={themeName}
+                  className="bg-base-100 rounded-btn flex gap-0.5 p-1 border border-base-content/10 shrink-0"
+                >
+                  <span className="w-2 h-4 rounded-sm bg-primary block" />
+                  <span className="w-2 h-4 rounded-sm bg-secondary block" />
+                  <span className="w-2 h-4 rounded-sm bg-accent block" />
+                  <span className="w-2 h-4 rounded-sm bg-neutral block" />
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
-} 
+}

@@ -9,7 +9,6 @@ import gsap from "gsap";
 import { useAdmin } from "@/lib/hooks/useAdmin";
 import { useRouter } from "next/navigation";
 
-// Define types for our data
 interface Book {
   id: number;
   title: string;
@@ -26,7 +25,6 @@ interface User {
   downloads: number;
 }
 
-// Empty arrays instead of mock data
 const recentBooks: Book[] = [];
 const recentUsers: User[] = [];
 
@@ -53,31 +51,26 @@ const fadeInUp = {
   }
 };
 
-// Stat card component
-function StatCard({ title, value, icon, gradient, accent }: { 
+function StatCard({ title, value, icon, colorClass = "text-primary bg-primary/10" }: { 
   title: string; 
   value: string | number; 
   icon: React.ReactNode; 
-  gradient: string;
-  accent: string;
+  colorClass?: string;
 }) {
   return (
     <motion.div
       variants={fadeInUp}
-      whileHover={{ y: -4, scale: 1.02 }}
-      transition={{ duration: 0.4 }}
-      className="dashboard-card relative overflow-hidden rounded-[1.6rem] border border-white/[0.08] bg-white/[0.02] p-6 backdrop-blur-xl shadow-[0_20px_60px_-25px_rgba(0,0,0,0.5)]"
+      whileHover={{ y: -4, scale: 1.01 }}
+      transition={{ duration: 0.3 }}
+      className="dashboard-card card bg-base-200 border border-base-300 p-6 shadow-md rounded-3xl"
     >
-      <div className="absolute top-0 right-0 h-32 w-32 opacity-[0.08] rounded-full blur-2xl" style={{ background: gradient }} />
-      <div className="relative">
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="text-sm text-white/50">{title}</p>
-            <p className="mt-3 font-[var(--font-geist-mono)] text-4xl font-light text-white">{value}</p>
-          </div>
-          <div className="rounded-xl p-4" style={{ background: `linear-gradient(135deg, ${gradient})` }}>
-            {icon}
-          </div>
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-wider text-base-content/60">{title}</p>
+          <p className="mt-3 font-mono text-4xl font-extrabold text-base-content">{value}</p>
+        </div>
+        <div className={`rounded-2xl p-3.5 ${colorClass}`}>
+          {icon}
         </div>
       </div>
     </motion.div>
@@ -154,32 +147,27 @@ export default function AdminDashboard() {
     : 0;
 
   return (
-    <div className="bg-[#0a0a0f] min-h-screen text-white">
-      {/* Noise overlay */}
-      <div className="fixed inset-0 pointer-events-none z-[100] opacity-[0.03] mix-blend-overlay" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
-      }} />
-
-      <div className="relative mx-auto max-w-[1480px] px-6 py-12 lg:px-12">
+    <div className="bg-base-100 min-h-screen text-base-content transition-colors">
+      <div className="mx-auto max-w-[1480px] px-6 py-10 lg:px-12">
         {/* Header */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="mb-12 flex items-center justify-between"
+          className="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
         >
           <div>
-            <p className="mb-2 text-xs tracking-[0.25em] text-white/40">CONTROL CENTER</p>
-            <h1 className="font-[var(--font-geist-sans)] text-3xl font-semibold tracking-tight lg:text-4xl">Dashboard Overview</h1>
+            <p className="mb-1 text-xs font-bold tracking-[0.25em] uppercase text-primary">Control Center</p>
+            <h1 className="text-3xl font-extrabold tracking-tight text-base-content lg:text-4xl">Dashboard Overview</h1>
           </div>
           <Link 
             href="/admin/books/new" 
-            className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-medium text-[#0a0a0f] transition-all duration-500 hover:-translate-y-0.5 hover:shadow-[0_0_60px_-15px_rgba(20,184,166,0.4)]"
+            className="btn btn-primary rounded-full px-6 gap-2 shadow-md hover:shadow-lg self-start sm:self-auto"
           >
             <MotionIcon animation="bounce" trigger="hover">
-              <FiPlusCircle className="transition-transform duration-300 group-hover:scale-110" />
+              <FiPlusCircle size={18} />
             </MotionIcon>
-            Add Book
+            <span>Add Book</span>
           </Link>
         </motion.div>
 
@@ -188,51 +176,47 @@ export default function AdminDashboard() {
           variants={staggerContainer}
           initial="hidden"
           animate="show"
-          className="mb-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4"
+          className="mb-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4"
         >
           <StatCard 
             title="Total Books" 
             value={stats.totalBooks} 
             icon={
               <MotionIcon animation="float" trigger="always">
-                <FiBook className="h-6 w-6 text-white" />
+                <FiBook className="h-6 w-6 text-primary" />
               </MotionIcon>
             } 
-            gradient="#14b8a6, #0d9488"
-            accent="#5eead4"
+            colorClass="bg-primary/10 text-primary"
           />
           <StatCard 
             title="Total Users" 
             value={stats.totalUsers} 
             icon={
               <MotionIcon animation="bounce" trigger="always">
-                <FiUsers className="h-6 w-6 text-white" />
+                <FiUsers className="h-6 w-6 text-secondary" />
               </MotionIcon>
             } 
-            gradient="#3b82f6, #1d4ed8"
-            accent="#60a5fa"
+            colorClass="bg-secondary/10 text-secondary"
           />
           <StatCard 
             title="Downloads Today" 
             value="-" 
             icon={
               <MotionIcon animation="bounce" trigger="always">
-                <FiDownload className="h-6 w-6 text-white" />
+                <FiDownload className="h-6 w-6 text-accent" />
               </MotionIcon>
             } 
-            gradient="#a855f7, #7c3aed"
-            accent="#c084fc"
+            colorClass="bg-accent/10 text-accent"
           />
           <StatCard 
             title="Growth Rate" 
             value="-" 
             icon={
               <MotionIcon animation="pulse" trigger="always">
-                <FiTrendingUp className="h-6 w-6 text-white" />
+                <FiTrendingUp className="h-6 w-6 text-warning" />
               </MotionIcon>
             } 
-            gradient="#f59e0b, #d97706"
-            accent="#fbbf24"
+            colorClass="bg-warning/10 text-warning"
           />
         </motion.div>
 
@@ -241,23 +225,23 @@ export default function AdminDashboard() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.3 }}
-          className="mb-12 grid grid-cols-1 gap-6 lg:grid-cols-2"
+          className="mb-10 grid grid-cols-1 gap-6 lg:grid-cols-2"
         >
           {/* Downloads Chart */}
-          <div className="dashboard-card relative overflow-hidden rounded-[2rem] border border-white/[0.08] bg-white/[0.02] p-8 backdrop-blur-xl">
-            <h2 className="mb-6 text-lg font-medium">Downloads Overview</h2>
+          <div className="dashboard-card card bg-base-200 border border-base-300 p-6 md:p-8 rounded-3xl shadow-md">
+            <h2 className="mb-6 text-lg font-bold text-base-content">Downloads Overview</h2>
             <div className="h-64" ref={chartRef}>
-              <div className="flex h-full items-end gap-4 px-2">
+              <div className="flex h-full items-end gap-3 px-2">
                 {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => (
                   <div key={day} className="flex h-full flex-1 flex-col items-center justify-end">
                     <div 
-                      className="chart-bar w-full rounded-t-lg" 
+                      className="chart-bar w-full rounded-t-lg bg-primary" 
                       style={{ 
                         height: ['65%', '40%', '85%', '55%', '75%', '30%', '45%'][i],
-                        background: 'linear-gradient(to top, #14b8a6, #5eead4)'
+                        opacity: 0.85
                       }}
                     />
-                    <div className="mt-3 text-xs text-white/40">{day}</div>
+                    <div className="mt-3 text-xs font-semibold text-base-content/50 uppercase">{day}</div>
                   </div>
                 ))}
               </div>
@@ -265,26 +249,27 @@ export default function AdminDashboard() {
           </div>
 
           {/* User Activity */}
-          <div className="dashboard-card relative overflow-hidden rounded-[2rem] border border-white/[0.08] bg-white/[0.02] p-8 backdrop-blur-xl">
-            <h2 className="mb-6 text-lg font-medium">User Activity</h2>
+          <div className="dashboard-card card bg-base-200 border border-base-300 p-6 md:p-8 rounded-3xl shadow-md">
+            <h2 className="mb-6 text-lg font-bold text-base-content">User Activity</h2>
             <div className="flex h-64 items-center justify-center">
               <div className="relative h-48 w-48">
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center">
-                    <div className="font-[var(--font-geist-mono)] text-4xl font-light">
+                    <div className="font-mono text-4xl font-extrabold text-base-content">
                       {activePercentage > 0 ? `${activePercentage}%` : '-'}
                     </div>
-                    <div className="mt-1 text-sm text-white/50">Active Users</div>
+                    <div className="mt-1 text-xs font-semibold text-base-content/60 uppercase">Active Users</div>
                   </div>
                 </div>
                 <svg className="h-full w-full" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="10" />
+                  <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" className="text-base-content/10" strokeWidth="10" />
                   <motion.circle
                     cx="50"
                     cy="50"
                     r="40"
                     fill="none"
-                    stroke="url(#progressGradient)"
+                    stroke="currentColor"
+                    className="text-primary"
                     strokeWidth="10"
                     strokeLinecap="round"
                     strokeDasharray="251.2"
@@ -293,12 +278,6 @@ export default function AdminDashboard() {
                     transition={{ duration: 1.5, delay: 0.5, ease: "easeOut" }}
                     transform="rotate(-90 50 50)"
                   />
-                  <defs>
-                    <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#14b8a6" />
-                      <stop offset="100%" stopColor="#5eead4" />
-                    </linearGradient>
-                  </defs>
                 </svg>
               </div>
             </div>
@@ -312,39 +291,31 @@ export default function AdminDashboard() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.5 }}
-            className="dashboard-table relative overflow-hidden rounded-[2rem] border border-white/[0.08] bg-white/[0.02] backdrop-blur-xl"
+            className="dashboard-table card bg-base-200 border border-base-300 rounded-3xl shadow-md overflow-hidden"
           >
-            <div className="border-b border-white/[0.08] px-8 py-6">
-              <h2 className="text-lg font-medium">Recent Books</h2>
+            <div className="border-b border-base-300 px-6 py-5">
+              <h2 className="text-base font-bold text-base-content">Recent Books</h2>
             </div>
             <div className="overflow-x-auto">
               {recentBooks.length > 0 ? (
-                <table className="min-w-full">
+                <table className="table table-zebra table-sm">
                   <thead>
-                    <tr className="border-b border-white/[0.06]">
-                      <th className="px-8 py-4 text-left text-xs tracking-[0.2em] text-white/40 uppercase">Title</th>
-                      <th className="px-8 py-4 text-left text-xs tracking-[0.2em] text-white/40 uppercase">Author</th>
-                      <th className="px-8 py-4 text-left text-xs tracking-[0.2em] text-white/40 uppercase">Downloads</th>
-                      <th className="px-8 py-4 text-left text-xs tracking-[0.2em] text-white/40 uppercase">Status</th>
+                    <tr className="text-xs uppercase text-base-content/60">
+                      <th>Title</th>
+                      <th>Author</th>
+                      <th>Downloads</th>
+                      <th>Status</th>
                     </tr>
                   </thead>
                   <tbody>
                     {recentBooks.map((book) => (
-                      <tr key={book.id} className="border-b border-white/[0.04] transition-colors hover:bg-white/[0.02]">
-                        <td className="whitespace-nowrap px-8 py-5">
-                          <div className="text-sm font-medium">{book.title}</div>
-                        </td>
-                        <td className="whitespace-nowrap px-8 py-5">
-                          <div className="text-sm text-white/60">{book.author}</div>
-                        </td>
-                        <td className="whitespace-nowrap px-8 py-5">
-                          <div className="text-sm text-white/60">{book.downloads}</div>
-                        </td>
-                        <td className="whitespace-nowrap px-8 py-5">
-                          <span className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${
-                            book.status === "active" 
-                              ? "bg-[#14b8a6]/20 text-[#5eead4]" 
-                              : "bg-[#f59e0b]/20 text-[#fbbf24]"
+                      <tr key={book.id}>
+                        <td className="font-medium">{book.title}</td>
+                        <td className="text-base-content/70">{book.author}</td>
+                        <td>{book.downloads}</td>
+                        <td>
+                          <span className={`badge badge-sm font-semibold ${
+                            book.status === "active" ? "badge-success" : "badge-warning"
                           }`}>
                             {book.status}
                           </span>
@@ -354,16 +325,16 @@ export default function AdminDashboard() {
                   </tbody>
                 </table>
               ) : (
-                <div className="py-16 text-center">
+                <div className="py-14 text-center">
                   <MotionIcon animation="float" trigger="always">
-                    <FiBook className="mx-auto h-14 w-14 text-white/20" />
+                    <FiBook className="mx-auto h-12 w-12 text-base-content/20" />
                   </MotionIcon>
-                  <h3 className="mt-4 text-sm font-medium">No books yet</h3>
-                  <p className="mt-2 text-sm text-white/50">Get started by adding your first book.</p>
-                  <div className="mt-8">
+                  <h3 className="mt-3 text-sm font-bold text-base-content">No books yet</h3>
+                  <p className="mt-1 text-xs text-base-content/60">Get started by adding your first book.</p>
+                  <div className="mt-6">
                     <Link
                       href="/admin/books/new"
-                      className="group inline-flex items-center gap-2 rounded-full bg-white/10 px-5 py-3 text-sm font-medium transition-all hover:bg-white/15"
+                      className="btn btn-outline btn-sm rounded-full gap-2"
                     >
                       <MotionIcon animation="bounce" trigger="hover">
                         <FiPlusCircle />
@@ -374,11 +345,11 @@ export default function AdminDashboard() {
                 </div>
               )}
             </div>
-            <div className="border-t border-white/[0.08] px-8 py-5">
-              <Link href="/admin/books" className="group flex items-center gap-2 text-sm text-[#5eead4] hover:text-[#2dd4bf]">
-                View all books
+            <div className="border-t border-base-300 px-6 py-4">
+              <Link href="/admin/books" className="btn btn-ghost btn-sm text-primary gap-1">
+                <span>View all books</span>
                 <MotionIcon animation="float" trigger="hover">
-                  <FiChevronRight className="transition-transform duration-300 group-hover:translate-x-1" />
+                  <FiChevronRight />
                 </MotionIcon>
               </Link>
             </div>
@@ -389,75 +360,71 @@ export default function AdminDashboard() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.6 }}
-            className="dashboard-table relative overflow-hidden rounded-[2rem] border border-white/[0.08] bg-white/[0.02] backdrop-blur-xl"
+            className="dashboard-table card bg-base-200 border border-base-300 rounded-3xl shadow-md overflow-hidden"
           >
-            <div className="border-b border-white/[0.08] px-8 py-6">
-              <h2 className="text-lg font-medium">Recent Users</h2>
+            <div className="border-b border-base-300 px-6 py-5">
+              <h2 className="text-base font-bold text-base-content">Recent Users</h2>
             </div>
             <div className="overflow-x-auto">
-              <table className="min-w-full">
+              <table className="table table-zebra table-sm">
                 <thead>
-                  <tr className="border-b border-white/[0.06]">
-                    <th className="px-8 py-4 text-left text-xs tracking-[0.2em] text-white/40 uppercase">Name</th>
-                    <th className="px-8 py-4 text-left text-xs tracking-[0.2em] text-white/40 uppercase">Email</th>
-                    <th className="px-8 py-4 text-left text-xs tracking-[0.2em] text-white/40 uppercase">Joined</th>
-                    <th className="px-8 py-4 text-left text-xs tracking-[0.2em] text-white/40 uppercase">Downloads</th>
+                  <tr className="text-xs uppercase text-base-content/60">
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Joined</th>
+                    <th>Downloads</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {recentUsers.map((user) => (
-                    <tr key={user.id} className="border-b border-white/[0.04] transition-colors hover:bg-white/[0.02]">
-                      <td className="whitespace-nowrap px-8 py-5">
-                        <div className="text-sm font-medium">{user.name}</div>
-                      </td>
-                      <td className="whitespace-nowrap px-8 py-5">
-                        <div className="text-sm text-white/60">{user.email}</div>
-                      </td>
-                      <td className="whitespace-nowrap px-8 py-5">
-                        <div className="text-sm text-white/60">{new Date(user.joined).toLocaleDateString()}</div>
-                      </td>
-                      <td className="whitespace-nowrap px-8 py-5">
-                        <div className="text-sm text-white/60">{user.downloads}</div>
+                  {recentUsers.length > 0 ? (
+                    recentUsers.map((user) => (
+                      <tr key={user.id}>
+                        <td className="font-medium">{user.name}</td>
+                        <td className="text-base-content/70">{user.email}</td>
+                        <td>{new Date(user.joined).toLocaleDateString()}</td>
+                        <td>{user.downloads}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={4} className="text-center py-12 text-base-content/50 text-xs">
+                        No recent users recorded yet.
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
-            <div className="border-t border-white/[0.08] px-8 py-5">
-              <Link href="/admin/users" className="group flex items-center gap-2 text-sm text-[#5eead4] hover:text-[#2dd4bf]">
-                View all users
+            <div className="border-t border-base-300 px-6 py-4">
+              <Link href="/admin/users" className="btn btn-ghost btn-sm text-primary gap-1">
+                <span>View all users</span>
                 <MotionIcon animation="float" trigger="hover">
-                  <FiChevronRight className="transition-transform duration-300 group-hover:translate-x-1" />
+                  <FiChevronRight />
                 </MotionIcon>
               </Link>
             </div>
           </motion.div>
         </div>
 
-        {/* System Alerts */}
+        {/* System Notice */}
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.7 }}
-          className="mt-12 relative overflow-hidden rounded-[2rem] border border-[#f59e0b]/20 bg-[#f59e0b]/10 p-6 backdrop-blur-xl"
+          className="mt-10 alert alert-warning shadow-md rounded-2xl"
         >
-          <div className="flex gap-4">
-            <div className="flex-shrink-0 rounded-full bg-[#f59e0b]/20 p-3">
-              <MotionIcon animation="wiggle" trigger="always">
-                <FiAlertCircle className="h-5 w-5 text-[#fbbf24]" />
-              </MotionIcon>
-            </div>
-            <div>
-              <h3 className="font-medium text-[#fbbf24]">System Notice</h3>
-              <p className="mt-2 text-sm text-white/70">
-                Scheduled maintenance planned for June 15, 2026, from 2:00 AM to 4:00 AM UTC. 
-                The system may experience brief downtime during this period.
-              </p>
-            </div>
+          <MotionIcon animation="wiggle" trigger="always">
+            <FiAlertCircle className="h-6 w-6 shrink-0" />
+          </MotionIcon>
+          <div>
+            <h3 className="font-bold text-sm">System Notice</h3>
+            <p className="mt-1 text-xs">
+              Scheduled maintenance planned for June 15, 2026, from 2:00 AM to 4:00 AM UTC. 
+              The system may experience brief downtime during this period.
+            </p>
           </div>
         </motion.div>
       </div>
     </div>
   );
-} 
+}

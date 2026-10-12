@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import BookGrid from '@/components/ui/BookGrid';
-import { FiSearch, FiLoader } from 'react-icons/fi';
+import { FiSearch, FiLoader, FiAlertCircle } from 'react-icons/fi';
 import MotionIcon from '@/components/ui/MotionIcon';
 import type { Book } from '@/lib/books';
 
@@ -49,28 +49,28 @@ export default function BooksPage() {
   });
 
   return (
-    <div className="bg-gray-50 min-h-screen py-12">
+    <div className="bg-base-100 text-base-content min-h-screen py-12 transition-colors">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-10">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Browse Books</h1>
-          <p className="text-lg text-gray-600">
+          <h1 className="text-3xl font-extrabold text-base-content mb-3">Browse Books</h1>
+          <p className="text-base text-base-content/70">
             Discover and download free books from our extensive collection
           </p>
         </div>
 
         {/* Search Bar */}
-        <div className="mb-8 max-w-3xl">
+        <div className="mb-8 max-w-2xl">
           <div className="relative">
             <input
               type="text"
               placeholder="Search books by title, author or description..."
-              className="w-full px-5 py-3 pr-12 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="input input-bordered w-full pr-12 bg-base-100 text-base-content"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500">
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-base-content/50">
               <MotionIcon animation="spin">
-                <FiSearch size={20} />
+                <FiSearch size={18} />
               </MotionIcon>
             </div>
           </div>
@@ -79,16 +79,21 @@ export default function BooksPage() {
         {/* Main Content - Book Grid */}
         <div>
           {isLoading ? (
-            <div className="flex justify-center items-center h-64">
+            <div className="flex justify-center items-center h-64 text-base-content">
               <MotionIcon animation="spin" trigger="always">
-                <FiLoader className="h-8 w-8 text-indigo-600" />
+                <FiLoader className="h-8 w-8 text-primary" />
               </MotionIcon>
-              <span className="ml-2 text-lg text-gray-600">Loading books...</span>
+              <span className="ml-3 text-base font-medium text-base-content/70">Loading books...</span>
             </div>
           ) : error ? (
-            <div className="bg-red-50 p-4 rounded-lg border border-red-200 text-red-700">
-              <p className="font-medium">{error}</p>
-              <p className="mt-1 text-sm">Please try refreshing the page or contact support if the problem persists.</p>
+            <div className="alert alert-error max-w-xl shadow-lg">
+              <MotionIcon animation="wiggle" trigger="always">
+                <FiAlertCircle className="h-6 w-6" />
+              </MotionIcon>
+              <div>
+                <h3 className="font-bold">Error</h3>
+                <div className="text-sm">{error}</div>
+              </div>
             </div>
           ) : (
             <BookGrid 
@@ -100,4 +105,4 @@ export default function BooksPage() {
       </div>
     </div>
   );
-} 
+}

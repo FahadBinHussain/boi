@@ -49,4 +49,19 @@ try {
   }
 }
 
+// Check if daisyui is installed
+try {
+  require.resolve('daisyui');
+  console.log('✅ daisyui is installed');
+} catch (e) {
+  console.log('⚠️ daisyui is not installed, installing now...');
+  try {
+    execSync('pnpm install -D daisyui@^4', { stdio: 'inherit' });
+    console.log('✅ daisyui installed successfully');
+  } catch (err) {
+    console.error('❌ Failed to install daisyui:', err);
+    process.exit(1);
+  }
+}
+
 console.log('✅ All required dependencies are installed'); 

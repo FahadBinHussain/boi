@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { FiDownload, FiArrowLeft, FiCalendar, FiFileText, FiTag, FiBook, FiUsers, FiLayers, FiStar, FiGlobe, FiHash, FiExternalLink } from 'react-icons/fi';
+import { FiDownload, FiArrowLeft, FiCalendar, FiFileText, FiTag, FiBook, FiUsers, FiLayers, FiStar, FiGlobe, FiHash, FiExternalLink, FiLoader } from 'react-icons/fi';
 import { FaGoodreads, FaWikipediaW, FaAmazon } from 'react-icons/fa';
 import { SiWikipedia } from 'react-icons/si';
 import MotionIcon from '@/components/ui/MotionIcon';
@@ -128,10 +128,12 @@ export default function BookDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-base-100 text-base-content">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading book details...</p>
+          <MotionIcon animation="spin" trigger="always" className="inline-block mb-4">
+            <FiLoader className="w-12 h-12 text-primary" />
+          </MotionIcon>
+          <p className="text-base-content/70 font-medium">Loading book details...</p>
         </div>
       </div>
     );
@@ -139,15 +141,17 @@ export default function BookDetailPage() {
 
   if (error || !book) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">{error || 'Book not found'}</h2>
-          <p className="text-gray-600 mb-6">The book you're looking for doesn't seem to exist.</p>
+      <div className="min-h-screen flex items-center justify-center bg-base-100 text-base-content px-4">
+        <div className="text-center card bg-base-200 border border-base-content/10 p-8 max-w-md shadow-xl rounded-3xl">
+          <h2 className="text-2xl font-bold text-base-content mb-2">{error || 'Book not found'}</h2>
+          <p className="text-base-content/70 mb-6">The book you're looking for doesn't seem to exist.</p>
           <Link 
             href="/books" 
-            className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700"
+            className="btn btn-primary gap-2"
           >
-            <FiArrowLeft size={16} />
+            <MotionIcon animation="bounce">
+              <FiArrowLeft size={16} />
+            </MotionIcon>
             Back to all books
           </Link>
         </div>
@@ -172,11 +176,11 @@ export default function BookDetailPage() {
   const genres = book.genres || book.categories || [];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-base-100 text-base-content py-8 transition-colors">
       <div className="max-w-6xl mx-auto px-4">
         <Link 
           href="/books" 
-          className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 mb-6"
+          className="btn btn-ghost btn-sm gap-2 text-primary mb-6"
         >
           <MotionIcon animation="bounce">
             <FiArrowLeft size={16} />
@@ -184,22 +188,22 @@ export default function BookDetailPage() {
           Back to all books
         </Link>
         
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="card bg-base-200/60 border border-base-content/10 shadow-xl rounded-3xl overflow-hidden">
           <div className="md:flex">
             {/* Book Cover */}
-            <div className="md:w-1/3 bg-gray-100 flex items-center justify-center p-8">
-              <div className="relative w-full max-w-xs aspect-[2/3] shadow-lg">
+            <div className="md:w-1/3 bg-base-300/60 flex items-center justify-center p-8">
+              <div className="relative w-full max-w-xs aspect-[2/3] shadow-2xl rounded-2xl overflow-hidden">
                 {coverImage ? (
                   <Image
                     src={coverImage}
                     alt={book.title}
                     fill
-                    className="object-cover rounded"
+                    className="object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gray-200 rounded flex items-center justify-center">
+                  <div className="w-full h-full bg-base-300 rounded flex items-center justify-center">
                     <MotionIcon animation="float">
-                      <FiBook size={64} className="text-gray-400" />
+                      <FiBook size={64} className="text-base-content/30" />
                     </MotionIcon>
                   </div>
                 )}
@@ -207,34 +211,34 @@ export default function BookDetailPage() {
             </div>
             
             {/* Book Details */}
-            <div className="md:w-2/3 p-6 md:p-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{book.title}</h1>
+            <div className="md:w-2/3 p-6 md:p-10 card-body">
+              <h1 className="text-3xl font-extrabold text-base-content mb-2">{book.title}</h1>
               
               <div className="mb-4">
                 {authors.length > 0 ? (
-                  <div className="flex flex-wrap items-center gap-1">
-                    <span className="text-gray-600">By</span>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="text-base-content/70">By</span>
                     {authors.map((author, index) => (
                       <span key={author.id}>
                         <Link 
                           href={`/authors/${author.id}`}
-                          className="text-indigo-600 hover:text-indigo-800"
+                          className="text-primary font-medium hover:underline"
                         >
                           {author.name}
                         </Link>
-                        {index < authors.length - 1 && <span className="text-gray-600">,</span>}
+                        {index < authors.length - 1 && <span className="text-base-content/60">,</span>}
                       </span>
                     ))}
                   </div>
                 ) : book.author ? (
-                  <div className="text-gray-600">By {book.author}</div>
+                  <div className="text-base-content/70">By {book.author}</div>
                 ) : null}
               </div>
               
               {/* Description */}
               <div className="mb-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-2">Description</h2>
-                <p className="text-gray-700 leading-relaxed">{description}</p>
+                <h2 className="text-lg font-bold text-base-content mb-2">Description</h2>
+                <p className="text-base-content/80 leading-relaxed">{description}</p>
               </div>
               
               {/* Additional Details */}
@@ -243,14 +247,14 @@ export default function BookDetailPage() {
                 {book.seriesName && (
                   <div className="flex items-start gap-2">
                     <MotionIcon animation="float">
-                      <FiBook className="text-gray-500 mt-1" />
+                      <FiBook className="text-primary mt-1" />
                     </MotionIcon>
                     <div>
-                      <h3 className="text-sm font-medium text-gray-900">Series</h3>
-                      <p className="text-gray-700">
+                      <h3 className="text-xs font-semibold text-base-content/60 uppercase">Series</h3>
+                      <p className="text-base-content font-medium">
                         <Link 
                           href={`/series/${book.seriesId || ''}`}
-                          className="text-indigo-600 hover:text-indigo-800"
+                          className="text-primary hover:underline"
                         >
                           {book.seriesName}
                         </Link>
@@ -263,11 +267,11 @@ export default function BookDetailPage() {
                 {book.seriesPosition && (
                   <div className="flex items-start gap-2">
                     <MotionIcon animation="wiggle">
-                      <FiHash className="text-gray-500 mt-1" />
+                      <FiHash className="text-primary mt-1" />
                     </MotionIcon>
                     <div>
-                      <h3 className="text-sm font-medium text-gray-900">Position in Series</h3>
-                      <p className="text-gray-700">{book.seriesPosition}</p>
+                      <h3 className="text-xs font-semibold text-base-content/60 uppercase">Position in Series</h3>
+                      <p className="text-base-content font-medium">{book.seriesPosition}</p>
                     </div>
                   </div>
                 )}
@@ -276,11 +280,11 @@ export default function BookDetailPage() {
                 {(book.publicationDate) && (
                   <div className="flex items-start gap-2">
                     <MotionIcon animation="bounce">
-                      <FiCalendar className="text-gray-500 mt-1" />
+                      <FiCalendar className="text-primary mt-1" />
                     </MotionIcon>
                     <div>
-                      <h3 className="text-sm font-medium text-gray-900">Publication Date</h3>
-                      <p className="text-gray-700">{book.publicationDate}</p>
+                      <h3 className="text-xs font-semibold text-base-content/60 uppercase">Publication Date</h3>
+                      <p className="text-base-content font-medium">{book.publicationDate}</p>
                     </div>
                   </div>
                 )}
@@ -289,11 +293,11 @@ export default function BookDetailPage() {
                 {book.publisher && (
                   <div className="flex items-start gap-2">
                     <MotionIcon animation="float">
-                      <FiFileText className="text-gray-500 mt-1" />
+                      <FiFileText className="text-primary mt-1" />
                     </MotionIcon>
                     <div>
-                      <h3 className="text-sm font-medium text-gray-900">Publisher</h3>
-                      <p className="text-gray-700">{book.publisher}</p>
+                      <h3 className="text-xs font-semibold text-base-content/60 uppercase">Publisher</h3>
+                      <p className="text-base-content font-medium">{book.publisher}</p>
                     </div>
                   </div>
                 )}
@@ -302,11 +306,11 @@ export default function BookDetailPage() {
                 {book.language && (
                   <div className="flex items-start gap-2">
                     <MotionIcon animation="spin">
-                      <FiGlobe className="text-gray-500 mt-1" />
+                      <FiGlobe className="text-primary mt-1" />
                     </MotionIcon>
                     <div>
-                      <h3 className="text-sm font-medium text-gray-900">Language</h3>
-                      <p className="text-gray-700">{book.language}</p>
+                      <h3 className="text-xs font-semibold text-base-content/60 uppercase">Language</h3>
+                      <p className="text-base-content font-medium">{book.language}</p>
                     </div>
                   </div>
                 )}
@@ -315,11 +319,11 @@ export default function BookDetailPage() {
                 {book.numberOfPages && (
                   <div className="flex items-start gap-2">
                     <MotionIcon animation="bounce">
-                      <FiLayers className="text-gray-500 mt-1" />
+                      <FiLayers className="text-primary mt-1" />
                     </MotionIcon>
                     <div>
-                      <h3 className="text-sm font-medium text-gray-900">Pages</h3>
-                      <p className="text-gray-700">{book.numberOfPages}</p>
+                      <h3 className="text-xs font-semibold text-base-content/60 uppercase">Pages</h3>
+                      <p className="text-base-content font-medium">{book.numberOfPages}</p>
                     </div>
                   </div>
                 )}
@@ -328,12 +332,12 @@ export default function BookDetailPage() {
                 {typeof book.averageRating === 'number' && book.averageRating > 0 && (
                   <div className="flex items-start gap-2">
                     <MotionIcon animation="pulse">
-                      <FiStar className="text-gray-500 mt-1" />
+                      <FiStar className="text-warning mt-1" />
                     </MotionIcon>
                     <div>
-                      <h3 className="text-sm font-medium text-gray-900">Rating</h3>
+                      <h3 className="text-xs font-semibold text-base-content/60 uppercase">Rating</h3>
                       <div className="flex items-center">
-                        <div className="flex text-yellow-400 mr-1">
+                        <div className="flex text-warning mr-2">
                           {[...Array(5)].map((_, i) => (
                             <span key={i}>
                               <MotionIcon animation="pulse">
@@ -348,9 +352,9 @@ export default function BookDetailPage() {
                             </span>
                           ))}
                         </div>
-                        <span className="text-gray-700">{(book.averageRating || 0).toFixed(1)} / 5</span>
+                        <span className="text-base-content font-medium">{(book.averageRating || 0).toFixed(1)} / 5</span>
                         {typeof book.ratings === 'number' && book.ratings > 0 && (
-                          <span className="text-gray-500 ml-1">({book.ratings} ratings)</span>
+                          <span className="text-base-content/60 ml-1 text-xs">({book.ratings} ratings)</span>
                         )}
                       </div>
                     </div>
@@ -361,11 +365,11 @@ export default function BookDetailPage() {
                 {book.format && (
                   <div className="flex items-start gap-2">
                     <MotionIcon animation="float">
-                      <FiFileText className="text-gray-500 mt-1" />
+                      <FiFileText className="text-primary mt-1" />
                     </MotionIcon>
                     <div>
-                      <h3 className="text-sm font-medium text-gray-900">Format</h3>
-                      <p className="text-gray-700">{book.format}</p>
+                      <h3 className="text-xs font-semibold text-base-content/60 uppercase">Format</h3>
+                      <p className="text-base-content font-medium">{book.format}</p>
                     </div>
                   </div>
                 )}
@@ -373,11 +377,11 @@ export default function BookDetailPage() {
                 {book.fileSize && (
                   <div className="flex items-start gap-2">
                     <MotionIcon animation="float">
-                      <FiFileText className="text-gray-500 mt-1" />
+                      <FiFileText className="text-primary mt-1" />
                     </MotionIcon>
                     <div>
-                      <h3 className="text-sm font-medium text-gray-900">File Size</h3>
-                      <p className="text-gray-700">{book.fileSize}</p>
+                      <h3 className="text-xs font-semibold text-base-content/60 uppercase">File Size</h3>
+                      <p className="text-base-content font-medium">{book.fileSize}</p>
                     </div>
                   </div>
                 )}
@@ -386,12 +390,12 @@ export default function BookDetailPage() {
               {/* Characters */}
               {Array.isArray(book.characters) && book.characters.length > 0 && (
                 <div className="mb-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-2">Characters</h2>
+                  <h2 className="text-sm font-bold text-base-content uppercase tracking-wider mb-2">Characters</h2>
                   <div className="flex flex-wrap gap-2">
                     {book.characters.map((character, index) => (
                       <span 
                         key={index}
-                        className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm"
+                        className="badge badge-outline border-base-content/20 bg-base-100 text-base-content py-2 px-3 text-xs"
                       >
                         {character}
                       </span>
@@ -403,12 +407,12 @@ export default function BookDetailPage() {
               {/* Genres/Categories */}
               {genres.length > 0 && (
                 <div className="mb-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-2">Genres</h2>
+                  <h2 className="text-sm font-bold text-base-content uppercase tracking-wider mb-2">Genres</h2>
                   <div className="flex flex-wrap gap-2">
                     {genres.map((genre, index) => (
                       <span 
                         key={index}
-                        className="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm"
+                        className="badge badge-primary py-2 px-3 text-xs"
                       >
                         {genre}
                       </span>
@@ -418,10 +422,10 @@ export default function BookDetailPage() {
               )}
               
               {/* Download Button */}
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-3 mt-4">
                 <a
                   href={filesVcDownloadLink}
-                  className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                  className="btn btn-primary gap-2 shadow-lg"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -435,36 +439,18 @@ export default function BookDetailPage() {
                   const sourceInfo = getSourceInfo(book.scraperUrl);
                   const SourceIcon = sourceInfo.icon;
                   
-                  // Define color classes based on the source type
-                  const colorClasses = {
-                    goodreads: "bg-amber-600 hover:bg-amber-700",
-                    fandom: "bg-purple-600 hover:bg-purple-700",
-                    wikipedia: "bg-slate-600 hover:bg-slate-700",
-                    amazon: "bg-orange-600 hover:bg-orange-700",
-                    unknown: "bg-emerald-600 hover:bg-emerald-700"
-                  };
-                  
-                  const buttonColorClass = colorClasses[sourceInfo.type as keyof typeof colorClasses] || colorClasses.unknown;
-                  
                   return (
-                    <div className="relative group/tooltip">
-                      <a
-                        href={book.scraperUrl}
-                        className={`inline-flex items-center gap-3 ${buttonColorClass} text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 relative overflow-hidden group`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <span className="absolute inset-0 opacity-10 bg-[radial-gradient(circle,_white_1px,_transparent_1px)] bg-[length:8px_8px]"></span>
-                        <MotionIcon animation="wiggle">
-                          <SourceIcon size={20} className="relative z-10 transform transition-transform duration-300 group-hover:scale-110" />
-                        </MotionIcon>
-                        <span className="relative z-10">{sourceInfo.name}</span>
-                      </a>
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none">
-                        {book.scraperUrl}
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
-                      </div>
-                    </div>
+                    <a
+                      href={book.scraperUrl}
+                      className="btn btn-outline gap-2 shadow"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <MotionIcon animation="wiggle">
+                        <SourceIcon size={18} />
+                      </MotionIcon>
+                      <span>{sourceInfo.name}</span>
+                    </a>
                   );
                 })()}
               </div>

@@ -23,23 +23,17 @@ export default function RootLayout({
           {`
             (function() {
               try {
-                // Check for stored theme preference
+                const darkThemes = ['dark','synthwave','halloween','forest','black','luxury','dracula','business','night','coffee','dim','sunset'];
                 const storedTheme = localStorage.getItem('theme');
                 const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                
-                // Determine which theme to use
-                let theme;
-                if (storedTheme === 'dark' || storedTheme === 'light') {
-                  theme = storedTheme;
-                } else if (storedTheme === 'system') {
-                  theme = systemPrefersDark ? 'dark' : 'light';
-                } else {
+                let theme = storedTheme;
+                if (!theme || theme === 'system') {
                   theme = systemPrefersDark ? 'dark' : 'light';
                 }
-                
-                // Apply theme class immediately to avoid flash
+                document.documentElement.setAttribute('data-theme', theme);
+                const isDark = darkThemes.indexOf(theme) !== -1;
                 document.documentElement.classList.remove('light', 'dark');
-                document.documentElement.classList.add(theme);
+                document.documentElement.classList.add(isDark ? 'dark' : 'light');
                 
                 // Fix for date and time hydration mismatches
                 window.__INITIAL_TIME__ = {
@@ -47,30 +41,26 @@ export default function RootLayout({
                   date: new Date().toISOString()
                 };
                 
-                // Force any floating point/random-based calculations to be deterministic during hydration
                 window.__HYDRATING__ = true;
-                
-                // Clean up after hydration is complete
                 window.addEventListener('load', function() {
                   setTimeout(function() {
                     window.__HYDRATING__ = false;
                   }, 0);
                 });
               } catch (e) {
-                // Fallback if localStorage is not available
-                console.error('Error accessing localStorage:', e);
+                console.error('Error initializing theme:', e);
               }
             })();
           `}
         </Script>
       </head>
       <body
-        className="font-sans antialiased min-h-screen flex flex-col"
+        className="font-sans antialiased min-h-screen flex flex-col bg-base-100 text-base-content"
         suppressHydrationWarning
       >
         <Providers>
           <Header />
-          <main className="flex-grow bg-background text-foreground">
+          <main className="flex-grow bg-base-100 text-base-content">
             {children}
           </main>
           <Footer />
@@ -78,25 +68,6 @@ export default function RootLayout({
             position="bottom-right"
             toastOptions={{
               duration: 4000,
-              style: {
-                background: 'var(--card-bg)',
-                color: 'var(--foreground)',
-                boxShadow: '0 3px 10px rgba(0,0,0,0.2)',
-                padding: '16px',
-                borderRadius: '8px',
-              },
-              success: {
-                style: {
-                  background: 'var(--accent-secondary)',
-                  color: 'white',
-                },
-              },
-              error: {
-                style: {
-                  background: '#EF4444',
-                  color: 'white',
-                },
-              },
             }}
           />
         </Providers>

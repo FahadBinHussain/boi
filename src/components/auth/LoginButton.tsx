@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { signIn, signOut, useSession } from 'next-auth/react';
-import { FiLogIn, FiLogOut, FiUser, FiPlusCircle } from 'react-icons/fi';
+import { FiLogIn, FiLogOut, FiUser, FiPlusCircle, FiLayout } from 'react-icons/fi';
 import MotionIcon from '../ui/MotionIcon';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -25,7 +25,7 @@ const LoginButton = () => {
 
   if (status === 'loading') {
     // Show loading state
-    return <div className="w-8 h-8 animate-pulse rounded-full bg-gray-200"></div>;
+    return <div className="w-8 h-8 animate-pulse rounded-full bg-base-300"></div>;
   }
 
   if (session) {
@@ -33,23 +33,25 @@ const LoginButton = () => {
       <div className="relative">
         <button
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          className="flex items-center space-x-2 text-gray-700 hover:text-indigo-600 focus:outline-none"
+          className="btn btn-ghost btn-sm gap-2 normal-case font-normal text-base-content"
           aria-label="User menu"
         >
-          <div className="relative w-8 h-8 rounded-full overflow-hidden bg-indigo-100 flex items-center justify-center">
-            {user?.image ? (
-              <img 
-                src={user.image} 
-                alt={user.name || 'User avatar'} 
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <MotionIcon animation="bounce">
-                <FiUser className="text-indigo-600" size={18} />
-              </MotionIcon>
-            )}
+          <div className="avatar">
+            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
+              {user?.image ? (
+                <img 
+                  src={user.image} 
+                  alt={user.name || 'User avatar'} 
+                  className="w-full h-full object-cover rounded-full"
+                />
+              ) : (
+                <MotionIcon animation="bounce">
+                  <FiUser className="text-primary" size={16} />
+                </MotionIcon>
+              )}
+            </div>
           </div>
-          <span className="hidden md:inline text-sm font-medium">
+          <span className="hidden md:inline text-xs font-medium">
             {user?.name?.split(' ')[0] || 'User'}
           </span>
         </button>
@@ -58,34 +60,40 @@ const LoginButton = () => {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200"
+            className="absolute right-0 mt-2 w-52 bg-base-200 text-base-content rounded-box shadow-xl py-2 z-50 border border-base-300 menu menu-sm"
           >
             {/* Show different links based on user role */}
             {isAdmin ? (
               <Link 
                 href="/admin" 
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                className="flex items-center gap-2 px-4 py-2 hover:bg-base-300 rounded-lg text-sm"
                 onClick={() => setIsDropdownOpen(false)}
               >
+                <MotionIcon animation="pulse">
+                  <FiLayout className="h-4 w-4 text-primary" />
+                </MotionIcon>
                 Admin Dashboard
               </Link>
             ) : (
               <Link 
                 href="/admin/books/new" 
-                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                className="flex items-center gap-2 px-4 py-2 hover:bg-base-300 rounded-lg text-sm"
                 onClick={() => setIsDropdownOpen(false)}
               >
-                <MotionIcon animation="spin" className="mr-2">
-                  <FiPlusCircle className="h-4 w-4" />
+                <MotionIcon animation="spin">
+                  <FiPlusCircle className="h-4 w-4 text-primary" />
                 </MotionIcon>
                 Add Book
               </Link>
             )}
             <Link 
               href="/profile" 
-              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              className="flex items-center gap-2 px-4 py-2 hover:bg-base-300 rounded-lg text-sm"
               onClick={() => setIsDropdownOpen(false)}
             >
+              <MotionIcon animation="wiggle">
+                <FiUser className="h-4 w-4 text-primary" />
+              </MotionIcon>
               Profile
             </Link>
             <button
@@ -93,8 +101,11 @@ const LoginButton = () => {
                 signOut({ callbackUrl: '/' });
                 setIsDropdownOpen(false);
               }}
-              className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+              className="flex items-center gap-2 px-4 py-2 text-error hover:bg-error/10 rounded-lg text-sm w-full text-left"
             >
+              <MotionIcon animation="float">
+                <FiLogOut className="h-4 w-4" />
+              </MotionIcon>
               Sign out
             </button>
           </motion.div>
@@ -106,14 +117,14 @@ const LoginButton = () => {
   return (
     <button
       onClick={() => signIn('google', { callbackUrl: '/' })}
-      className="flex items-center space-x-2 text-gray-700 hover:text-indigo-600 transition-colors focus:outline-none"
+      className="btn btn-ghost btn-sm gap-2 normal-case font-normal text-base-content hover:text-primary"
     >
       <MotionIcon animation="float">
-        <FiLogIn size={20} />
+        <FiLogIn size={18} />
       </MotionIcon>
-      <span className="hidden md:inline">Sign in</span>
+      <span className="hidden md:inline text-xs font-medium">Sign in</span>
     </button>
   );
 };
 
-export default LoginButton; 
+export default LoginButton;

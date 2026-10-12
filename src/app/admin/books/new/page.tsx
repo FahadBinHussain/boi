@@ -68,24 +68,21 @@ const BookThumbnail = ({
   };
   
   return (
-    <div className="relative h-48 w-32 overflow-hidden rounded-md border border-gray-200 bg-gray-50 flex items-center justify-center shadow-sm">
+    <div className="relative h-48 w-32 overflow-hidden rounded-xl border border-base-300 bg-base-200 flex items-center justify-center shadow-sm">
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-          <svg className="animate-spin h-6 w-6 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
+        <div className="absolute inset-0 flex items-center justify-center bg-base-300/60">
+          <span className="loading loading-spinner text-primary"></span>
         </div>
       )}
       
       {hasError && (
         <div className="flex flex-col items-center justify-center text-center p-2">
           <MotionIcon animation="wiggle" trigger="always">
-            <svg className="h-8 w-8 text-gray-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <svg className="h-8 w-8 text-base-content/40 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
             </svg>
           </MotionIcon>
-          <span className="text-xs text-gray-500">Image not available</span>
+          <span className="text-xs text-base-content/60">Image not available</span>
         </div>
       )}
       
@@ -762,67 +759,65 @@ export default function AddNewBook() {
         <div className="flex items-center">
           <Link
             href="/admin/books"
-            className="mr-4 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition-colors"
+            className="mr-4 btn btn-ghost btn-sm border border-base-300 text-base-content gap-2"
           >
-            <MotionIcon animation="bounce" trigger="hover" className="mr-2">
+            <MotionIcon animation="bounce" trigger="hover">
               <FiArrowLeft className="h-4 w-4" />
             </MotionIcon>
             Back to Books
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-base-content">
             Add New Book
           </h1>
         </div>
       </div>
 
       {/* Files.vc integration status indicator */}
-      <div className="mb-4 flex items-center bg-white rounded-lg p-3 shadow-sm">
-        <span className="text-sm font-medium mr-2">Files.vc:</span>
+      <div className="mb-4 flex items-center card bg-base-200 border border-base-300 p-3 shadow-sm flex-row">
+        <span className="text-sm font-semibold mr-2 text-base-content">Files.vc:</span>
         {settings?.filesVcApiKey && settings?.filesVcAccountId ? (
-          <span className="inline-flex items-center">
-            <span className="h-3 w-3 rounded-full bg-green-500 mr-1" aria-hidden="true"></span>
-            <span className="text-sm text-green-700">Active</span>
+          <span className="badge badge-success gap-1 text-xs font-semibold">
+            <span className="h-2 w-2 rounded-full bg-success-content" aria-hidden="true"></span>
+            Active
           </span>
         ) : (
-          <span className="inline-flex items-center">
-            <span className="h-3 w-3 rounded-full bg-red-500 mr-1" aria-hidden="true"></span>
-            <span className="text-sm text-red-700">
-              {settings?.filesVcApiKey ? "Account ID not configured" : 
-               settings?.filesVcAccountId ? "API Key not configured" : "Not configured"}
-            </span>
+          <span className="badge badge-error gap-1 text-xs font-semibold">
+            <span className="h-2 w-2 rounded-full bg-error-content" aria-hidden="true"></span>
+            {settings?.filesVcApiKey ? "Account ID not configured" : 
+             settings?.filesVcAccountId ? "API Key not configured" : "Not configured"}
           </span>
         )}
       </div>
 
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="border-b border-gray-200 bg-gray-50 p-4 sm:p-6">
-          <h2 className="text-lg font-medium text-gray-900">Book Information</h2>
-          <p className="mt-1 text-sm text-gray-600">
+      <div className="card bg-base-200 border border-base-300 shadow-xl overflow-hidden">
+        <div className="border-b border-base-300 bg-base-300/40 p-4 sm:p-6">
+          <h2 className="text-lg font-bold text-base-content">Book Information</h2>
+          <p className="mt-1 text-sm text-base-content/70">
             Enter all details of the book you want to add to the library. Required fields are marked with an asterisk (*).
           </p>
         </div>
         
         <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-8">
           {/* Auto-fill from web section at the top for better UX */}
-          <div className="form-group bg-gray-50 p-4 rounded-lg border border-gray-200">
-            <h3 className="text-base font-medium text-gray-900">Quick Fill from Web</h3>
-            <p className="mt-1 text-sm text-gray-500">
+          <div className="form-group bg-base-100 p-4 rounded-xl border border-base-300">
+            <h3 className="text-base font-bold text-base-content">Quick Fill from Web</h3>
+            <p className="mt-1 text-sm text-base-content/60">
               Save time by automatically populating book details from Fandom or Goodreads.
             </p>
 
             <div className="mt-3">
-              <div className="flex rounded-md shadow-sm">
+              <div className="flex rounded-lg shadow-sm">
                 <div className="relative flex flex-grow items-stretch focus-within:z-10">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                     <MotionIcon animation="wiggle" trigger="hover">
-                      <FiLink className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                      <FiLink className="h-5 w-5 text-base-content/40" aria-hidden="true" />
                     </MotionIcon>
                   </div>
                   <input
                     type="text"
                     id="metadataUrl"
-                    className={`block w-full rounded-none rounded-l-md border-gray-300 pl-10 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                      scrapingError ? "border-red-300 text-red-900 placeholder-red-300" : ""
+                    className={`input input-bordered w-full rounded-r-none bg-base-100 text-base-content pl-10 focus:input-primary text-sm ${
+                      scrapingError ? "input-error" : ""
                     }`}
                     placeholder="Paste a Fandom or Goodreads URL to auto-fill book details"
                     value={metadataUrl}
@@ -833,18 +828,18 @@ export default function AddNewBook() {
                   type="button"
                   onClick={handleFetchMetadata}
                   disabled={isScrapingMetadata || !metadataUrl.trim()}
-                  className={`relative -ml-px inline-flex items-center rounded-r-md border border-gray-300 bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
-                    (isScrapingMetadata || !metadataUrl.trim()) ? "cursor-not-allowed opacity-75" : ""
+                  className={`btn btn-primary rounded-l-none gap-2 ${
+                    (isScrapingMetadata || !metadataUrl.trim()) ? "btn-disabled" : ""
                   }`}
                 >
                   {isScrapingMetadata ? (
                     <>
-                      <FiLoader className="mr-2 h-4 w-4 animate-spin" />
+                      <span className="loading loading-spinner loading-xs"></span>
                       Fetching...
                     </>
                   ) : (
                     <>
-                      <MotionIcon animation="bounce" trigger="hover" className="mr-2">
+                      <MotionIcon animation="bounce" trigger="hover">
                         <FiDownload className="h-4 w-4" />
                       </MotionIcon>
                       Fetch Data
@@ -855,8 +850,8 @@ export default function AddNewBook() {
             </div>
             
             {scrapingError && (
-              <div className="mt-3 flex items-center rounded-md bg-red-50 p-3 text-red-700">
-                <MotionIcon animation="wiggle" trigger="always" className="mr-2">
+              <div className="alert alert-error mt-3 py-2 text-xs flex items-center gap-2">
+                <MotionIcon animation="wiggle" trigger="always">
                   <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" clipRule="evenodd" />
                   </svg>
@@ -867,50 +862,52 @@ export default function AddNewBook() {
           </div>
 
           {/* Section 1: Basic Information */}
-          <div className="border-t border-gray-200 pt-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Basic Information</h3>
+          <div className="border-t border-base-300 pt-6">
+            <h3 className="text-lg font-bold text-base-content mb-4">Basic Information</h3>
             <div className="space-y-6">
               {/* Book Name */}
               <div className="form-group">
-                <label htmlFor="bookName" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="bookName" className="label-text block text-sm font-semibold text-base-content mb-2">
                   <div className="flex items-center">
                     <MotionIcon animation="float" trigger="hover" className="mr-2">
-                      <FiBook className="h-4 w-4 text-indigo-500" />
+                      <FiBook className="h-4 w-4 text-primary" />
                     </MotionIcon>
-                    Book Name <span className="text-red-500 ml-1">*</span>
+                    Book Name <span className="text-error ml-1">*</span>
                   </div>
                 </label>
                 <input
                   type="text"
                   id="bookName"
-                  className={`block w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm
-                    ${formErrors.bookName ? "border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500" : "border-gray-300"}`}
+                  className={`input input-bordered w-full bg-base-100 text-base-content ${
+                    formErrors.bookName ? "input-error" : ""
+                  }`}
                   placeholder="Enter book name"
                   value={bookName}
                   onChange={(e) => setBookName(e.target.value)}
                 />
                 {formErrors.bookName && (
-                  <p className="mt-2 text-sm text-red-600">{formErrors.bookName}</p>
+                  <p className="mt-1 text-xs text-error">{formErrors.bookName}</p>
                 )}
               </div>
 
               {/* Authors */}
               <div className="form-group">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="label-text block text-sm font-semibold text-base-content mb-2">
                   <div className="flex items-center">
                     <MotionIcon animation="wiggle" trigger="hover" className="mr-2">
-                      <FiUsers className="h-4 w-4 text-indigo-500" />
+                      <FiUsers className="h-4 w-4 text-primary" />
                     </MotionIcon>
-                    Authors <span className="text-red-500 ml-1">*</span>
+                    Authors <span className="text-error ml-1">*</span>
                   </div>
                 </label>
                 <div className="space-y-3">
                   {authors.map((author, index) => (
-                    <div key={author.id} className="flex items-center">
+                    <div key={author.id} className="flex items-center gap-2">
                       <input
                         type="text"
-                        className={`block w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm
-                          ${formErrors.authors ? "border-red-300 text-red-900 placeholder-red-300" : "border-gray-300"}`}
+                        className={`input input-bordered flex-1 bg-base-100 text-base-content ${
+                          formErrors.authors ? "input-error" : ""
+                        }`}
                         placeholder={`Author ${index + 1}`}
                         value={author.name}
                         onChange={(e) => updateAuthor(author.id!, e.target.value)}
@@ -919,7 +916,7 @@ export default function AddNewBook() {
                         <button 
                           type="button"
                           onClick={() => removeAuthor(author.id!)}
-                          className="ml-2 p-1.5 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                          className="btn btn-ghost btn-circle btn-sm text-error hover:bg-error/10"
                           aria-label="Remove author"
                         >
                           <MotionIcon animation="wiggle" trigger="hover">
@@ -935,9 +932,9 @@ export default function AddNewBook() {
                 <button
                   type="button"
                   onClick={addAuthor}
-                  className="mt-3 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+                  className="mt-3 btn btn-outline btn-sm gap-2"
                 >
-                  <MotionIcon animation="bounce" trigger="hover" className="-ml-0.5 mr-2">
+                  <MotionIcon animation="bounce" trigger="hover">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
                     </svg>
@@ -945,16 +942,16 @@ export default function AddNewBook() {
                   Add Author
                 </button>
                 {formErrors.authors && (
-                  <p className="mt-2 text-sm text-red-600">{formErrors.authors}</p>
+                  <p className="mt-1 text-xs text-error">{formErrors.authors}</p>
                 )}
               </div>
 
               {/* Book Summary Field */}
               <div className="form-group">
-                <label htmlFor="summary" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="summary" className="label-text block text-sm font-semibold text-base-content mb-2">
                   <div className="flex items-center">
                     <MotionIcon animation="float" trigger="hover" className="mr-2">
-                      <FiFileText className="h-4 w-4 text-indigo-500" />
+                      <FiFileText className="h-4 w-4 text-primary" />
                     </MotionIcon>
                     Book Summary
                   </div>
@@ -962,32 +959,33 @@ export default function AddNewBook() {
                 <textarea
                   id="summary"
                   rows={4}
-                  className={`block w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm
-                    ${formErrors.summary ? "border-red-300 text-red-900 placeholder-red-300" : "border-gray-300"}`}
+                  className={`textarea textarea-bordered w-full bg-base-100 text-base-content leading-relaxed ${
+                    formErrors.summary ? "textarea-error" : ""
+                  }`}
                   placeholder="Enter a brief summary of the book's content"
                   value={summary}
                   onChange={(e) => setSummary(e.target.value)}
                 />
                 {formErrors.summary && (
-                  <p className="mt-2 text-sm text-red-600">{formErrors.summary}</p>
+                  <p className="mt-1 text-xs text-error">{formErrors.summary}</p>
                 )}
-                <p className="mt-1 text-xs text-gray-500">Provide a concise summary or description of the book's content</p>
+                <p className="mt-1 text-xs text-base-content/60">Provide a concise summary or description of the book's content</p>
               </div>
             </div>
           </div>
           
           {/* Section 2: Media */}
-          <div className="border-t border-gray-200 pt-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Media</h3>
+          <div className="border-t border-base-300 pt-6">
+            <h3 className="text-lg font-bold text-base-content mb-4">Media</h3>
             <div className="space-y-6">
               {/* Single Book Thumbnail Input */}
               <div className="form-group">
-                <label htmlFor="thumbnailUrl" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="thumbnailUrl" className="label-text block text-sm font-semibold text-base-content mb-2">
                   <div className="flex items-center">
                     <MotionIcon animation="pulse" trigger="hover" className="mr-2">
-                      <FiImage className="h-4 w-4 text-indigo-500" />
+                      <FiImage className="h-4 w-4 text-primary" />
                     </MotionIcon>
-                    Thumbnail URL <span className="text-red-500 ml-1">*</span>
+                    Thumbnail URL <span className="text-error ml-1">*</span>
                   </div>
                 </label>
                 <div className="flex flex-col md:flex-row md:items-start md:space-x-4">
@@ -995,16 +993,17 @@ export default function AddNewBook() {
                     <input
                       type="text"
                       id="thumbnailUrl"
-                      className={`block w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm
-                        ${formErrors.thumbnailUrl ? "border-red-300 text-red-900 placeholder-red-300" : "border-gray-300"}`}
+                      className={`input input-bordered w-full bg-base-100 text-base-content ${
+                        formErrors.thumbnailUrl ? "input-error" : ""
+                      }`}
                       placeholder="https://example.com/image.jpg"
                       value={thumbnailUrl}
                       onChange={(e) => setThumbnailUrl(e.target.value)}
                     />
                     {formErrors.thumbnailUrl && (
-                      <p className="mt-2 text-sm text-red-600">{formErrors.thumbnailUrl}</p>
+                      <p className="mt-1 text-xs text-error">{formErrors.thumbnailUrl}</p>
                     )}
-                    <p className="mt-1 text-xs text-gray-500">Enter a URL for the book cover image</p>
+                    <p className="mt-1 text-xs text-base-content/60">Enter a URL for the book cover image</p>
                   </div>
                   
                   <div className="flex-shrink-0 flex justify-center">
@@ -1017,11 +1016,11 @@ export default function AddNewBook() {
                         }}
                       />
                     ) : (
-                      <div className="h-48 w-32 border-2 border-dashed border-gray-300 rounded-md flex flex-col items-center justify-center text-gray-400">
+                      <div className="h-48 w-32 border-2 border-dashed border-base-300 rounded-xl flex flex-col items-center justify-center text-base-content/40 bg-base-100">
                         <MotionIcon animation="pulse" trigger="always" className="mb-2">
                           <FiImage className="h-10 w-10" />
                         </MotionIcon>
-                        <span className="text-xs text-center px-2">Cover preview will appear here</span>
+                        <span className="text-xs text-center px-2 text-base-content/50">Cover preview will appear here</span>
                       </div>
                     )}
                   </div>
@@ -1030,24 +1029,24 @@ export default function AddNewBook() {
 
               {/* Book PDF File Input for single book */}
               <div className="form-group">
-                <label htmlFor="bookPdf" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="bookPdf" className="label-text block text-sm font-semibold text-base-content mb-2">
                   <div className="flex items-center">
                     <MotionIcon animation="float" trigger="hover" className="mr-2">
-                      <FiFileText className="h-4 w-4 text-indigo-500" />
+                      <FiFileText className="h-4 w-4 text-primary" />
                     </MotionIcon>
-                    Book File (PDF) <span className="text-red-500 ml-1">*</span>
+                    Book File (PDF) <span className="text-error ml-1">*</span>
                   </div>
                 </label>
-                <div className="mt-1 bg-gray-50 border border-gray-300 border-dashed rounded-md p-4">
+                <div className="mt-1 bg-base-100 border-2 border-base-300 border-dashed rounded-xl p-6">
                   <div className="flex justify-center">
                     <div className="space-y-2 text-center">
                       <MotionIcon animation="bounce" trigger="hover">
-                        <svg className="mx-auto h-10 w-10 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                        <svg className="mx-auto h-10 w-10 text-base-content/40" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
                           <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H8m36-12h-4m4 0H20" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       </MotionIcon>
-                      <div className="flex text-sm text-gray-600">
-                        <label htmlFor="bookPdf" className="relative cursor-pointer rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                      <div className="flex text-sm text-base-content/70 justify-center">
+                        <label htmlFor="bookPdf" className="relative cursor-pointer rounded-md font-semibold text-primary hover:underline">
                           <span>Upload a PDF file</span>
                           <input
                             id="bookPdf"
@@ -1061,28 +1060,28 @@ export default function AddNewBook() {
                         </label>
                         <p className="pl-1">or drag and drop</p>
                       </div>
-                      <p className="text-xs text-gray-500">PDF up to 100MB</p>
+                      <p className="text-xs text-base-content/50">PDF up to 100MB</p>
                     </div>
                   </div>
                   
                   {/* Selected file info */}
                   {bookPdfFile && (
-                    <div className="mt-4 flex items-center justify-between bg-white p-3 rounded-md border border-gray-200">
+                    <div className="mt-4 flex items-center justify-between bg-base-200 p-3 rounded-xl border border-base-300">
                       <div className="flex items-center">
                         <MotionIcon animation="float" trigger="always">
-                          <svg className="h-8 w-8 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                          <svg className="h-8 w-8 text-error" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
                           </svg>
                         </MotionIcon>
                         <div className="ml-3">
-                          <p className="text-sm font-medium text-gray-900">{bookPdfFile.name}</p>
-                          <p className="text-sm text-gray-500">{(bookPdfFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                          <p className="text-sm font-semibold text-base-content">{bookPdfFile.name}</p>
+                          <p className="text-xs text-base-content/60">{(bookPdfFile.size / 1024 / 1024).toFixed(2)} MB</p>
                         </div>
                       </div>
                       <button
                         type="button"
                         onClick={() => setBookPdfFile(null)}
-                        className="text-gray-400 hover:text-gray-500"
+                        className="btn btn-ghost btn-circle btn-sm text-base-content/60 hover:text-error"
                         disabled={singleBookUploadStatus === 'uploading'}
                       >
                         <MotionIcon animation="wiggle" trigger="hover">
@@ -1098,52 +1097,37 @@ export default function AddNewBook() {
                 {/* Upload progress indicators */}
                 {singleBookUploadStatus === 'uploading' && singleBookUploadProgress !== null && (
                   <div className="mt-3">
-                    <div className="relative pt-1">
-                      <div className="flex mb-2 items-center justify-between">
-                        <div>
-                          <span className="text-xs font-semibold inline-block text-indigo-600">
-                            Uploading...
-                          </span>
-                        </div>
-                        <div className="text-right">
-                          <span className="text-xs font-semibold inline-block text-indigo-600">
-                            {singleBookUploadProgress}%
-                          </span>
-                        </div>
-                      </div>
-                      <div className="overflow-hidden h-2 text-xs flex rounded bg-indigo-200">
-                        <div 
-                          className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-indigo-500 transition-all duration-300 ease-in-out"
-                          style={{ width: `${singleBookUploadProgress}%` }}
-                        ></div>
-                      </div>
+                    <div className="flex mb-1 items-center justify-between text-xs font-semibold text-primary">
+                      <span>Uploading...</span>
+                      <span>{singleBookUploadProgress}%</span>
                     </div>
+                    <progress className="progress progress-primary w-full" value={singleBookUploadProgress} max="100"></progress>
                   </div>
                 )}
                 
                 {/* Success message */}
                 {singleBookUploadStatus === 'success' && singleBookPdfUrl && (
-                  <div className="mt-3 flex items-center rounded-md bg-green-50 p-3 text-green-700">
-                    <MotionIcon animation="bounce" trigger="always" className="mr-2">
-                      <FiCheckCircle className="h-5 w-5" />
-                    </MotionIcon>
-                    <div>
-                      <span className="font-medium">Upload successful!</span>
-                      <button 
-                        type="button"
-                        onClick={() => window.open(singleBookPdfUrl, '_blank')}
-                        className="ml-2 text-green-800 underline"
-                      >
-                        View file
-                      </button>
+                  <div className="mt-3 alert alert-success text-xs py-2 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <MotionIcon animation="bounce" trigger="always">
+                        <FiCheckCircle className="h-5 w-5" />
+                      </MotionIcon>
+                      <span className="font-semibold">Upload successful!</span>
                     </div>
+                    <button 
+                      type="button"
+                      onClick={() => window.open(singleBookPdfUrl, '_blank')}
+                      className="btn btn-xs btn-outline"
+                    >
+                      View file
+                    </button>
                   </div>
                 )}
                 
                 {/* Error message */}
                 {singleBookUploadStatus === 'error' && singleBookUploadError && (
-                  <div className="mt-3 flex items-center rounded-md bg-red-50 p-3 text-red-700">
-                    <MotionIcon animation="wiggle" trigger="always" className="mr-2">
+                  <div className="mt-3 alert alert-error text-xs py-2 flex items-center gap-2">
+                    <MotionIcon animation="wiggle" trigger="always">
                       <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                       </svg>
@@ -1153,255 +1137,227 @@ export default function AddNewBook() {
                 )}
                 
                 {formErrors.bookPdf && (
-                  <p className="mt-2 text-sm text-red-600">{formErrors.bookPdf}</p>
+                  <p className="mt-1 text-xs text-error">{formErrors.bookPdf}</p>
                 )}
               </div>
             </div>
           </div>
           
           {/* Section 3: Publication */}
-          <div className="border-t border-gray-200 pt-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Publication Details</h3>
+          <div className="border-t border-base-300 pt-6">
+            <h3 className="text-lg font-bold text-base-content mb-4">Publication Details</h3>
             <div className="space-y-6">
               {/* Publication Date */}
               <div className="form-group">
-                <label htmlFor="publicationDate" className="block text-sm font-medium text-gray-700 mb-2">
-                  <div className="flex items-center justify-between w-full">
-                    <div className="flex items-center">
-                      <MotionIcon animation="wiggle" trigger="hover" className="mr-2">
-                        <FiCalendar className="h-4 w-4 text-indigo-500" />
-                      </MotionIcon>
-                      Publication Date
-                    </div>
+                <label htmlFor="publicationDate" className="label-text block text-sm font-semibold text-base-content mb-2">
+                  <div className="flex items-center">
+                    <MotionIcon animation="wiggle" trigger="hover" className="mr-2">
+                      <FiCalendar className="h-4 w-4 text-primary" />
+                    </MotionIcon>
+                    Publication Date
                   </div>
                 </label>
                 
-                <div className="mt-1">
-                  <div className="relative rounded-md shadow-sm">
-                    <input
-                      type="text"
-                      id="publicationDate"
-                      className={`block w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm
-                        ${formErrors.publicationDate ? "border-red-300 text-red-900 placeholder-red-300" : "border-gray-300"}`}
-                      placeholder="YYYY or YYYY-MM-DD"
-                      value={publicationDate}
-                      onChange={(e) => setPublicationDate(e.target.value)}
-                    />
-                  </div>
-                  <p className="mt-1 text-xs text-gray-500">Enter year (YYYY) or full date (YYYY-MM-DD). Auto-filled dates will be formatted automatically.</p>
-                </div>
+                <input
+                  type="text"
+                  id="publicationDate"
+                  className={`input input-bordered w-full bg-base-100 text-base-content ${
+                    formErrors.publicationDate ? "input-error" : ""
+                  }`}
+                  placeholder="YYYY or YYYY-MM-DD"
+                  value={publicationDate}
+                  onChange={(e) => setPublicationDate(e.target.value)}
+                />
+                <p className="mt-1 text-xs text-base-content/60">Enter year (YYYY) or full date (YYYY-MM-DD). Auto-filled dates will be formatted automatically.</p>
                 
                 {formErrors.publicationDate && (
-                  <p className="mt-2 text-sm text-red-600">{formErrors.publicationDate}</p>
+                  <p className="mt-1 text-xs text-error">{formErrors.publicationDate}</p>
                 )}
               </div>
               
               {/* Publisher */}
               <div className="form-group">
-                <label htmlFor="publisher" className="block text-sm font-medium text-gray-700">Publisher</label>
-                <div className="mt-1">
-                  <input
-                    type="text"
-                    id="publisher"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="Publisher name"
-                    value={publisher}
-                    onChange={(e) => setPublisher(e.target.value)}
-                  />
-                </div>
-                <p className="mt-1 text-xs text-gray-500">Enter the name of the publishing company (optional)</p>
+                <label htmlFor="publisher" className="label-text block text-sm font-semibold text-base-content mb-2">Publisher</label>
+                <input
+                  type="text"
+                  id="publisher"
+                  className="input input-bordered w-full bg-base-100 text-base-content"
+                  placeholder="Publisher name"
+                  value={publisher}
+                  onChange={(e) => setPublisher(e.target.value)}
+                />
+                <p className="mt-1 text-xs text-base-content/60">Enter the name of the publishing company (optional)</p>
               </div>
               
               {/* Language */}
               <div className="form-group">
-                <label htmlFor="language" className="block text-sm font-medium text-gray-700">Language</label>
-                <div className="mt-1">
-                  <input
-                    type="text"
-                    id="language"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="Language"
-                    value={language}
-                    onChange={(e) => setLanguage(e.target.value)}
-                  />
-                </div>
-                <p className="mt-1 text-xs text-gray-500">Enter the language of the book (e.g. English, Spanish)</p>
+                <label htmlFor="language" className="label-text block text-sm font-semibold text-base-content mb-2">Language</label>
+                <input
+                  type="text"
+                  id="language"
+                  className="input input-bordered w-full bg-base-100 text-base-content"
+                  placeholder="Language"
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value)}
+                />
+                <p className="mt-1 text-xs text-base-content/60">Enter the language of the book (e.g. English, Spanish)</p>
               </div>
             </div>
           </div>
           
           {/* Section 4: Additional Details */}
-          <div className="border-t border-gray-200 pt-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Additional Book Details (Optional)</h3>
+          <div className="border-t border-base-300 pt-6">
+            <h3 className="text-lg font-bold text-base-content mb-4">Additional Book Details (Optional)</h3>
             <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
               {/* Series Information */}
               <div className="sm:col-span-4">
-                <label htmlFor="series" className="block text-sm font-medium text-gray-700">Series</label>
-                <div className="mt-1">
-                  <input
-                    type="text"
-                    id="series"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="Series name (e.g. Harry Potter)"
-                    value={series}
-                    onChange={(e) => setSeries(e.target.value)}
-                  />
-                  <p className="mt-1 text-xs text-gray-500">If this book is part of a series, enter the series name</p>
-                </div>
+                <label htmlFor="series" className="label-text block text-sm font-semibold text-base-content mb-2">Series</label>
+                <input
+                  type="text"
+                  id="series"
+                  className="input input-bordered w-full bg-base-100 text-base-content"
+                  placeholder="Series name (e.g. Harry Potter)"
+                  value={series}
+                  onChange={(e) => setSeries(e.target.value)}
+                />
+                <p className="mt-1 text-xs text-base-content/60">If this book is part of a series, enter the series name</p>
               </div>
               
               <div className="sm:col-span-2">
-                <label htmlFor="seriesPosition" className="block text-sm font-medium text-gray-700">Position in Series</label>
-                <div className="mt-1">
-                  <input
-                    type="text"
-                    id="seriesPosition"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="1, 1/1, 2.5, etc."
-                    value={seriesPosition}
-                    onChange={(e) => setSeriesPosition(e.target.value)}
-                  />
-                  <p className="mt-1 text-xs text-gray-500">Book's position in the series (can be any format like "1/1" or "2")</p>
-                </div>
+                <label htmlFor="seriesPosition" className="label-text block text-sm font-semibold text-base-content mb-2">Position in Series</label>
+                <input
+                  type="text"
+                  id="seriesPosition"
+                  className="input input-bordered w-full bg-base-100 text-base-content"
+                  placeholder="1, 1/1, 2.5, etc."
+                  value={seriesPosition}
+                  onChange={(e) => setSeriesPosition(e.target.value)}
+                />
+                <p className="mt-1 text-xs text-base-content/60">Book's position in the series (e.g. "1" or "2.5")</p>
               </div>
             
               {/* Number of Pages */}
               <div className="sm:col-span-2">
-                <label htmlFor="numberOfPages" className="block text-sm font-medium text-gray-700">Number of Pages</label>
-                <div className="mt-1">
-                  <div className="relative rounded-md shadow-sm">
-                    <input
-                      type="number"
-                      id="numberOfPages"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      placeholder="Number of pages"
-                      value={numberOfPages || ""}
-                      onChange={(e) => setNumberOfPages(parseInt(e.target.value) || undefined)}
-                    />
-                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <MotionIcon animation="float" trigger="hover">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                          <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
-                        </svg>
-                      </MotionIcon>
-                    </div>
+                <label htmlFor="numberOfPages" className="label-text block text-sm font-semibold text-base-content mb-2">Number of Pages</label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    id="numberOfPages"
+                    className="input input-bordered w-full bg-base-100 text-base-content pr-10"
+                    placeholder="Number of pages"
+                    value={numberOfPages || ""}
+                    onChange={(e) => setNumberOfPages(parseInt(e.target.value) || undefined)}
+                  />
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-base-content/40">
+                    <MotionIcon animation="float" trigger="hover">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+                      </svg>
+                    </MotionIcon>
                   </div>
                 </div>
               </div>
               
               {/* Ratings */}
               <div className="sm:col-span-2">
-                <label htmlFor="ratings" className="block text-sm font-medium text-gray-700">Ratings</label>
-                <div className="mt-1">
-                  <div className="relative rounded-md shadow-sm">
-                    <input
-                      type="number"
-                      id="ratings"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      placeholder="Number of ratings"
-                      value={ratings || ""}
-                      onChange={(e) => setRatings(parseInt(e.target.value) || undefined)}
-                    />
-                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <MotionIcon animation="bounce" trigger="hover">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      </MotionIcon>
-                    </div>
+                <label htmlFor="ratings" className="label-text block text-sm font-semibold text-base-content mb-2">Ratings</label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    id="ratings"
+                    className="input input-bordered w-full bg-base-100 text-base-content pr-10"
+                    placeholder="Number of ratings"
+                    value={ratings || ""}
+                    onChange={(e) => setRatings(parseInt(e.target.value) || undefined)}
+                  />
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-base-content/40">
+                    <MotionIcon animation="bounce" trigger="hover">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    </MotionIcon>
                   </div>
                 </div>
               </div>
               
               {/* Average Rating */}
               <div className="sm:col-span-2">
-                <label htmlFor="averageRating" className="block text-sm font-medium text-gray-700">Average Rating</label>
-                <div className="mt-1">
-                  <div className="relative rounded-md shadow-sm">
-                    <input
-                      type="number"
-                      id="averageRating"
-                      step="0.01"
-                      min="0"
-                      max="5"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      placeholder="Average Rating (0-5)"
-                      value={averageRating || ""}
-                      onChange={(e) => setAverageRating(parseFloat(e.target.value) || undefined)}
-                    />
-                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <MotionIcon animation="spin" trigger="hover">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      </MotionIcon>
-                    </div>
+                <label htmlFor="averageRating" className="label-text block text-sm font-semibold text-base-content mb-2">Average Rating</label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    id="averageRating"
+                    step="0.01"
+                    min="0"
+                    max="5"
+                    className="input input-bordered w-full bg-base-100 text-base-content pr-10"
+                    placeholder="Average Rating (0-5)"
+                    value={averageRating || ""}
+                    onChange={(e) => setAverageRating(parseFloat(e.target.value) || undefined)}
+                  />
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-base-content/40">
+                    <MotionIcon animation="spin" trigger="hover">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    </MotionIcon>
                   </div>
-                  <p className="mt-1 text-xs text-gray-500">Average rating out of 5</p>
                 </div>
+                <p className="mt-1 text-xs text-base-content/60">Average rating out of 5</p>
               </div>
               
               {/* Genres - as a comma-separated input */}
               <div className="sm:col-span-6">
-                <label htmlFor="genres" className="block text-sm font-medium text-gray-700">Genres</label>
-                <div className="mt-1">
-                  <input
-                    type="text"
-                    id="genres"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="Fantasy, Adventure, Mystery"
-                    value={genres.join(", ")}
-                    onChange={(e) => {
-                      const genresArray = e.target.value.split(",").map(genre => genre.trim()).filter(genre => genre !== "");
-                      setGenres(genresArray);
-                    }}
-                  />
-                  <p className="mt-1 text-xs text-gray-500">Separate genres with commas</p>
-                </div>
+                <label htmlFor="genres" className="label-text block text-sm font-semibold text-base-content mb-2">Genres</label>
+                <input
+                  type="text"
+                  id="genres"
+                  className="input input-bordered w-full bg-base-100 text-base-content"
+                  placeholder="Fantasy, Adventure, Mystery"
+                  value={genres.join(", ")}
+                  onChange={(e) => {
+                    const genresArray = e.target.value.split(",").map(genre => genre.trim()).filter(genre => genre !== "");
+                    setGenres(genresArray);
+                  }}
+                />
+                <p className="mt-1 text-xs text-base-content/60">Separate genres with commas</p>
               </div>
               
               {/* Characters - as a comma-separated input */}
               <div className="sm:col-span-6">
-                <label htmlFor="characters" className="block text-sm font-medium text-gray-700">Characters</label>
-                <div className="mt-1">
-                  <input
-                    type="text"
-                    id="characters"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="Harry Potter, Hermione Granger, Ron Weasley"
-                    value={characters.join(", ")}
-                    onChange={(e) => {
-                      const charactersArray = e.target.value.split(",").map(character => character.trim()).filter(character => character !== "");
-                      setCharacters(charactersArray);
-                    }}
-                  />
-                  <p className="mt-1 text-xs text-gray-500">Separate character names with commas</p>
-                </div>
+                <label htmlFor="characters" className="label-text block text-sm font-semibold text-base-content mb-2">Characters</label>
+                <input
+                  type="text"
+                  id="characters"
+                  className="input input-bordered w-full bg-base-100 text-base-content"
+                  placeholder="Harry Potter, Hermione Granger, Ron Weasley"
+                  value={characters.join(", ")}
+                  onChange={(e) => {
+                    const charactersArray = e.target.value.split(",").map(character => character.trim()).filter(character => character !== "");
+                    setCharacters(charactersArray);
+                  }}
+                />
+                <p className="mt-1 text-xs text-base-content/60">Separate character names with commas</p>
               </div>
             </div>
           </div>
           
           {/* Submit Button */}
-          <div className="form-group border-t border-gray-200 pt-6 mt-6">
-            <div className="flex justify-end">
+          <div className="form-group border-t border-base-300 pt-6 mt-6">
+            <div className="flex justify-end gap-3">
               <button
                 type="submit"
                 disabled={isSubmitting || singleBookUploadStatus === 'uploading'}
-                className={`inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors ${
-                  (isSubmitting || singleBookUploadStatus === 'uploading') ? "cursor-not-allowed opacity-75" : ""
-                }`}
+                className="btn btn-primary px-8 gap-2"
               >
                 {isSubmitting ? (
                   <>
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
+                    <span className="loading loading-spinner loading-sm"></span>
                     Saving...
                   </>
                 ) : (
                   <>
-                    <MotionIcon animation="float" trigger="hover" className="mr-2">
+                    <MotionIcon animation="float" trigger="hover">
                       <FiSave className="h-4 w-4" />
                     </MotionIcon>
                     Save Book
@@ -1411,7 +1367,7 @@ export default function AddNewBook() {
               
               <Link
                 href="/admin/books"
-                className="ml-4 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
+                className="btn btn-ghost border border-base-300 px-6 text-base-content"
               >
                 Cancel
               </Link>

@@ -55,21 +55,21 @@ const AuthCTA = () => {
     return (
       <section 
         ref={ctaSectionRef}
-        className="py-20 bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 bg-[length:200%_100%]"
+        className="py-20 bg-base-200 border-y border-base-300 text-base-content"
       >
         <div 
           ref={ctaContentRef}
           className="container mx-auto px-4 sm:px-6 lg:px-8 text-center"
         >
-          <h2 className="text-3xl font-bold text-white mb-6 drop-shadow-sm">
+          <h2 className="text-3xl md:text-4xl font-black text-base-content mb-4">
             Welcome back, {session.user?.name?.split(' ')[0] || 'Reader'}!
           </h2>
-          <p className="text-indigo-100 text-lg mb-8 max-w-2xl mx-auto">
+          <p className="text-base-content/70 text-lg mb-8 max-w-2xl mx-auto">
             Continue your reading journey with personalized recommendations.
           </p>
           <Link 
             href="/books" 
-            className="inline-block px-8 py-4 bg-white text-indigo-600 font-bold rounded-lg hover:bg-gray-100 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200"
+            className="btn btn-primary btn-lg rounded-full px-10 shadow-lg"
           >
             My Library
           </Link>
@@ -82,38 +82,36 @@ const AuthCTA = () => {
   return (
     <section 
       ref={ctaSectionRef}
-      className="py-20 bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 bg-[length:200%_100%]"
+      className="py-20 bg-base-200 border-y border-base-300 text-base-content"
     >
       <div 
         ref={ctaContentRef}
         className="container mx-auto px-4 sm:px-6 lg:px-8 text-center"
       >
-        <h2 className="text-3xl font-bold text-white mb-6 drop-shadow-sm">
+        <h2 className="text-3xl md:text-4xl font-black text-base-content mb-4">
           Ready to start your reading journey?
         </h2>
-        <p className="text-indigo-100 text-lg mb-8 max-w-2xl mx-auto">
+        <p className="text-base-content/70 text-lg mb-8 max-w-2xl mx-auto">
           Join thousands of readers who discover new books every day on বই.
         </p>
         
         <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
           <Link 
             href="/books" 
-            className="inline-block px-8 py-4 bg-white text-indigo-600 font-bold rounded-lg hover:bg-gray-100 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200"
+            className="btn btn-primary btn-lg rounded-full px-8 shadow-lg"
           >
             Start Browsing
           </Link>
           
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
+          <button
             onClick={() => signIn('google')}
-            className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-700 text-white font-bold rounded-lg hover:bg-indigo-800 transition-colors shadow-lg border border-indigo-500 hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200"
+            className="btn btn-neutral btn-lg rounded-full px-8 gap-2 shadow-lg"
           >
-            <MotionIcon animation="float">
+            <MotionIcon animation="bounce" trigger="hover">
               <FiLogIn size={20} />
             </MotionIcon>
             Sign in with Google
-          </motion.button>
+          </button>
         </div>
       </div>
     </section>

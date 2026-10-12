@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import BookCard from './BookCard';
-import { FiLoader } from 'react-icons/fi';
+import { FiLoader, FiInbox, FiAlertCircle } from 'react-icons/fi';
 import MotionIcon from './MotionIcon';
 import type { Book } from '@/lib/books';
 
@@ -57,11 +57,11 @@ const BookGrid = ({ books, selectedGenres, isLoading = false, error = null, comp
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-20">
+      <div className="flex flex-col items-center justify-center py-20 text-base-content">
         <MotionIcon animation="spin" trigger="always" className="mb-4">
-          <FiLoader className="w-10 h-10 text-indigo-500 dark:text-indigo-400" />
+          <FiLoader className="w-10 h-10 text-primary" />
         </MotionIcon>
-        <p className="text-gray-600 dark:text-gray-400">Loading books...</p>
+        <p className="text-base-content/70 font-medium">Loading books...</p>
       </div>
     );
   }
@@ -69,9 +69,14 @@ const BookGrid = ({ books, selectedGenres, isLoading = false, error = null, comp
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-4 rounded-lg max-w-md text-center">
-          <p className="font-medium mb-2">Error</p>
-          <p className="text-sm">{error}</p>
+        <div className="alert alert-error max-w-md shadow-lg">
+          <MotionIcon animation="wiggle" trigger="always">
+            <FiAlertCircle className="w-6 h-6" />
+          </MotionIcon>
+          <div>
+            <h3 className="font-bold">Error</h3>
+            <div className="text-xs">{error}</div>
+          </div>
         </div>
       </div>
     );
@@ -80,9 +85,14 @@ const BookGrid = ({ books, selectedGenres, isLoading = false, error = null, comp
   if (filteredBooks.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <div className="bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 p-6 rounded-lg max-w-md text-center">
-          <p className="font-medium mb-2">No books found</p>
-          <p className="text-sm">Try adjusting your search or filters.</p>
+        <div className="card bg-base-200 border border-base-content/10 p-8 max-w-md text-center rounded-2xl shadow-sm">
+          <div className="flex justify-center mb-3">
+            <MotionIcon animation="float" trigger="always">
+              <FiInbox className="w-10 h-10 text-base-content/40" />
+            </MotionIcon>
+          </div>
+          <h3 className="font-bold text-base-content text-lg mb-1">No books found</h3>
+          <p className="text-sm text-base-content/60">Try adjusting your search or filters.</p>
         </div>
       </div>
     );
@@ -108,4 +118,4 @@ const BookGrid = ({ books, selectedGenres, isLoading = false, error = null, comp
   );
 };
 
-export default BookGrid; 
+export default BookGrid;

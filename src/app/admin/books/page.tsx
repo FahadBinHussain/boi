@@ -190,35 +190,38 @@ export default function BooksManagement() {
   };
   
   return (
-    <div>
-      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Books Management</h1>
-        <div className="mt-4 sm:mt-0">
+    <div className="p-6 lg:p-8 bg-base-100 min-h-screen text-base-content transition-colors">
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-extrabold text-base-content">Books Management</h1>
+          <p className="text-xs text-base-content/60 mt-1">Manage and organize all books in the catalog</p>
+        </div>
+        <div>
           <Link
             href="/admin/books/new"
-            className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="btn btn-primary btn-sm rounded-full px-5 gap-2 shadow-md"
           >
-            <MotionIcon animation="bounce" trigger="hover" className="mr-2">
+            <MotionIcon animation="bounce" trigger="hover">
               <FiPlusCircle className="h-4 w-4" />
             </MotionIcon>
-            Add New Book
+            <span>Add New Book</span>
           </Link>
         </div>
       </div>
       
       {/* Filters and Search */}
-      <div className="mb-6 rounded-lg bg-white p-4 shadow-md">
-        <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
-          <div className="flex flex-1 flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
+      <div className="mb-6 card bg-base-200 border border-base-300 p-4 rounded-2xl shadow-sm">
+        <div className="flex flex-col space-y-3 md:flex-row md:items-center md:justify-between md:space-y-0 gap-4">
+          <div className="flex flex-1 flex-col space-y-3 md:flex-row md:space-x-3 md:space-y-0">
             <div className="relative flex-1">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                 <MotionIcon animation="wiggle" trigger="hover">
-                  <FiSearch className="h-5 w-5 text-gray-400" />
+                  <FiSearch className="h-4 w-4 text-base-content/40" />
                 </MotionIcon>
               </div>
               <input
                 type="text"
-                className="block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
+                className="input input-bordered input-sm w-full pl-9 bg-base-100 text-base-content"
                 placeholder="Search books..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -226,12 +229,12 @@ export default function BooksManagement() {
             </div>
             
             <div className="flex items-center space-x-2">
-              <div className="inline-flex items-center">
-                <MotionIcon animation="wiggle" trigger="hover" className="mr-2">
-                  <FiFilter className="h-5 w-5 text-gray-400" />
+              <div className="inline-flex items-center gap-1.5">
+                <MotionIcon animation="wiggle" trigger="hover">
+                  <FiFilter className="h-4 w-4 text-base-content/40" />
                 </MotionIcon>
                 <select
-                  className="rounded-md border-0 py-1.5 pl-2 pr-8 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
+                  className="select select-bordered select-sm bg-base-100 text-base-content"
                   value={filter}
                   onChange={(e) => setFilter(e.target.value as "all" | "active" | "pending")}
                 >
@@ -245,15 +248,15 @@ export default function BooksManagement() {
           
           {selectedBooks.length > 0 && (
             <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-500">{selectedBooks.length} selected</span>
+              <span className="text-xs text-base-content/70">{selectedBooks.length} selected</span>
               <button
                 onClick={deleteSelected}
-                className="inline-flex items-center rounded-md bg-red-100 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-200"
+                className="btn btn-error btn-sm gap-1.5"
               >
-                <MotionIcon animation="wiggle" trigger="hover" className="mr-1">
+                <MotionIcon animation="wiggle" trigger="hover">
                   <FiTrash2 className="h-4 w-4" />
                 </MotionIcon>
-                Delete
+                <span>Delete</span>
               </button>
             </div>
           )}
@@ -262,147 +265,148 @@ export default function BooksManagement() {
       
       {/* Loading State */}
       {isLoading && (
-        <div className="flex justify-center items-center h-64">
-          <FiLoader className="animate-spin h-8 w-8 text-indigo-600" />
-          <span className="ml-2 text-lg text-gray-600">Loading books...</span>
+        <div className="flex justify-center items-center h-64 text-base-content">
+          <MotionIcon animation="spin" trigger="always">
+            <FiLoader className="h-8 w-8 text-primary" />
+          </MotionIcon>
+          <span className="ml-3 text-base text-base-content/70 font-medium">Loading books...</span>
         </div>
       )}
       
       {/* Error State */}
       {error && (
-        <div className="bg-red-50 p-4 rounded-lg border border-red-200 text-red-700">
-          <p className="font-medium">{error}</p>
-          <p className="mt-1 text-sm">Please try refreshing the page or contact support if the problem persists.</p>
+        <div className="alert alert-error max-w-xl shadow-lg my-6">
+          <MotionIcon animation="wiggle" trigger="always">
+            <FiTrash2 className="h-5 w-5" />
+          </MotionIcon>
+          <div>
+            <h3 className="font-bold">Error</h3>
+            <div className="text-xs">{error}</div>
+          </div>
         </div>
       )}
       
       {/* Books Table or Empty State */}
       {!isLoading && !error && (
         books.length > 0 ? (
-          <div className="overflow-hidden rounded-lg bg-white shadow">
+          <div className="card bg-base-200 border border-base-300 rounded-2xl shadow-md overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+              <table className="table table-zebra table-sm">
+                <thead>
+                  <tr className="text-xs uppercase text-base-content/60">
+                    <th scope="col" className="w-10">
                       <input
                         type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                        className="checkbox checkbox-primary checkbox-xs"
                         checked={selectedBooks.length === currentBooks.length && currentBooks.length > 0}
                         onChange={toggleSelectAll}
                       />
                     </th>
                     <th 
                       scope="col" 
-                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer"
+                      className="cursor-pointer"
                       onClick={() => handleSort("title")}
                     >
-                      <div className="group inline-flex">
+                      <div className="inline-flex items-center gap-1 font-bold">
                         Title
-                        <span className="ml-2 flex-none rounded text-gray-400 group-hover:visible group-hover:text-gray-500">
-                          {sort.field === "title" && (
-                            sort.direction === "desc" ? "↓" : "↑"
-                          )}
-                        </span>
+                        {sort.field === "title" && (
+                          <span className="text-primary font-bold">{sort.direction === "desc" ? "↓" : "↑"}</span>
+                        )}
                       </div>
                     </th>
                     <th 
                       scope="col" 
-                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer"
+                      className="cursor-pointer"
                       onClick={() => handleSort("author")}
                     >
-                      <div className="group inline-flex">
+                      <div className="inline-flex items-center gap-1 font-bold">
                         Author
-                        <span className="ml-2 flex-none rounded text-gray-400 group-hover:visible group-hover:text-gray-500">
-                          {sort.field === "author" && (
-                            sort.direction === "desc" ? "↓" : "↑"
-                          )}
-                        </span>
+                        {sort.field === "author" && (
+                          <span className="text-primary font-bold">{sort.direction === "desc" ? "↓" : "↑"}</span>
+                        )}
                       </div>
                     </th>
                     <th 
                       scope="col" 
-                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer"
+                      className="cursor-pointer"
                       onClick={() => handleSort("category")}
                     >
-                      <div className="group inline-flex">
+                      <div className="inline-flex items-center gap-1 font-bold">
                         Category
-                        <span className="ml-2 flex-none rounded text-gray-400 group-hover:visible group-hover:text-gray-500">
-                          {sort.field === "category" && (
-                            sort.direction === "desc" ? "↓" : "↑"
-                          )}
-                        </span>
+                        {sort.field === "category" && (
+                          <span className="text-primary font-bold">{sort.direction === "desc" ? "↓" : "↑"}</span>
+                        )}
                       </div>
                     </th>
                     <th 
                       scope="col" 
-                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer"
+                      className="cursor-pointer"
                       onClick={() => handleSort("downloads")}
                     >
-                      <div className="group inline-flex">
+                      <div className="inline-flex items-center gap-1 font-bold">
                         Downloads
-                        <span className="ml-2 flex-none rounded text-gray-400 group-hover:visible group-hover:text-gray-500">
-                          {sort.field === "downloads" && (
-                            sort.direction === "desc" ? "↓" : "↑"
-                          )}
-                        </span>
+                        {sort.field === "downloads" && (
+                          <span className="text-primary font-bold">{sort.direction === "desc" ? "↓" : "↑"}</span>
+                        )}
                       </div>
                     </th>
                     <th 
                       scope="col" 
-                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer"
+                      className="cursor-pointer"
                       onClick={() => handleSort("status")}
                     >
-                      <div className="group inline-flex">
+                      <div className="inline-flex items-center gap-1 font-bold">
                         Status
-                        <span className="ml-2 flex-none rounded text-gray-400 group-hover:visible group-hover:text-gray-500">
-                          {sort.field === "status" && (
-                            sort.direction === "desc" ? "↓" : "↑"
-                          )}
-                        </span>
+                        {sort.field === "status" && (
+                          <span className="text-primary font-bold">{sort.direction === "desc" ? "↓" : "↑"}</span>
+                        )}
                       </div>
                     </th>
-                    <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                      <span className="sr-only">Actions</span>
+                    <th scope="col" className="text-right">
+                      Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200 bg-white">
+                <tbody>
                   {currentBooks.map((book) => (
-                    <tr key={book.id} className="book-table-row">
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <tr key={book.id} className="book-table-row hover">
+                      <td>
                         <input
                           type="checkbox"
-                          className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                          className="checkbox checkbox-primary checkbox-xs"
                           checked={selectedBooks.includes(book.id)}
                           onChange={() => toggleSelectBook(book.id)}
                         />
                       </td>
-                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                      <td className="font-semibold text-base-content">
                         {book.title}
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{book.author}</td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{book.category}</td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{book.downloads}</td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
+                      <td className="text-base-content/70">{book.author}</td>
+                      <td>
+                        <span className="badge badge-outline border-base-content/20 badge-sm text-xs">
+                          {book.category}
+                        </span>
+                      </td>
+                      <td className="font-mono text-xs">{book.downloads}</td>
+                      <td>
+                        <span className={`badge badge-sm font-semibold ${
                           book.status === "active" 
-                            ? "bg-green-100 text-green-800" 
-                            : "bg-yellow-100 text-yellow-800"
+                            ? "badge-success text-success-content" 
+                            : "badge-warning text-warning-content"
                         }`}>
                           {book.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-right text-sm font-medium">
-                        <div className="flex justify-end space-x-2">
+                      <td className="text-right">
+                        <div className="flex justify-end gap-1">
                           <Link
                             href={`/admin/books/${book.id}`}
-                            className="rounded bg-blue-100 p-1.5 text-blue-600 hover:bg-blue-200 focus:outline-none"
+                            className="btn btn-ghost btn-circle btn-xs text-primary"
+                            title="Edit"
                           >
                             <MotionIcon animation="float" trigger="hover">
-                              <FiEdit2 className="h-4 w-4" />
+                              <FiEdit2 className="h-3.5 w-3.5" />
                             </MotionIcon>
-                            <span className="sr-only">Edit</span>
                           </Link>
                           <button
                             onClick={async () => {
@@ -420,7 +424,6 @@ export default function BooksManagement() {
                                     );
                                   }
                                   
-                                  // Update local state
                                   setBooks(prevBooks => prevBooks.filter(b => b.id !== book.id));
                                   toast.success(`"${book.title}" deleted successfully.`);
                                 } catch (error) {
@@ -429,12 +432,12 @@ export default function BooksManagement() {
                                 }
                               }
                             }}
-                            className="rounded bg-red-100 p-1.5 text-red-600 hover:bg-red-200 focus:outline-none"
+                            className="btn btn-ghost btn-circle btn-xs text-error"
+                            title="Delete"
                           >
                             <MotionIcon animation="wiggle" trigger="hover">
-                              <FiTrash2 className="h-4 w-4" />
+                              <FiTrash2 className="h-3.5 w-3.5" />
                             </MotionIcon>
-                            <span className="sr-only">Delete</span>
                           </button>
                         </div>
                       </td>
@@ -446,81 +449,68 @@ export default function BooksManagement() {
             
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
-                <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                  <div>
-                    <p className="text-sm text-gray-700">
-                      Showing <span className="font-medium">{indexOfFirstBook + 1}</span> to{" "}
-                      <span className="font-medium">
-                        {indexOfLastBook > filteredBooks.length
-                          ? filteredBooks.length
-                          : indexOfLastBook}
-                      </span>{" "}
-                      of <span className="font-medium">{filteredBooks.length}</span> results
-                    </p>
-                  </div>
-                  <div>
-                    <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-                      <button
-                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                        disabled={currentPage === 1}
-                        className={`relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${
-                          currentPage === 1 ? "cursor-not-allowed" : ""
-                        }`}
-                      >
-                        <span className="sr-only">Previous</span>
-                        <MotionIcon animation="bounce" trigger="hover">
-                          <FiChevronLeft className="h-5 w-5" aria-hidden="true" />
-                        </MotionIcon>
-                      </button>
-                      
-                      {/* Page numbers */}
-                      {[...Array(totalPages)].map((_, index) => (
-                        <button
-                          key={index + 1}
-                          onClick={() => setCurrentPage(index + 1)}
-                          className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
-                            currentPage === index + 1
-                              ? "z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                              : "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                          }`}
-                        >
-                          {index + 1}
-                        </button>
-                      ))}
-                      
-                      <button
-                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                        disabled={currentPage === totalPages}
-                        className={`relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${
-                          currentPage === totalPages ? "cursor-not-allowed" : ""
-                        }`}
-                      >
-                        <span className="sr-only">Next</span>
-                        <MotionIcon animation="bounce" trigger="hover">
-                          <FiChevronRight className="h-5 w-5" aria-hidden="true" />
-                        </MotionIcon>
-                      </button>
-                    </nav>
-                  </div>
+              <div className="flex flex-col sm:flex-row items-center justify-between border-t border-base-300 bg-base-200/50 px-4 py-3 gap-3">
+                <p className="text-xs text-base-content/70">
+                  Showing <span className="font-bold">{indexOfFirstBook + 1}</span> to{" "}
+                  <span className="font-bold">
+                    {indexOfLastBook > filteredBooks.length
+                      ? filteredBooks.length
+                      : indexOfLastBook}
+                  </span>{" "}
+                  of <span className="font-bold">{filteredBooks.length}</span> results
+                </p>
+                <div className="join">
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className={`btn btn-outline btn-xs join-item ${currentPage === 1 ? "btn-disabled opacity-40" : ""}`}
+                  >
+                    <MotionIcon animation="bounce" trigger="hover">
+                      <FiChevronLeft className="h-3.5 w-3.5" />
+                    </MotionIcon>
+                  </button>
+                  
+                  {[...Array(totalPages)].map((_, index) => (
+                    <button
+                      key={index + 1}
+                      onClick={() => setCurrentPage(index + 1)}
+                      className={`btn btn-xs join-item ${
+                        currentPage === index + 1
+                          ? "btn-primary"
+                          : "btn-outline"
+                      }`}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+                  
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                    className={`btn btn-outline btn-xs join-item ${currentPage === totalPages ? "btn-disabled opacity-40" : ""}`}
+                  >
+                    <MotionIcon animation="bounce" trigger="hover">
+                      <FiChevronRight className="h-3.5 w-3.5" />
+                    </MotionIcon>
+                  </button>
                 </div>
               </div>
             )}
           </div>
         ) : (
-          <div className="py-12 text-center bg-white rounded-lg shadow-md">
+          <div className="card bg-base-200 border border-base-300 p-12 text-center rounded-2xl shadow-sm">
             <MotionIcon animation="float" trigger="always">
-              <FiBook className="mx-auto h-12 w-12 text-gray-300" />
+              <FiBook className="mx-auto h-12 w-12 text-base-content/30" />
             </MotionIcon>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No books yet</h3>
-            <p className="mt-1 text-sm text-gray-500">Get started by adding your first book to your collection.</p>
+            <h3 className="mt-3 text-base font-bold text-base-content">No books yet</h3>
+            <p className="mt-1 text-xs text-base-content/60">Get started by adding your first book to your collection.</p>
             <div className="mt-6">
               <Link
                 href="/admin/books/new"
-                className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700"
+                className="btn btn-primary rounded-full px-6 btn-sm gap-2"
               >
-                <MotionIcon animation="bounce" trigger="hover" className="-ml-0.5 mr-1.5">
-                  <FiPlusCircle className="h-4 w-4" aria-hidden="true" />
+                <MotionIcon animation="bounce" trigger="hover">
+                  <FiPlusCircle className="h-4 w-4" />
                 </MotionIcon>
                 Add New Book
               </Link>
@@ -530,4 +520,5 @@ export default function BooksManagement() {
       )}
     </div>
   );
-} 
+}
+ 

@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { FiLayers, FiBookOpen, FiLoader } from 'react-icons/fi';
+import { FiLayers, FiBookOpen, FiLoader, FiAlertCircle } from 'react-icons/fi';
 import MotionIcon from '@/components/ui/MotionIcon';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
@@ -83,32 +83,33 @@ function SeriesContent() {
 
   // Function to handle series click
   const handleSeriesClick = (seriesId: string) => {
-    setActiveSeries(seriesId);
-    router.push(`/series?id=${seriesId}`);
+    if (activeSeries === seriesId) {
+      setActiveSeries(null);
+      router.push('/series');
+    } else {
+      setActiveSeries(seriesId);
+      router.push(`/series?id=${seriesId}`);
+    }
   };
 
-  // Get books for the active series
+  // Filter books by active series
   const getSeriesBooks = () => {
     if (!activeSeries) return [];
-    return books
-      .filter(book => book.seriesId === activeSeries)
+    
+    return books.filter(book => book.seriesId === activeSeries)
       .sort((a, b) => {
-        // Sort by series position if available
-        if (a.seriesPosition?.[0] && b.seriesPosition?.[0]) {
-          return a.seriesPosition[0] - b.seriesPosition[0];
-        }
-        return 0;
+        const posA = a.seriesPosition?.[0] || 0;
+        const posB = b.seriesPosition?.[0] || 0;
+        return posA - posB;
       });
   };
 
   // Get active series name
   const getActiveSeriesName = () => {
-    if (!activeSeries) return '';
-    const series = seriesList.find(s => s.id === activeSeries);
-    return series ? series.name : '';
+    return seriesList.find(s => s.id === activeSeries)?.name || '';
   };
 
-  // Animation variants
+  // Animations
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -125,75 +126,81 @@ function SeriesContent() {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen py-12">
+    <div className="bg-base-100 text-base-content min-h-screen py-12 transition-colors">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-10">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Series</h1>
-          <p className="text-lg text-gray-600">
+          <h1 className="text-3xl font-extrabold text-base-content mb-3">Series</h1>
+          <p className="text-base text-base-content/70">
             Browse our collection of book series
           </p>
         </div>
 
         {/* Loading State */}
         {isLoading && (
-          <div className="flex justify-center items-center py-12">
+          <div className="flex justify-center items-center py-16 text-base-content">
             <MotionIcon animation="spin" trigger="always">
-              <FiLoader className="animate-spin h-8 w-8 text-indigo-600" />
+              <FiLoader className="h-8 w-8 text-primary" />
             </MotionIcon>
-            <span className="ml-2 text-lg text-gray-600">Loading series...</span>
+            <span className="ml-3 text-base font-medium text-base-content/70">Loading series...</span>
           </div>
         )}
 
         {/* Error State */}
         {error && (
-          <div className="bg-red-50 p-4 rounded-lg border border-red-200 text-red-700">
-            <p className="font-medium">{error}</p>
-            <p className="mt-1 text-sm">Please try refreshing the page or contact support if the problem persists.</p>
+          <div className="alert alert-error max-w-xl shadow-lg my-6">
+            <MotionIcon animation="wiggle" trigger="always">
+              <FiAlertCircle className="h-6 w-6" />
+            </MotionIcon>
+            <div>
+              <h3 className="font-bold">Error</h3>
+              <div className="text-sm">{error}</div>
+            </div>
           </div>
         )}
 
         {!isLoading && !error && (
           <>
             {/* Series Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-12">
-              {seriesList.map((series) => (
-                <motion.button
-                  key={series.id}
-                  onClick={() => handleSeriesClick(series.id)}
-                  className={`p-6 rounded-lg text-center transition-colors ${
-                    activeSeries === series.id
-                      ? 'bg-indigo-600 text-white shadow-md'
-                      : 'bg-white border border-gray-200 text-gray-800 hover:bg-indigo-50'
-                  }`}
-                  whileHover={{ y: -5 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <div className="flex flex-col items-center">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-12">
+              {seriesList.map((series) => {
+                const isActive = activeSeries === series.id;
+                return (
+                  <motion.button
+                    key={series.id}
+                    onClick={() => handleSeriesClick(series.id)}
+                    className={`p-5 rounded-2xl text-center transition-all flex flex-col items-center justify-center gap-2 border ${
+                      isActive
+                        ? 'btn-primary shadow-lg border-primary'
+                        : 'bg-base-200/60 border-base-content/10 text-base-content hover:bg-base-300 hover:border-base-content/20'
+                    }`}
+                    whileHover={{ y: -4 }}
+                    whileTap={{ scale: 0.96 }}
+                  >
                     <MotionIcon animation="bounce">
                       <FiLayers 
-                        size={24} 
-                        className={`mb-3 ${activeSeries === series.id ? 'text-white' : 'text-indigo-500'}`} 
+                        size={22} 
+                        className={isActive ? 'text-primary-content' : 'text-primary'} 
                       />
                     </MotionIcon>
-                    <span className="font-medium">{series.name}</span>
-                  </div>
-                </motion.button>
-              ))}
+                    <span className="font-medium text-sm line-clamp-1">{series.name}</span>
+                  </motion.button>
+                );
+              })}
             </div>
 
             {/* Selected Series Books */}
             {activeSeries && (
               <div className="mt-8">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">
-                    <span className="text-indigo-600">{getActiveSeriesName()}</span> Series
+                <div className="flex items-center justify-between mb-6 pb-3 border-b border-base-content/10">
+                  <h2 className="text-2xl font-bold text-base-content">
+                    <span className="text-primary">{getActiveSeriesName()}</span> Series
                   </h2>
                   <button 
                     onClick={() => {
                       setActiveSeries(null);
                       router.push('/series');
                     }}
-                    className="text-sm text-gray-600 hover:text-indigo-600"
+                    className="btn btn-ghost btn-sm text-primary"
                   >
                     Clear selection
                   </button>
@@ -209,9 +216,9 @@ function SeriesContent() {
                   {getSeriesBooks().map((book) => (
                     <motion.div key={book.id} variants={item}>
                       <Link href={`/books/${book.id}`}>
-                        <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200 transition-all hover:shadow-md h-full flex flex-col">
-                          {/* Cover Image with Aspect Ratio */}
-                          <div className="relative w-full pt-[140%]">
+                        <div className="card bg-base-100 border border-base-200 shadow-sm hover:shadow-xl overflow-hidden rounded-2xl transition-all h-full flex flex-col group">
+                          {/* Cover Image */}
+                          <div className="relative w-full pt-[140%] bg-base-200">
                             <div className="absolute inset-0">
                               {book.imageUrl ? (
                                 <Image
@@ -219,12 +226,12 @@ function SeriesContent() {
                                   alt={`${book.title} cover`}
                                   fill
                                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                                  className="object-cover"
+                                  className="object-cover group-hover:scale-105 transition-transform duration-500"
                                 />
                               ) : (
-                                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                                <div className="w-full h-full flex items-center justify-center bg-base-300">
                                   <MotionIcon animation="float">
-                                    <FiBookOpen size={48} className="text-gray-400" />
+                                    <FiBookOpen size={48} className="text-base-content/30" />
                                   </MotionIcon>
                                 </div>
                               )}
@@ -232,20 +239,22 @@ function SeriesContent() {
                           </div>
                           
                           {/* Book Info */}
-                          <div className="p-4 flex flex-col flex-grow">
-                            <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1">{book.title}</h3>
-                            <p className="text-sm text-gray-600">
+                          <div className="card-body p-4 flex flex-col flex-grow">
+                            <h3 className="card-title text-base font-bold text-base-content mb-1 line-clamp-1 group-hover:text-primary transition-colors">
+                              {book.title}
+                            </h3>
+                            <p className="text-xs text-base-content/70 mb-auto line-clamp-1">
                               {book.authors.map(author => author.name).join(', ')}
                             </p>
                             {book.seriesPosition && book.seriesPosition.length > 0 && (
-                              <p className="text-xs text-indigo-600 mt-1">
+                              <span className="badge badge-primary badge-sm mt-2 font-medium">
                                 Book #{book.seriesPosition[0]}
-                              </p>
+                              </span>
                             )}
                             
-                            <div className="mt-4 flex items-center gap-2 text-indigo-600 text-sm font-medium">
-                              <MotionIcon animation="float">
-                                <FiBookOpen size={16} />
+                            <div className="mt-4 flex items-center gap-1.5 text-primary text-xs font-semibold">
+                              <MotionIcon animation="float" trigger="hover">
+                                <FiBookOpen size={14} />
                               </MotionIcon>
                               <span>View Details</span>
                             </div>
@@ -257,8 +266,8 @@ function SeriesContent() {
                 </motion.div>
 
                 {getSeriesBooks().length === 0 && (
-                  <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-                    <p className="text-gray-600">No books found in this series.</p>
+                  <div className="card bg-base-200 border border-base-content/10 p-12 text-center rounded-2xl">
+                    <p className="text-base-content/60">No books found in this series.</p>
                   </div>
                 )}
               </div>
@@ -266,9 +275,9 @@ function SeriesContent() {
 
             {/* No Series Selected */}
             {!activeSeries && (
-              <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Select a series</h2>
-                <p className="text-gray-600">Click on a series above to view books in that collection.</p>
+              <div className="card bg-base-200/50 border border-base-content/10 p-12 text-center rounded-2xl">
+                <h2 className="text-xl font-bold text-base-content mb-2">Select a series</h2>
+                <p className="text-base-content/60">Click on a series above to view books in that collection.</p>
               </div>
             )}
           </>
@@ -281,17 +290,19 @@ function SeriesContent() {
 export default function SeriesPage() {
   return (
     <Suspense fallback={
-      <div className="bg-gray-50 min-h-screen py-12">
+      <div className="bg-base-100 text-base-content min-h-screen py-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-10">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">Series</h1>
-            <p className="text-lg text-gray-600">
+            <h1 className="text-3xl font-extrabold text-base-content mb-3">Series</h1>
+            <p className="text-base text-base-content/70">
               Browse our collection of book series
             </p>
           </div>
-          <div className="flex justify-center items-center py-12">
-            <FiLoader className="animate-spin h-8 w-8 text-indigo-600" />
-            <span className="ml-2 text-lg text-gray-600">Loading series...</span>
+          <div className="flex justify-center items-center py-16">
+            <MotionIcon animation="spin" trigger="always">
+              <FiLoader className="h-8 w-8 text-primary" />
+            </MotionIcon>
+            <span className="ml-3 text-base text-base-content/70">Loading series...</span>
           </div>
         </div>
       </div>
@@ -299,4 +310,4 @@ export default function SeriesPage() {
       <SeriesContent />
     </Suspense>
   );
-} 
+}
