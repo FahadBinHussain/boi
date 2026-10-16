@@ -53,6 +53,20 @@ When a record is not a normal book, preserve the material type in metadata, espe
 - For raw Internet Archive research updates, also use the matching IA apply script when relevant:
   - `pnpm dataset:apply:ia-research`
 
+## Dataset Restore (dataset/main is gitignored)
+
+`dataset/main/` and `dataset/archive/` are gitignored, so a fresh clone, a CI clone, or a wiped machine has neither. Never rebuild them by hand — restore the backup archive.
+
+- backup: `boi-dataset-backup.zip` (947,236,007 bytes, 8107 entries, one top-level `dataset/` dir), kept outside the repo; how to reach it lives in the private automation notes, not here.
+- zip integrity: every entry CRC-checks clean; extracting `dataset/main` + `dataset/archive` alone yields 8006 files / ~5.10 GB (main 7254, archive 789).
+- extract ONLY `dataset/main/` and `dataset/archive/` into the repo root. The archive also carries `dataset/manifest.json`, `README.md`, `schema.md`, `schema/`, `scripts/` from its own older snapshot; those already exist in git and are newer, so extracting them too silently rolls back tracked files.
+- restore baseline (counts the restored snapshot reported): 508,434 source records, 120,653 authors, 340,585 works, 351,197 editions, 408,576 contributions.
+- verify after restoring:
+  - `dataset/main/generated/exports` exists — that is what `prebuild` syncs into `public/dataset-assets/exports`
+  - `pnpm build` passes
+  - `pnpm start`, then `http://127.0.0.1:3000/dataset` returns 200 with real rows and no `DatasetExportError`
+  - `http://127.0.0.1:3000/dataset/exports/dataset-summary.json` returns the counts above
+
 ## Dataset Research Rules
 
 Keep research simple and search-first.
