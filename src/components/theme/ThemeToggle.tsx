@@ -46,7 +46,7 @@ export default function ThemeToggle() {
 
       <ul
         tabIndex={0}
-        className="dropdown-content z-[100] mt-2 p-2 shadow-2xl bg-base-200 text-base-content rounded-box w-60 max-h-96 overflow-y-auto menu menu-sm gap-1 border border-base-content/10"
+        className="dropdown-content z-[100] mt-2 p-2 shadow-2xl bg-base-200 text-base-content rounded-box w-60 max-h-96 overflow-y-auto overflow-x-hidden menu menu-sm flex-nowrap gap-1 border border-base-content/10"
       >
         <li className="menu-title text-xs font-bold uppercase tracking-wider px-2 py-1 text-base-content/60">
           Preferences
