@@ -35,7 +35,7 @@ When a record is not a normal book, preserve the material type in metadata, espe
     lock matches `package.json` + `node_modules`; ~100ms when clean).
   - commit the lock as-is when it matches what is installed; reverting it
     desyncs `node_modules` and the next install just rewrites it again.
-- `dataset/main/` is gitignored (not present on Vercel/CI clones), so `scripts/sync-public-dataset.js` (run in `prebuild`) must warn and exit `0` when `dataset/main/generated/exports` is absent; exiting `1` breaks every Vercel build before `/dataset` can render its loud `DatasetExportError` banner.
+- `dataset/main/` is gitignored (not present on Vercel/CI clones). Nothing under it is copied into `public/` anymore — `/dataset` and `/dataset/exports/*` read the Turso database, so a clone without `dataset/main` still renders the full dataset (see "Dataset Live Database (Turso)"). Never make a build step depend on `dataset/main` existing.
 - UI icon motion (Rule 10): all UI icons are wrapped with `@/components/ui/MotionIcon` (`bounce`, `spin`, `pulse`, `wiggle`, `float`, `hover`), which supports hover and persistent (`always`) motions. Never leave bare static icons in navigation, cards, tables, filters, or admin pages.
 - DaisyUI & Theme System:
   - DaisyUI 4 (`daisyui: { themes: true }`) is configured in `tailwind.config.ts`, enabling all 32 official themes (`light`, `dark`, `cupcake`, `bumblebee`, `emerald`, `corporate`, `synthwave`, `retro`, `cyberpunk`, `valentine`, `halloween`, `garden`, `forest`, `aqua`, `lofi`, `pastel`, `fantasy`, `wireframe`, `black`, `luxury`, `dracula`, `cmyk`, `autumn`, `business`, `acid`, `lemonade`, `night`, `coffee`, `winter`, `dim`, `nord`, `sunset`).
@@ -63,7 +63,7 @@ When a record is not a normal book, preserve the material type in metadata, espe
 - extract ONLY `dataset/main/` and `dataset/archive/` into the repo root. The archive also carries `dataset/manifest.json`, `README.md`, `schema.md`, `schema/`, `scripts/` from its own older snapshot; those already exist in git and are newer, so extracting them too silently rolls back tracked files.
 - restore baseline (counts the restored snapshot reported): 508,434 source records, 120,653 authors, 340,585 works, 351,197 editions, 408,576 contributions.
 - verify after restoring:
-  - `dataset/main/generated/exports` exists — that is what `prebuild` syncs into `public/dataset-assets/exports`
+  - `dataset/main/generated/exports` exists (the source for `pnpm dataset:db:build`; the site itself reads the Turso database, not these files)
   - `pnpm build` passes
   - `pnpm start`, then `http://127.0.0.1:3000/dataset` returns 200 with real rows and no `DatasetExportError`
   - `http://127.0.0.1:3000/dataset/exports/dataset-summary.json` returns the counts above

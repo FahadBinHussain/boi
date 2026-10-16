@@ -23,7 +23,6 @@
 # production
 /build
 /dist
-/public/dataset-assets/exports
 
 # misc
 .DS_Store
@@ -50,7 +49,6 @@ yarn-error.log*
 
 # dataset generated artifacts
 /dataset/main/generated/
-/public/dataset-assets/
 
 # Dataset files - stored separately from git
 /dataset/main/

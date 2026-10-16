@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "prebuild": "node scripts/check-deps.js && node scripts/sync-public-dataset.js",
+    "prebuild": "node scripts/check-deps.js",
     "build": "prisma generate && next build --webpack",
     "start": "next start",
     "lint": "eslint .",
