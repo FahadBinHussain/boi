@@ -68,6 +68,27 @@ When a record is not a normal book, preserve the material type in metadata, espe
   - `pnpm start`, then `http://127.0.0.1:3000/dataset` returns 200 with real rows and no `DatasetExportError`
   - `http://127.0.0.1:3000/dataset/exports/dataset-summary.json` returns the counts above
 
+## Dataset Live Database (Turso)
+
+`/dataset` and every `/dataset/exports/*` response are served live from the Turso
+database — `dataset/main/` is NOT required at runtime. Rules:
+
+- Free-tier guardrails (plan `starter`, overages off, so hitting a cap errors instead of billing):
+  - 5 GB storage (db file is ~0.9 GB), 500M rows read, 10M rows written, 3 GB syncs per month.
+  - one `/dataset` view is about 1,330 rows read, so the read quota is roughly 376k page views/month.
+  - every page read is keyset: 1 `dataset_page_keys` read + 1 read per row. Never add offset/`LIMIT` scans or joins over `works`/`contributions` — the rank key columns exist for this.
+  - region: group `boi-mumbai` (`aws-ap-south-1`, closest free region to Dhaka). The free plan allows exactly one group.
+- Ordering contract lives in `dataset/scripts/dataset-db-schema.mjs` (`sortBookRows` mirrors the export comparator). SQLite binary collation cannot reproduce the export's ICU `localeCompare`, so rows store a precomputed RANK per (sort, direction) in `k_{title,author,year,editions}_{asc,desc}` and are always compared ASC. Never re-sort in SQL.
+- Rare undeclared row fields ride in an `extras` JSON column and are merged back with the export file's exact field order.
+- References grid pages (`references/pages/*.json`) are stored verbatim gzipped (~50 MB for 416 MB raw); regenerating them from normalized tables could not be byte-faithful. The route gunzips with `node:zlib`.
+- Build + seed flow (scripts read `TURSO_*` from `.env.local`; tokens in the vault):
+  - `pnpm dataset:db:build` -> `dataset/main/generated/db/boi-dataset.db` + `db-manifest.json`, and parity-checks against the export files (paged works/candidates samples, stored export files byte-identical, references pages byte-identical).
+  - `pnpm dataset:db:provision` (destructive, needs `--yes`) -> deletes and recreates the database with `seed.type = "database_upload"`, then mints read-only + full-access tokens into `dataset/main/generated/db/token.json`. Platform token lives in the vault (`app.turso.tech`).
+  - `pnpm dataset:db:upload` -> native `curl.exe --http1.1 -H "Expect:" --data-binary @file` with a manual Content-Length (node fetch/undici streaming dies with `write ECONNRESET`), then verifies counts/pages/stored files against the live DB. `--verify` skips the upload.
+  - The upload endpoint is single-shot seeding: it only works while the DB has no file, and an aborted upload leaves a sticky `"Database upload already in progress"` lock that only delete+recreate clears. Never probe the endpoint first; run provision and upload in one shot.
+- App data layer: `src/lib/dataset-db.ts` (`@libsql/client/web`). It fails loudly — quota exhaustion or a DB error renders the `DatasetExportError` panel; there is no fallback to disk exports.
+- Env: `TURSO_DATABASE_URL` + `TURSO_AUTH_TOKEN` (read-only token, the app never uploads) in `.env.local` locally and in the Vercel `boi` project (Production + Preview). The full-access token is only needed by `dataset:db:upload`.
+
 ## Dataset Research Rules
 
 Keep research simple and search-first.
