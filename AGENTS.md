@@ -68,6 +68,22 @@ When a record is not a normal book, preserve the material type in metadata, espe
   - `pnpm start`, then `http://127.0.0.1:3000/dataset` returns 200 with real rows and no `DatasetExportError`
   - `http://127.0.0.1:3000/dataset/exports/dataset-summary.json` returns the counts above
 
+## Dataset JSONL Storage Forms (flat vs paged)
+
+The four big tables (`works`, `editions`, `contributions`, `source_records`) can exist in two forms under `dataset/main/`: a flat `<table>.jsonl`, or a paged `<table>/NNNN.jsonl` set with `<table>/manifest.json`. `dataset/scripts/jsonl-store.js` `readJsonl()` prefers the paged dir whenever page files exist, and its `writeJsonl()` for these paths writes pages + manifest and deletes the flat file.
+
+Several older apply scripts (`apply-candidate-source-research.js`, `merge-duplicate-candidate-works.js`, `repair-rokomari-page-titles.js`) carry their own local `writeJsonl` that writes the flat file directly (hit 2026-10-16). On a paged dataset their edits land in a form the pipeline never reads, so `dataset:export`, `dataset:check`, and `dataset:db:build` keep the old data even though the apply reported success. After running one of those scripts on a paged dataset, re-materialize the pages before exporting — load each table from the flat file that was just written and call the store writer:
+
+```js
+const store = require("./dataset/scripts/jsonl-store.js");
+const paths = require("./dataset/scripts/paths.js");
+for (const key of ["sources", "works", "editions", "contributions"]) {
+  const file = paths.tables[key];
+  const rows = fs.readFileSync(file, "utf8").split("\n").filter((l) => l.trim()).map((l) => JSON.parse(l));
+  store.writeJsonl(file, rows); // writes pages + manifest, removes the flat file
+}
+```
+
 ## Dataset Live Database (Turso)
 
 `/dataset` and every `/dataset/exports/*` response are served live from the Turso
