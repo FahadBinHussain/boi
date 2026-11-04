@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { FiPlusCircle, FiSearch, FiEdit2, FiTrash2, FiFilter, FiDownload, FiChevronLeft, FiChevronRight, FiBook, FiLoader } from "react-icons/fi";
 import MotionIcon from "@/components/ui/MotionIcon";
+import SortableTableHeader from "@/components/ui/SortableTableHeader";
+import { showErrorToast } from "@/components/ui/ErrorToast";
 import gsap from "gsap";
 import toast from "react-hot-toast";
 import { useAdmin } from "@/lib/hooks/useAdmin";
@@ -187,7 +189,9 @@ export default function BooksManagement() {
       toast.success(`${pluralBooks(result.count)} deleted.`);
     } catch (error) {
       console.error('Error deleting books:', error);
-      toast.error(error instanceof Error ? error.message : 'Unable to delete books. Try again.');
+      showErrorToast(
+        error instanceof Error ? error.message : "Unable to delete books. Try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -225,6 +229,7 @@ export default function BooksManagement() {
               </div>
               <input
                 type="text"
+                aria-label="Search books"
                 className="input input-bordered input-sm w-full pl-9 bg-base-100 text-base-content"
                 placeholder="Search books…"
                 value={searchTerm}
@@ -238,6 +243,7 @@ export default function BooksManagement() {
                   <FiFilter className="h-4 w-4 text-base-content/75" />
                 </MotionIcon>
                 <select
+                  aria-label="Filter by status"
                   className="select select-bordered select-sm bg-base-100 text-base-content"
                   value={filter}
                   onChange={(e) => setFilter(e.target.value as "all" | "active" | "pending")}
@@ -301,71 +307,52 @@ export default function BooksManagement() {
                     <th scope="col" className="w-10">
                       <input
                         type="checkbox"
+                        aria-label="Select all books"
                         className="checkbox checkbox-primary checkbox-xs"
                         checked={selectedBooks.length === currentBooks.length && currentBooks.length > 0}
                         onChange={toggleSelectAll}
                       />
                     </th>
-                    <th 
-                      scope="col" 
-                      className="cursor-pointer"
-                      onClick={() => handleSort("title")}
-                    >
-                      <div className="inline-flex items-center gap-1 font-bold">
-                        Title
-                        {sort.field === "title" && (
-                          <span className="text-primary font-bold">{sort.direction === "desc" ? "↓" : "↑"}</span>
-                        )}
-                      </div>
-                    </th>
-                    <th 
-                      scope="col" 
-                      className="cursor-pointer"
-                      onClick={() => handleSort("author")}
-                    >
-                      <div className="inline-flex items-center gap-1 font-bold">
-                        Author
-                        {sort.field === "author" && (
-                          <span className="text-primary font-bold">{sort.direction === "desc" ? "↓" : "↑"}</span>
-                        )}
-                      </div>
-                    </th>
-                    <th 
-                      scope="col" 
-                      className="cursor-pointer"
-                      onClick={() => handleSort("category")}
-                    >
-                      <div className="inline-flex items-center gap-1 font-bold">
-                        Category
-                        {sort.field === "category" && (
-                          <span className="text-primary font-bold">{sort.direction === "desc" ? "↓" : "↑"}</span>
-                        )}
-                      </div>
-                    </th>
-                    <th 
-                      scope="col" 
-                      className="cursor-pointer"
-                      onClick={() => handleSort("downloads")}
-                    >
-                      <div className="inline-flex items-center gap-1 font-bold">
-                        Downloads
-                        {sort.field === "downloads" && (
-                          <span className="text-primary font-bold">{sort.direction === "desc" ? "↓" : "↑"}</span>
-                        )}
-                      </div>
-                    </th>
-                    <th 
-                      scope="col" 
-                      className="cursor-pointer"
-                      onClick={() => handleSort("status")}
-                    >
-                      <div className="inline-flex items-center gap-1 font-bold">
-                        Status
-                        {sort.field === "status" && (
-                          <span className="text-primary font-bold">{sort.direction === "desc" ? "↓" : "↑"}</span>
-                        )}
-                      </div>
-                    </th>
+                    <SortableTableHeader
+                      field="title"
+                      label="Title"
+                      activeField={sort.field}
+                      direction={sort.direction}
+                      onSort={handleSort}
+                      buttonClassName="font-bold"
+                    />
+                    <SortableTableHeader
+                      field="author"
+                      label="Author"
+                      activeField={sort.field}
+                      direction={sort.direction}
+                      onSort={handleSort}
+                      buttonClassName="font-bold"
+                    />
+                    <SortableTableHeader
+                      field="category"
+                      label="Category"
+                      activeField={sort.field}
+                      direction={sort.direction}
+                      onSort={handleSort}
+                      buttonClassName="font-bold"
+                    />
+                    <SortableTableHeader
+                      field="downloads"
+                      label="Downloads"
+                      activeField={sort.field}
+                      direction={sort.direction}
+                      onSort={handleSort}
+                      buttonClassName="font-bold"
+                    />
+                    <SortableTableHeader
+                      field="status"
+                      label="Status"
+                      activeField={sort.field}
+                      direction={sort.direction}
+                      onSort={handleSort}
+                      buttonClassName="font-bold"
+                    />
                     <th scope="col" className="text-right">
                       Actions
                     </th>
@@ -377,6 +364,7 @@ export default function BooksManagement() {
                       <td>
                         <input
                           type="checkbox"
+                          aria-label={`Select ${book.title}`}
                           className="checkbox checkbox-primary checkbox-xs"
                           checked={selectedBooks.includes(book.id)}
                           onChange={() => toggleSelectBook(book.id)}
@@ -432,7 +420,9 @@ export default function BooksManagement() {
                                   toast.success(`"${book.title}" deleted.`);
                                 } catch (error) {
                                   console.error('Error deleting book:', error);
-                                  toast.error(error instanceof Error ? error.message : 'Unable to delete the book. Try again.');
+                                  showErrorToast(
+          error instanceof Error ? error.message : "Unable to delete the book. Try again."
+        );
                                 }
                               }
                             }}
@@ -469,8 +459,9 @@ export default function BooksManagement() {
                     disabled={currentPage === 1}
                     className={`btn btn-outline btn-xs join-item ${currentPage === 1 ? "btn-disabled opacity-40" : ""}`}
                   >
+                    <span className="sr-only">Previous</span>
                     <MotionIcon animation="bounce" trigger="hover">
-                      <FiChevronLeft className="h-3.5 w-3.5" />
+                      <FiChevronLeft className="h-3.5 w-3.5" aria-hidden="true" />
                     </MotionIcon>
                   </button>
                   
@@ -493,8 +484,9 @@ export default function BooksManagement() {
                     disabled={currentPage === totalPages}
                     className={`btn btn-outline btn-xs join-item ${currentPage === totalPages ? "btn-disabled opacity-40" : ""}`}
                   >
+                    <span className="sr-only">Next</span>
                     <MotionIcon animation="bounce" trigger="hover">
-                      <FiChevronRight className="h-3.5 w-3.5" />
+                      <FiChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
                     </MotionIcon>
                   </button>
                 </div>

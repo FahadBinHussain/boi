@@ -1,6 +1,13 @@
 import Link from 'next/link';
 import { FiBook, FiMail, FiHeart, FiInfo } from 'react-icons/fi';
 import MotionIcon from '@/components/ui/MotionIcon';
+import { pageMetadata } from '@/lib/seo';
+
+export const metadata = pageMetadata({
+  title: "About",
+  description: "What বই is, who builds it, and how to get in touch.",
+  path: "/about",
+});
 
 export default function AboutPage() {
   return (

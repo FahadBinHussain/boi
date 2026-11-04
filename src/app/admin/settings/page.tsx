@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { FiSave, FiSettings, FiLock, FiCheck, FiLoader, FiRefreshCw, FiAlertCircle, FiCheckCircle } from "react-icons/fi";
 import MotionIcon from "@/components/ui/MotionIcon";
+import { showErrorToast } from "@/components/ui/ErrorToast";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
@@ -62,7 +63,7 @@ export default function AdminSettings() {
     } else if (syncStatus === 'error') {
       notificationShownRef.current = true;
       console.log('Settings page: Showing error notification with message:', lastSyncMessage);
-      toast.error(lastSyncMessage || 'Unable to synchronize settings. Try again.');
+      showErrorToast(lastSyncMessage || "Unable to synchronize settings. Try again.");
       setTimeout(() => {
         notificationShownRef.current = false;
         console.log('Settings page: Reset notification flag after timeout');

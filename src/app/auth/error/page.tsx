@@ -21,9 +21,9 @@ function ErrorContent() {
           </div>
         </div>
         <div>
-          <h2 className="text-2xl font-extrabold text-base-content">
+          <h1 className="text-2xl font-extrabold text-base-content">
             Sign-in failed
-          </h2>
+          </h1>
           <p className="mt-2 text-sm text-base-content/75">
             {error === "AccessDenied"
               ? "Your account does not have admin access. Ask an administrator for access."

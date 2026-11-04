@@ -20,10 +20,10 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* Quick Links */}
+          {/* Quick links */}
           <div>
             <h3 className="text-sm font-semibold text-base-content tracking-wider uppercase mb-4">
-              Quick Links
+              Quick links
             </h3>
             <ul className="space-y-3">
               <li>
@@ -39,7 +39,7 @@ const Footer = () => {
                   href="/books" 
                   className="text-base-content/75 hover:text-primary text-sm transition-colors"
                 >
-                  Browse Books
+                  Browse books
                 </Link>
               </li>
               <li>
@@ -71,7 +71,7 @@ const Footer = () => {
                   href="/about" 
                   className="text-base-content/75 hover:text-primary text-sm transition-colors"
                 >
-                  About Us
+                  About us
                 </Link>
               </li>
             </ul>
@@ -88,7 +88,7 @@ const Footer = () => {
                   href="/privacy" 
                   className="text-base-content/75 hover:text-primary text-sm transition-colors"
                 >
-                  Privacy Policy
+                  Privacy policy
                 </Link>
               </li>
               <li>
@@ -96,7 +96,7 @@ const Footer = () => {
                   href="/terms" 
                   className="text-base-content/75 hover:text-primary text-sm transition-colors"
                 >
-                  Terms of Service
+                  Terms of service
                 </Link>
               </li>
               <li>
@@ -104,7 +104,7 @@ const Footer = () => {
                   href="/copyright" 
                   className="text-base-content/75 hover:text-primary text-sm transition-colors"
                 >
-                  Copyright Notice
+                  Copyright notice
                 </Link>
               </li>
               <li>
@@ -112,7 +112,7 @@ const Footer = () => {
                   href="/dmca" 
                   className="text-base-content/75 hover:text-primary text-sm transition-colors"
                 >
-                  DMCA Policy
+                  DMCA policy
                 </Link>
               </li>
             </ul>
@@ -121,20 +121,25 @@ const Footer = () => {
           {/* Contact */}
           <div>
             <h3 className="text-sm font-semibold text-base-content tracking-wider uppercase mb-4">
-              Connect With Us
+              Connect with us
             </h3>
             <div className="flex gap-3 mb-4">
-              <a href="#" className="btn btn-ghost btn-circle btn-sm text-base-content/75 hover:text-primary">
+              <a
+                href="https://github.com/FahadBinHussain/boi"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="বই on GitHub"
+                className="btn btn-ghost btn-circle btn-sm text-base-content/75 hover:text-primary"
+              >
                 <MotionIcon animation="bounce">
                   <FiGithub size={18} />
                 </MotionIcon>
               </a>
-              <a href="#" className="btn btn-ghost btn-circle btn-sm text-base-content/75 hover:text-primary">
-                <MotionIcon animation="wiggle">
-                  <FiTwitter size={18} />
-                </MotionIcon>
-              </a>
-              <a href="mailto:contact@boi.com" className="btn btn-ghost btn-circle btn-sm text-base-content/75 hover:text-primary">
+              <a
+                href="mailto:contact@boi.com"
+                aria-label="Email বই"
+                className="btn btn-ghost btn-circle btn-sm text-base-content/75 hover:text-primary"
+              >
                 <MotionIcon animation="float">
                   <FiMail size={18} />
                 </MotionIcon>

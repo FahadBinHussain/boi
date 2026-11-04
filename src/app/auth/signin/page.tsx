@@ -42,9 +42,9 @@ function SignInContent() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-base-100 text-base-content py-12 px-4 sm:px-6 lg:px-8 transition-colors">
       <div className="w-full max-w-md card bg-base-200 border border-base-content/10 shadow-2xl p-8 rounded-3xl space-y-6">
         <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-base-content">
+          <h1 className="text-3xl font-extrabold text-base-content">
             Admin console login
-          </h2>
+          </h1>
           <p className="mt-2 text-sm text-base-content/75">
             Sign in to access the admin dashboard
           </p>

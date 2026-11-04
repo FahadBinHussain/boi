@@ -64,6 +64,7 @@ export default function BooksPage() {
             <input
               type="text"
               placeholder="Search books by title, author or description…"
+              aria-label="Search books"
               className="input input-bordered w-full pe-12 bg-base-100 text-base-content"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}

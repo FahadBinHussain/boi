@@ -116,6 +116,12 @@ export default function MotionIcon({
       variants={activeVariants}
       animate={animateState}
       initial="rest"
+      // Icons inside MotionIcon are decorative: the button, link or heading
+      // they sit in carries the name. Without this every icon is announced as
+      // an unnamed graphic, and a screen reader reads the icon list aloud.
+      aria-hidden={
+        props["aria-label"] ? undefined : (props["aria-hidden"] ?? true)
+      }
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       {...props}

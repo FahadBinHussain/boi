@@ -87,6 +87,48 @@ html {
   }
 }
 
+/* Skip to content: the first focusable element on the page, so a keyboard
+   user can jump past the header navigation instead of tabbing through it. */
+.skip-link {
+  position: absolute;
+  inset-inline-start: -9999px;
+  top: 0;
+  z-index: 100;
+}
+
+.skip-link:focus {
+  position: fixed;
+  inset-inline-start: 1rem;
+  top: 1rem;
+  width: auto;
+  height: auto;
+  padding: 0.5rem 1rem;
+  overflow: visible;
+  clip: auto;
+  clip-path: none;
+  white-space: normal;
+  border-radius: 0.5rem;
+  background-color: oklch(var(--p));
+  color: oklch(var(--pc));
+  box-shadow: 0 10px 25px -5px oklch(0 0 0 / 0.3);
+}
+
+/* DaisyUI opens a dropdown on :focus-within, so a keyboard user cannot
+   escape it: focusing anything inside the wrapper keeps it open. The theme
+   menu is driven by React state instead, so the CSS only opens it when the
+   state says so. */
+.dropdown.dropdown-controlled > .dropdown-content {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.dropdown.dropdown-controlled.dropdown-open > .dropdown-content {
+  visibility: visible;
+  opacity: 1;
+  --tw-scale-x: 1;
+  --tw-scale-y: 1;
+}
+
 body {
   /* Both vars come from next/font in src/app/layout.tsx. The fallback inside
      var() matters: an undefined var without one invalidates the whole

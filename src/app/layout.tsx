@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import RouteAnnouncer from "@/components/layout/RouteAnnouncer";
 import { Providers } from "./providers";
 import Script from "next/script";
 import { Toaster } from "react-hot-toast";
 import { Inter, Hind_Siliguri } from "next/font/google";
+import { SITE_NAME, SITE_URL } from "@/lib/seo";
 
 // Latin UI face. Exposed as --font-inter, which tailwind.config.ts maps into
 // fontFamily.sans. Inter has no Bengali glyphs, so Bengali text falls through
@@ -25,8 +27,25 @@ const bengali = Hind_Siliguri({
 });
 
 export const metadata: Metadata = {
-  title: "বই - Free Books Download",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "বই - Free Books Download",
+    template: "%s - বই",
+  },
   description: "A digital library offering free access to books across various genres.",
+  alternates: { canonical: `${SITE_URL}/` },
+  openGraph: {
+    type: "website",
+    url: `${SITE_URL}/`,
+    siteName: SITE_NAME,
+    title: "বই - Free Books Download",
+    description: "A digital library offering free access to books across various genres.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "বই - Free Books Download",
+    description: "A digital library offering free access to books across various genres.",
+  },
 };
 
 export default function RootLayout({
@@ -76,16 +95,31 @@ export default function RootLayout({
         className={`${inter.variable} ${bengali.variable} font-sans antialiased min-h-dvh flex flex-col bg-base-100 text-base-content`}
         suppressHydrationWarning
       >
+        <a href="#main-content" className="skip-link">
+          Skip to content
+        </a>
         <Providers>
+          <RouteAnnouncer />
           <Header />
-          <main className="flex-grow bg-base-100 text-base-content">
+          <main
+            id="main-content"
+            tabIndex={-1}
+            className="flex-grow bg-base-100 text-base-content"
+          >
             {children}
           </main>
           <Footer />
-          <Toaster 
+          <Toaster
             position="bottom-right"
             toastOptions={{
               duration: 4000,
+              // An error has to be read, not glimpsed: error toasts stay until
+              // they are dismissed. `showErrorToast` adds the dismiss button
+              // and the assertive announcement on top of this.
+              error: { duration: Infinity },
+              success: {
+                ariaProps: { role: "status", "aria-live": "polite" },
+              },
             }}
           />
         </Providers>

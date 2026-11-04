@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { FiArrowLeft, FiSave, FiImage, FiCalendar, FiUsers, FiBook, FiFileText, FiCheckCircle, FiLink, FiLoader, FiDownload, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import MotionIcon from "@/components/ui/MotionIcon";
+import { showErrorToast } from "@/components/ui/ErrorToast";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import toast from "react-hot-toast";
 
@@ -153,7 +154,7 @@ export default function AddNewBook() {
   useEffect(() => {
     // Only show important notifications (error states)
     if (syncStatus === 'error') {
-      toast.error(lastSyncMessage || 'Unable to synchronize settings. Try again.');
+      showErrorToast(lastSyncMessage || "Unable to synchronize settings. Try again.");
     }
   }, [syncStatus, lastSyncMessage]);
 
@@ -221,7 +222,7 @@ export default function AddNewBook() {
     // Validate all fields before submission
     if (!validateForm()) {
       // Show error notification
-      toast.error('Fill in the highlighted fields');
+      showErrorToast("Fill in the highlighted fields");
       return;
     }
     
@@ -284,7 +285,7 @@ export default function AddNewBook() {
       router.push('/admin/books');
     } catch (error) {
       console.error("Error submitting form:", error);
-      toast.error('Unable to save the book. Try again.');
+      showErrorToast("Unable to save the book. Try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -451,7 +452,7 @@ export default function AddNewBook() {
     } catch (error) {
       console.error('Error fetching metadata:', error);
       setScrapingError(error instanceof Error ? error.message : 'Failed to fetch metadata');
-      toast.error('Unable to fetch metadata. Check the URL and try again.');
+      showErrorToast("Unable to fetch metadata. Check the URL and try again.");
     } finally {
       setIsScrapingMetadata(false);
     }
@@ -750,7 +751,7 @@ export default function AddNewBook() {
   const handleSingleBookUploadError = (errorMessage: string) => {
     setSingleBookUploadStatus('error');
     setSingleBookUploadError(errorMessage);
-    toast.error(`Upload failed: ${errorMessage}`);
+    showErrorToast(`Upload failed: ${errorMessage}`);
   };
 
   return (
@@ -816,6 +817,7 @@ export default function AddNewBook() {
                   <input
                     type="text"
                     id="metadataUrl"
+                    aria-label="Book page URL"
                     className={`input input-bordered w-full rounded-r-none bg-base-100 text-base-content pl-10 focus:input-primary text-sm ${
                       scrapingError ? "input-error" : ""
                     }`}
@@ -892,7 +894,7 @@ export default function AddNewBook() {
 
               {/* Authors */}
               <div className="form-group">
-                <label className="label-text block text-sm font-semibold text-base-content mb-2">
+                <label htmlFor="author-0" className="label-text block text-sm font-semibold text-base-content mb-2">
                   <div className="flex items-center">
                     <MotionIcon animation="wiggle" trigger="hover" className="mr-2">
                       <FiUsers className="h-4 w-4 text-primary" />
@@ -905,6 +907,8 @@ export default function AddNewBook() {
                     <div key={author.id} className="flex items-center gap-2">
                       <input
                         type="text"
+                        id={`author-${index}`}
+                        aria-label={`Author ${index + 1}`}
                         className={`input input-bordered flex-1 bg-base-100 text-base-content ${
                           formErrors.authors ? "input-error" : ""
                         }`}

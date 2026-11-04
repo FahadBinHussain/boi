@@ -193,8 +193,8 @@ function SeriesContent() {
             {/* Selected Series Books */}
             {activeSeries && (
               <div className="mt-8">
-                <div className="flex items-center justify-between mb-6 pb-3 border-b border-base-content/10">
-                  <h2 className="text-2xl font-bold text-base-content">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-3 border-b border-base-content/10">
+                  <h2 className="min-w-0 text-2xl font-bold text-base-content">
                     <span className="text-primary">{getActiveSeriesName()}</span> Series
                   </h2>
                   <button 

@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import { FiLogIn, FiLogOut, FiUser, FiPlusCircle, FiLayout } from 'react-icons/fi';
 import MotionIcon from '../ui/MotionIcon';
+import { useDismissable } from '@/hooks/useDismissable';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
@@ -18,6 +19,16 @@ type ExtendedUser = {
 const LoginButton = () => {
   const { data: session, status } = useSession();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Escape closes the account menu and returns focus to the trigger.
+  useDismissable(
+    isDropdownOpen,
+    () => setIsDropdownOpen(false),
+    triggerRef,
+    menuRef
+  );
   
   // Cast the user to include role
   const user = session?.user as ExtendedUser | undefined;
@@ -32,9 +43,12 @@ const LoginButton = () => {
     return (
       <div className="relative">
         <button
+          ref={triggerRef}
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           className="btn btn-ghost btn-sm gap-2 normal-case font-normal text-base-content"
           aria-label="User menu"
+          aria-expanded={isDropdownOpen}
+          aria-controls="user-menu"
         >
           <div className="avatar">
             <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
@@ -58,6 +72,8 @@ const LoginButton = () => {
 
         {isDropdownOpen && (
           <motion.div
+            id="user-menu"
+            ref={menuRef}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className="absolute right-0 mt-2 w-52 bg-base-200 text-base-content rounded-box shadow-xl py-2 z-50 border border-base-300 menu menu-sm"

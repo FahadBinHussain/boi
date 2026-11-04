@@ -198,10 +198,10 @@ function AuthorsContent() {
             {activeAuthor && (
               <div className="mt-8">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-3 border-b border-base-content/10">
-                  <h2 className="text-2xl font-bold text-base-content">
+                  <h2 className="min-w-0 text-2xl font-bold text-base-content">
                     Books by <span className="text-primary">{getActiveAuthorName()}</span>
                   </h2>
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-3">
                     <label htmlFor="sort" className="text-xs font-semibold text-base-content/75 uppercase">Sort by:</label>
                     <select
                       id="sort"

@@ -268,9 +268,9 @@ export default function Home() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8 }}
-          className="mb-10 flex items-end justify-between gap-6 border-b border-base-content/10 pb-6"
+          className="mb-10 flex flex-col gap-4 border-b border-base-content/10 pb-6 sm:flex-row sm:items-end sm:justify-between sm:gap-6"
         >
-          <div>
+          <div className="min-w-0">
             <p className="mb-2 text-xs font-bold tracking-[0.25em] uppercase text-primary">Curated Now</p>
             <h2 className="text-balance text-3xl/[1.2] font-extrabold tracking-tight lg:text-4xl/[1.15] text-base-content">Featured reading picks</h2>
           </div>

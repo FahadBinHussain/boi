@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { FiArchive, FiBookOpen, FiChevronLeft, FiChevronRight, FiDatabase, FiDownloadCloud, FiAlertCircle } from 'react-icons/fi';
 import MotionIcon from '@/components/ui/MotionIcon';
+import { pageMetadata } from '@/lib/seo';
 import {
   DatasetDatabaseError,
   datasetSortDirections,
@@ -146,10 +147,11 @@ function RefMarks({
 
 export const dynamic = 'force-dynamic';
 
-export const metadata = {
-  title: 'Dataset - বই',
-  description: 'Source-backed Bangla books dataset status and exports.',
-};
+export const metadata = pageMetadata({
+  title: "Dataset",
+  description: "Source-backed Bangla books dataset status and exports.",
+  path: "/dataset",
+});
 
 function datasetUpdatedLabel(updatedAt: string) {
   const parsed = new Date(updatedAt);

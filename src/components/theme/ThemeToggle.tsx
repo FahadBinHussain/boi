@@ -1,17 +1,28 @@
 "use client";
 
-import { useTheme, DAISYUI_THEMES, type DaisyTheme } from "@/contexts/ThemeContext";
-import { useEffect, useState } from "react";
+import { useTheme, DAISYUI_THEMES, type DaisyTheme, type Theme } from "@/contexts/ThemeContext";
+import { useEffect, useRef, useState } from "react";
 import { FiCheck, FiChevronDown, FiDroplet, FiMonitor } from "react-icons/fi";
 import MotionIcon from "@/components/ui/MotionIcon";
+import { useDismissable } from "@/hooks/useDismissable";
 
 export default function ThemeToggle() {
   const { theme, resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLUListElement>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const close = () => setIsOpen(false);
+
+  // Escape closes the menu and puts focus back on the trigger. DaisyUI opens
+  // a dropdown on :focus-within, which a keyboard user cannot escape from,
+  // so the menu is driven by state instead.
+  useDismissable(isOpen, close, triggerRef, menuRef);
 
   if (!mounted) {
     return (
@@ -24,14 +35,25 @@ export default function ThemeToggle() {
 
   const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
+  const chooseTheme = (next: Theme) => {
+    setTheme(next);
+    setIsOpen(false);
+    triggerRef.current?.focus();
+  };
+
   return (
-    <div className="dropdown dropdown-end">
-      <div
-        tabIndex={0}
-        role="button"
+    <div
+      className={`dropdown dropdown-end dropdown-controlled ${isOpen ? "dropdown-open" : ""}`}
+    >
+      <button
+        ref={triggerRef}
+        type="button"
+        onClick={() => setIsOpen((open) => !open)}
         className="btn btn-ghost btn-sm gap-2 border border-base-content/10 hover:border-base-content/20"
         title="Change theme"
         aria-label="Change theme"
+        aria-expanded={isOpen}
+        aria-controls="theme-menu"
       >
         <MotionIcon animation="spin" trigger="hover">
           <FiDroplet className="w-4 h-4 text-primary" />
@@ -42,10 +64,12 @@ export default function ThemeToggle() {
         <MotionIcon animation="bounce" trigger="hover">
           <FiChevronDown className="w-3 h-3 opacity-60" />
         </MotionIcon>
-      </div>
+      </button>
 
       <ul
-        tabIndex={0}
+        id="theme-menu"
+        ref={menuRef}
+        aria-label="Theme"
         className="dropdown-content z-[100] mt-2 p-2 shadow-2xl bg-base-200 text-base-content rounded-box w-60 max-h-96 overflow-y-auto overflow-x-hidden overscroll-contain menu menu-sm flex-nowrap gap-1 border border-base-content/10"
       >
         <li className="menu-title text-xs font-bold uppercase tracking-wider px-2 py-1 text-base-content/75">
@@ -53,11 +77,7 @@ export default function ThemeToggle() {
         </li>
         <li>
           <button
-            onClick={() => {
-              setTheme("system");
-              const elem = document.activeElement as HTMLElement | null;
-              elem?.blur();
-            }}
+            onClick={() => chooseTheme("system")}
             className={`flex items-center justify-between py-2 px-3 rounded-lg ${
               theme === "system" ? "active font-bold" : ""
             }`}
@@ -85,11 +105,7 @@ export default function ThemeToggle() {
           return (
             <li key={themeName}>
               <button
-                onClick={() => {
-                  setTheme(themeName);
-                  const elem = document.activeElement as HTMLElement | null;
-                  elem?.blur();
-                }}
+                onClick={() => chooseTheme(themeName)}
                 className={`flex items-center justify-between py-2 px-3 rounded-lg ${
                   isSelected ? "active font-bold" : ""
                 }`}

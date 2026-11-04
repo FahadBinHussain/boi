@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { FiSearch, FiFilter, FiMail, FiEye, FiUserX, FiUserCheck, FiChevronLeft, FiChevronRight, FiEdit2, FiTrash2, FiLoader, FiUsers } from "react-icons/fi";
 import MotionIcon from "@/components/ui/MotionIcon";
+import SortableTableHeader from "@/components/ui/SortableTableHeader";
 import gsap from "gsap";
 import { useAdmin } from "@/lib/hooks/useAdmin";
 import { useRouter } from "next/navigation";
@@ -208,6 +209,7 @@ export default function UsersManagement() {
             </div>
             <input
               type="text"
+              aria-label="Search users"
               className="input input-bordered w-full pl-10 bg-base-100 text-base-content"
               placeholder="Search users…"
               value={searchTerm}
@@ -221,6 +223,7 @@ export default function UsersManagement() {
                 <FiFilter className="h-5 w-5 text-base-content/75" />
               </MotionIcon>
               <select
+                aria-label="Filter by status"
                 className="select select-bordered bg-base-100 text-base-content"
                 value={filter}
                 onChange={(e) => setFilter(e.target.value as "all" | "active" | "pending")}
@@ -233,6 +236,7 @@ export default function UsersManagement() {
             
             <div className="inline-flex items-center">
               <select
+                aria-label="Filter by role"
                 className="select select-bordered bg-base-100 text-base-content"
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value as "all" | "admin" | "user")}
@@ -255,95 +259,66 @@ export default function UsersManagement() {
                 <th scope="col" className="px-3 py-3.5 text-left">
                   <input
                     type="checkbox"
+                    aria-label="Select all users"
                     className="checkbox checkbox-primary checkbox-sm"
                     checked={selectedUsers.length === currentUsers.length && currentUsers.length > 0}
                     onChange={toggleSelectAll}
                   />
                 </th>
-                <th 
-                  scope="col" 
-                  className="px-3 py-3.5 text-left text-sm font-bold text-base-content cursor-pointer"
-                  onClick={() => handleSort("name")}
-                >
-                  <div className="group inline-flex items-center">
-                    Name
-                    <span className="ms-2 text-base-content/75 group-hover:text-base-content">
-                      {sort.field === "name" && (
-                        sort.direction === "desc" ? "↓" : "↑"
-                      )}
-                    </span>
-                  </div>
-                </th>
-                <th 
-                  scope="col" 
-                  className="px-3 py-3.5 text-left text-sm font-bold text-base-content cursor-pointer"
-                  onClick={() => handleSort("email")}
-                >
-                  <div className="group inline-flex items-center">
-                    Email
-                    <span className="ms-2 text-base-content/75 group-hover:text-base-content">
-                      {sort.field === "email" && (
-                        sort.direction === "desc" ? "↓" : "↑"
-                      )}
-                    </span>
-                  </div>
-                </th>
-                <th 
-                  scope="col" 
-                  className="px-3 py-3.5 text-left text-sm font-bold text-base-content cursor-pointer"
-                  onClick={() => handleSort("role")}
-                >
-                  <div className="group inline-flex items-center">
-                    Role
-                    <span className="ms-2 text-base-content/75 group-hover:text-base-content">
-                      {sort.field === "role" && (
-                        sort.direction === "desc" ? "↓" : "↑"
-                      )}
-                    </span>
-                  </div>
-                </th>
-                <th 
-                  scope="col" 
-                  className="px-3 py-3.5 text-left text-sm font-bold text-base-content cursor-pointer"
-                  onClick={() => handleSort("status")}
-                >
-                  <div className="group inline-flex items-center">
-                    Status
-                    <span className="ms-2 text-base-content/75 group-hover:text-base-content">
-                      {sort.field === "status" && (
-                        sort.direction === "desc" ? "↓" : "↑"
-                      )}
-                    </span>
-                  </div>
-                </th>
-                <th 
-                  scope="col" 
-                  className="px-3 py-3.5 text-left text-sm font-bold text-base-content cursor-pointer"
-                  onClick={() => handleSort("lastLogin")}
-                >
-                  <div className="group inline-flex items-center">
-                    Last Login
-                    <span className="ms-2 text-base-content/75 group-hover:text-base-content">
-                      {sort.field === "lastLogin" && (
-                        sort.direction === "desc" ? "↓" : "↑"
-                      )}
-                    </span>
-                  </div>
-                </th>
-                <th 
-                  scope="col" 
-                  className="px-3 py-3.5 text-left text-sm font-bold text-base-content cursor-pointer"
-                  onClick={() => handleSort("joined")}
-                >
-                  <div className="group inline-flex items-center">
-                    Joined
-                    <span className="ms-2 text-base-content/75 group-hover:text-base-content">
-                      {sort.field === "joined" && (
-                        sort.direction === "desc" ? "↓" : "↑"
-                      )}
-                    </span>
-                  </div>
-                </th>
+                <SortableTableHeader
+                  field="name"
+                  label="Name"
+                  activeField={sort.field}
+                  direction={sort.direction}
+                  onSort={handleSort}
+                  className="px-3 py-3.5 text-left text-sm font-bold text-base-content"
+                  buttonClassName="group"
+                />
+                <SortableTableHeader
+                  field="email"
+                  label="Email"
+                  activeField={sort.field}
+                  direction={sort.direction}
+                  onSort={handleSort}
+                  className="px-3 py-3.5 text-left text-sm font-bold text-base-content"
+                  buttonClassName="group"
+                />
+                <SortableTableHeader
+                  field="role"
+                  label="Role"
+                  activeField={sort.field}
+                  direction={sort.direction}
+                  onSort={handleSort}
+                  className="px-3 py-3.5 text-left text-sm font-bold text-base-content"
+                  buttonClassName="group"
+                />
+                <SortableTableHeader
+                  field="status"
+                  label="Status"
+                  activeField={sort.field}
+                  direction={sort.direction}
+                  onSort={handleSort}
+                  className="px-3 py-3.5 text-left text-sm font-bold text-base-content"
+                  buttonClassName="group"
+                />
+                <SortableTableHeader
+                  field="lastLogin"
+                  label="Last Login"
+                  activeField={sort.field}
+                  direction={sort.direction}
+                  onSort={handleSort}
+                  className="px-3 py-3.5 text-left text-sm font-bold text-base-content"
+                  buttonClassName="group"
+                />
+                <SortableTableHeader
+                  field="joined"
+                  label="Joined"
+                  activeField={sort.field}
+                  direction={sort.direction}
+                  onSort={handleSort}
+                  className="px-3 py-3.5 text-left text-sm font-bold text-base-content"
+                  buttonClassName="group"
+                />
                 <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
                   <span className="sr-only">Actions</span>
                 </th>
@@ -356,6 +331,7 @@ export default function UsersManagement() {
                     <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
                       <input
                         type="checkbox"
+                        aria-label={`Select ${user.name}`}
                         className="checkbox checkbox-primary checkbox-sm"
                         checked={selectedUsers.includes(user.id)}
                         onChange={() => toggleSelectUser(user.id)}

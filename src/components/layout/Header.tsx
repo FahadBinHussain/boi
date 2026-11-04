@@ -8,6 +8,7 @@ import { FiMenu, FiX, FiBook, FiSearch, FiHome, FiGrid, FiUsers, FiLayers, FiDat
 import MotionIcon from '../ui/MotionIcon';
 import LoginButton from '../auth/LoginButton';
 import ThemeToggle from '../theme/ThemeToggle';
+import { useDismissable } from '@/hooks/useDismissable';
 import gsap from 'gsap';
 
 const navItems = [
@@ -31,6 +32,11 @@ const Header = () => {
   const actionsRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Escape closes the mobile navigation and returns focus to the button that
+  // opened it. Without that a keyboard user is stuck inside the panel.
+  useDismissable(isMenuOpen, () => setIsMenuOpen(false), menuButtonRef, mobileMenuRef);
   
   const isLinkActive = (href: string) => {
     if (!pathname) return href === '/';
@@ -218,11 +224,14 @@ const Header = () => {
             </div>
             
             <motion.button
+              ref={menuButtonRef}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.96 }}
               className="md:hidden btn btn-ghost btn-circle btn-sm text-base-content/75 hover:text-primary"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label="Toggle menu"
+              aria-expanded={isMenuOpen}
+              aria-controls="mobile-menu"
             >
               <MotionIcon animation="wiggle">
                 {isMenuOpen ? <FiX size={18} /> : <FiMenu size={18} />}
@@ -241,10 +250,15 @@ const Header = () => {
               <input
                 type="text"
                 placeholder="Search for books…"
+                aria-label="Search books"
                 className="input input-bordered w-full pe-12 bg-base-100 text-base-content"
                 autoFocus
               />
-              <button className="btn btn-primary btn-sm absolute end-2 top-1/2 -translate-y-1/2">
+              <button
+                type="button"
+                aria-label="Search"
+                className="btn btn-primary btn-sm absolute end-2 top-1/2 -translate-y-1/2"
+              >
                 <MotionIcon animation="spin">
                   <FiSearch size={16} />
                 </MotionIcon>
@@ -256,6 +270,7 @@ const Header = () => {
         {/* Mobile Navigation - Conditional Rendering */}
         {isMenuOpen && (
           <div
+            id="mobile-menu"
             ref={mobileMenuRef}
             className="md:hidden py-4 overflow-hidden"
           >
@@ -293,7 +308,7 @@ const Header = () => {
                 
                 {/* Mobile Sign In Button */}
                 <div className="sm:hidden border-t border-base-300 mt-2 pt-3">
-                  <div onClick={() => setIsMenuOpen(false)}>
+                  <div>
                     <LoginButton />
                   </div>
                 </div>
