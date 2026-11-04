@@ -40,11 +40,20 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     title: "বই - Free Books Download",
     description: "A digital library offering free access to books across various genres.",
+    images: [
+      {
+        url: `${SITE_URL}/opengraph-image`,
+        width: 1200,
+        height: 630,
+        alt: "বই — free books to read and download",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "বই - Free Books Download",
     description: "A digital library offering free access to books across various genres.",
+    images: [`${SITE_URL}/opengraph-image`],
   },
 };
 

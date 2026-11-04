@@ -119,6 +119,14 @@ When a record is not a normal book, preserve the material type in metadata, espe
 - **Every route carries its own title and canonical URL.** Page metadata lives in a route-segment `layout.tsx` (`src/lib/seo.ts` -> `pageMetadata()`); a segment layout still needs a default export even when it only carries metadata. A dynamic title comes from `generateMetadata` (`src/app/books/[id]/layout.tsx` reads the book from Prisma, because the crawler never runs the client bundle). The admin area is `noindex`.
 - **Local admin testing does not need Google OAuth.** The dev database uses NextAuth database sessions: create a `User` with `role = "ADMIN"` and a `Session` row, then set the `next-auth.session-token` cookie for `localhost` in the browser (`Network.setCookie`). The session table is local-only and never touches the deployed database.
 
+## Share Previews
+
+- **Every public route carries a title, a description, a canonical URL and a 1200x630 preview image.** The metadata is built by `pageMetadata()` in `src/lib/seo.ts`, the route-to-image map lives in `src/lib/og-images.ts`, and the cards themselves are Next.js `opengraph-image.tsx` route files that draw through `src/lib/og-image.tsx`. The admin console is `noindex` and has no card.
+- **The absolute origin comes from `NEXT_PUBLIC_SITE_URL`** (default `https://iboi.vercel.app`). `metadataBase` in the root layout turns every relative URL into an absolute one. Never set a global `noindex` — WhatsApp drops the snippet when it sees one.
+- **Satori cannot read woff2 and cannot reach the network at request time,** so Hind Siliguri is bundled at `src/assets/fonts/HindSiliguri-Regular.ttf` (SIL Open Font License). The card is drawn while the page is being requested, not at build time.
+- **Satori does not shrink text to fit.** A long Bengali book title at 76px runs off the card, so `ogImage()` steps the size down with the length, clips the title and caps the title block. A book card also drops the summary when the summary only repeats the title.
+- **Keep the cards under 300KB.** The PNGs are 40-95KB; a bigger card means more text or a photo.
+
 ## Dataset Restore (dataset/main is gitignored)
 
 `dataset/main/` and `dataset/archive/` are gitignored, so a fresh clone, a CI clone, or a wiped machine has neither. Never rebuild them by hand — restore the backup archive.

@@ -36,7 +36,6 @@ export async function generateMetadata({
         ? summary.slice(0, 160)
         : `Read and download ${book.title} free from বই.`,
     path: `/books/${id}`,
-    image: `/books/${id}/opengraph-image`,
   });
 }
 

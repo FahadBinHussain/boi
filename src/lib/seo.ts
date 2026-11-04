@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ogImageFor } from "@/lib/og-images";
 
 /**
  * Public origin of the site. Every absolute URL in the metadata — the
@@ -20,8 +21,6 @@ export type PageSeo = {
   description: string;
   /** Path of the page, starting with a slash. */
   path: string;
-  /** Absolute or site-relative URL of the 1200x630 preview image. */
-  image?: string;
   /** Keep this page out of search indexes. */
   noIndex?: boolean;
 };
@@ -38,11 +37,10 @@ export function pageMetadata({
   title,
   description,
   path,
-  image,
   noIndex = false,
 }: PageSeo): Metadata {
   const url = `${SITE_URL}${path}`;
-  const imageUrl = image ? `${SITE_URL}${image}` : undefined;
+  const imageUrl = `${SITE_URL}${ogImageFor(path)}`;
   // The metadata title picks up the "%s - বই" template from the root layout,
   // but OpenGraph and Twitter read the raw string, so the site name is added
   // here as well and both cards carry the same title the tab shows.
@@ -58,15 +56,13 @@ export function pageMetadata({
       siteName: SITE_NAME,
       title: cardTitle,
       description,
-      ...(imageUrl
-        ? { images: [{ url: imageUrl, width: 1200, height: 630, alt: title }] }
-        : {}),
+      images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
     },
     twitter: {
       card: "summary_large_image",
       title: cardTitle,
       description,
-      ...(imageUrl ? { images: [imageUrl] } : {}),
+      images: [imageUrl],
     },
     ...(noIndex ? { robots: { index: false, follow: false } } : {}),
   };
