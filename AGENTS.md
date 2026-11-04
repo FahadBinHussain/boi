@@ -54,6 +54,16 @@ When a record is not a normal book, preserve the material type in metadata, espe
 - For raw Internet Archive research updates, also use the matching IA apply script when relevant:
   - `pnpm dataset:apply:ia-research`
 
+## Frontend Layout Conventions
+
+- **A CSS variable without a fallback invalidates the whole declaration.** `font-family: var(--font-inter), sans-serif` with `--font-inter` undefined does not fall back to `sans-serif` — it falls back to the *initial* value, so the whole site silently rendered in Times New Roman until `next/font` was wired up. Always write `var(--font-inter, ui-sans-serif)`. The fonts now come from `next/font/google` in `src/app/layout.tsx` (`--font-inter` = Inter for Latin, `--font-bengali` = Hind Siliguri for Bengali, which Inter has no glyphs for), and `tailwind.config.ts` maps both into `fontFamily.sans`.
+- **One layout shell for every page.** `.shell` in `src/app/globals.css` owns the max-width (1480px) and the gutter step (24px / 48px at `lg`). The header, footer and every page use it, so their edges line up. Do not reintroduce `container mx-auto px-4 sm:px-6 lg:px-8` or a bespoke `max-w-[1480px]` — those two widths disagree with each other and break alignment.
+- **Grid tracks that hold text need `minmax(0, 1fr)`.** `grid-cols-[1.1fr_0.9fr]` overflows on long Bengali titles; write `grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]`. Grid/flex children that hold long text also need `min-w-0`.
+- **Never chain a GSAP timeline over a live `HTMLCollection`.** The desktop nav in `Header.tsx` is `display:none` below `md`, and a tween chain built from `ref.current.children` stalled there, leaving the mobile search/menu buttons at `opacity: 0` and pushed off-screen (they were invisible and untappable on every phone). Flatten to a plain array and use ONE tween over all targets, with `clearProps` so the natural CSS state is restored. Keep `prefers-reduced-motion` as an early return.
+- **The sticky header needs `scroll-padding-block-start`** (set to `5rem` on `html`), otherwise anchored or focus-scrolled targets land underneath it.
+- **A hover-only overlay is unreachable on touch.** `BookCard`'s cover actions open on hover, keyboard focus, or always on `(hover: none)` devices.
+- Local dev needs a Postgres for the `/api/books` catalog path (`prisma db push`), and the seeded catalog can be filled from the live Turso `works`/`editions`/`authors` tables so layouts are verified against real Bengali titles. The vault `.env.local` only carries the Turso variables; `DATABASE_URL` and the NextAuth/Google vars are local-only additions.
+
 ## Dataset Restore (dataset/main is gitignored)
 
 `dataset/main/` and `dataset/archive/` are gitignored, so a fresh clone, a CI clone, or a wiped machine has neither. Never rebuild them by hand — restore the backup archive.

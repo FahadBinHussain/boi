@@ -7,7 +7,7 @@ const Footer = () => {
 
   return (
     <footer className="bg-base-200 text-base-content border-t border-base-300 transition-colors">
-      <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
+      <div className="shell py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* About */}
           <div>
@@ -123,7 +123,7 @@ const Footer = () => {
             <h3 className="text-sm font-semibold text-base-content tracking-wider uppercase mb-4">
               Connect With Us
             </h3>
-            <div className="flex space-x-3 mb-4">
+            <div className="flex gap-3 mb-4">
               <a href="#" className="btn btn-ghost btn-circle btn-sm text-base-content/70 hover:text-primary">
                 <MotionIcon animation="bounce">
                   <FiGithub size={18} />
@@ -142,7 +142,7 @@ const Footer = () => {
             </div>
             <p className="text-sm text-base-content/70">
               Questions or suggestions? 
-              <a href="mailto:contact@boi.com" className="text-primary hover:underline ml-1">
+              <a href="mailto:contact@boi.com" className="text-primary hover:underline ms-1">
                 Reach out to us
               </a>
             </p>

@@ -127,7 +127,7 @@ function SeriesContent() {
 
   return (
     <div className="bg-base-100 text-base-content min-h-screen py-12 transition-colors">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="shell">
         <div className="mb-10">
           <h1 className="text-3xl font-extrabold text-base-content mb-3">Series</h1>
           <p className="text-base text-base-content/70">
@@ -291,7 +291,7 @@ export default function SeriesPage() {
   return (
     <Suspense fallback={
       <div className="bg-base-100 text-base-content min-h-screen py-12">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="shell">
           <div className="mb-10">
             <h1 className="text-3xl font-extrabold text-base-content mb-3">Series</h1>
             <p className="text-base text-base-content/70">

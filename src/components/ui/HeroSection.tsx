@@ -222,7 +222,7 @@ const HeroSection = () => {
       ))}
       
       {/* Main content */}
-      <div className="container mx-auto h-full relative z-10 px-4 lg:px-8">
+      <div className="shell h-full relative z-10">
         <div className="flex flex-col lg:flex-row h-full items-center py-16">
           {/* Hero text content */}
           <div ref={contentRef} className="hero-content w-full lg:w-1/2 pt-8 lg:pt-0">

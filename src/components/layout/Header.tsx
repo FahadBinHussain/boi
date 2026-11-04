@@ -58,34 +58,26 @@ const Header = () => {
   
   // Initial animations with GSAP
   useEffect(() => {
-    if (headerRef.current && logoRef.current && navItemsRef.current && actionsRef.current) {
-      const tl = gsap.timeline({ defaults: { ease: "power2.out" } });
-      
-      // Initial state
-      gsap.set([logoRef.current, navItemsRef.current.children, actionsRef.current.children], { 
-        opacity: 0, 
-        y: -20 
-      });
-      
-      // Animate navbar elements
-      tl.to(logoRef.current, { 
-        opacity: 1, 
-        y: 0, 
-        duration: 0.6 
-      })
-      .to(navItemsRef.current.children, { 
-        opacity: 1, 
-        y: 0, 
-        stagger: 0.1, 
-        duration: 0.4 
-      }, "-=0.3")
-      .to(actionsRef.current.children, { 
-        opacity: 1, 
-        y: 0, 
-        stagger: 0.1, 
-        duration: 0.4 
-      }, "-=0.2");
-    }
+    const logo = logoRef.current;
+    const nav = navItemsRef.current;
+    const actions = actionsRef.current;
+    if (!logo || !nav || !actions) return;
+
+    // Flatten the live HTMLCollections into plain arrays once.
+    // The desktop nav is display:none below the md breakpoint; targeting it as
+    // a live collection made the old tween chain stall there, which left the
+    // search and menu buttons stuck at opacity 0 and pushed off-screen.
+    const targets = [logo, ...Array.from(nav.children), ...Array.from(actions.children)].filter(Boolean);
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    // One tween over every target, so nothing can be left behind at opacity 0.
+    // clearProps hands the elements back to their natural CSS state.
+    gsap.fromTo(
+      targets,
+      { opacity: 0, y: -20 },
+      { opacity: 1, y: 0, duration: 0.45, stagger: 0.05, ease: 'power2.out', clearProps: 'opacity,transform' }
+    );
   }, []);
   
   // Handle search animation
@@ -126,10 +118,10 @@ const Header = () => {
           : 'bg-base-100/80 backdrop-blur-md border-b border-base-200 py-3'
       }`}
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="shell">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-3 z-10">
+          <Link href="/" className="flex items-center gap-3 z-10">
             <div ref={logoRef} className="flex items-center">
               <motion.div
                 whileHover={{ scale: 1.1, rotate: 10 }}
@@ -138,7 +130,7 @@ const Header = () => {
               >
                 <FiBook size={24} />
               </motion.div>
-              <span className="font-bold text-2xl text-base-content ml-2">বই</span>
+              <span className="font-bold text-2xl text-base-content ms-2">বই</span>
             </div>
           </Link>
 
@@ -173,7 +165,7 @@ const Header = () => {
                   {isActive && (
                     <motion.div
                       layoutId="navbar-active-marker"
-                      className="absolute -bottom-1.5 left-2 right-2 h-1 bg-primary rounded-full shadow-[0_2px_8px_rgba(var(--p),0.4)]"
+                      className="absolute -bottom-1.5 inset-inline-2 h-1 bg-primary rounded-full shadow-[0_2px_8px_rgba(var(--p),0.4)]"
                       transition={{
                         type: 'spring',
                         stiffness: 450,
@@ -187,7 +179,7 @@ const Header = () => {
           </div>
 
           {/* Search, Login & Mobile Menu Button */}
-          <div ref={actionsRef} className="flex items-center space-x-2">
+          <div ref={actionsRef} className="flex items-center gap-3">
             <motion.button 
               onClick={() => setIsSearchOpen(!isSearchOpen)}
               whileHover={{ scale: 1.05 }}
@@ -228,18 +220,18 @@ const Header = () => {
 
         {/* Search Bar - Conditional Rendering */}
         {isSearchOpen && (
-          <div 
+          <div
             ref={searchRef}
-            className="py-4 px-2"
+            className="py-4"
           >
             <div className="relative">
               <input
                 type="text"
                 placeholder="Search for books..."
-                className="input input-bordered w-full pr-12 bg-base-100 text-base-content"
+                className="input input-bordered w-full pe-12 bg-base-100 text-base-content"
                 autoFocus
               />
-              <button className="btn btn-primary btn-sm absolute right-2 top-1/2 -translate-y-1/2">
+              <button className="btn btn-primary btn-sm absolute end-2 top-1/2 -translate-y-1/2">
                 <MotionIcon animation="spin">
                   <FiSearch size={16} />
                 </MotionIcon>
@@ -255,7 +247,7 @@ const Header = () => {
             className="md:hidden py-4 overflow-hidden"
           >
             <div className="bg-base-200/95 backdrop-blur-md rounded-box shadow-xl border border-base-300 p-4">
-              <div className="flex flex-col space-y-1">
+              <div className="flex flex-col gap-1">
                 {navItems.map((item) => {
                   const isActive = isLinkActive(item.href);
                   const Icon = item.icon;
@@ -265,7 +257,7 @@ const Header = () => {
                       href={item.href} 
                       className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl font-medium transition-colors ${
                         isActive
-                          ? 'bg-primary/10 text-primary font-bold border-l-4 border-primary'
+                          ? 'bg-primary/10 text-primary font-bold border-s-4 border-primary'
                           : 'text-base-content/70 hover:bg-base-300 hover:text-base-content'
                       }`}
                       onClick={() => setIsMenuOpen(false)}
@@ -275,7 +267,7 @@ const Header = () => {
                       </MotionIcon>
                       <span>{item.label}</span>
                       {isActive && (
-                        <span className="badge badge-primary badge-xs ml-auto">Active</span>
+                        <span className="badge badge-primary badge-xs ms-auto">Active</span>
                       )}
                     </Link>
                   );

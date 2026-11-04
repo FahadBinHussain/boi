@@ -19,6 +19,9 @@
 html {
   scrollbar-width: thin;
   scrollbar-color: rgba(120, 120, 120, 0.4) transparent;
+  /* The header is sticky. Without this, an anchored or focus-scrolled target
+     lands underneath it and the content is unreachable. */
+  scroll-padding-block-start: 5rem;
 }
 
 ::-webkit-scrollbar {
@@ -48,8 +51,26 @@ html {
   padding-bottom: 8px;
 }
 
+/* Layout shell: one max-width and one gutter step for the header, the page
+   content and the footer, so every page shares the same alignment edges. */
+.shell {
+  width: 100%;
+  max-width: 1480px;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .shell {
+    padding-inline: 3rem;
+  }
+}
+
 body {
-  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  /* Both vars come from next/font in src/app/layout.tsx. The fallback inside
+     var() matters: an undefined var without one invalidates the whole
+     font-family declaration and the page silently falls back to the UA serif. */
+  font-family: var(--font-inter, ui-sans-serif), var(--font-bengali, ui-sans-serif), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
 /* Animation utilities */

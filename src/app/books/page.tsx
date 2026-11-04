@@ -49,8 +49,8 @@ export default function BooksPage() {
   });
 
   return (
-    <div className="bg-base-100 text-base-content min-h-screen py-12 transition-colors">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="bg-base-100 text-base-content min-h-dvh py-12 transition-colors">
+      <div className="shell">
         <div className="mb-10">
           <h1 className="text-3xl font-extrabold text-base-content mb-3">Browse Books</h1>
           <p className="text-base text-base-content/70">
@@ -64,11 +64,11 @@ export default function BooksPage() {
             <input
               type="text"
               placeholder="Search books by title, author or description..."
-              className="input input-bordered w-full pr-12 bg-base-100 text-base-content"
+              className="input input-bordered w-full pe-12 bg-base-100 text-base-content"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-base-content/50">
+            <div className="absolute end-4 top-1/2 -translate-y-1/2 text-base-content/50">
               <MotionIcon animation="spin">
                 <FiSearch size={18} />
               </MotionIcon>
@@ -83,7 +83,7 @@ export default function BooksPage() {
               <MotionIcon animation="spin" trigger="always">
                 <FiLoader className="h-8 w-8 text-primary" />
               </MotionIcon>
-              <span className="ml-3 text-base font-medium text-base-content/70">Loading books...</span>
+              <span className="ms-3 text-base font-medium text-base-content/70">Loading books...</span>
             </div>
           ) : error ? (
             <div className="alert alert-error max-w-xl shadow-lg">

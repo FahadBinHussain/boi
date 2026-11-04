@@ -59,7 +59,7 @@ const AuthCTA = () => {
       >
         <div 
           ref={ctaContentRef}
-          className="container mx-auto px-4 sm:px-6 lg:px-8 text-center"
+          className="shell text-center"
         >
           <h2 className="text-3xl md:text-4xl font-black text-base-content mb-4">
             Welcome back, {session.user?.name?.split(' ')[0] || 'Reader'}!
@@ -86,7 +86,7 @@ const AuthCTA = () => {
     >
       <div 
         ref={ctaContentRef}
-        className="container mx-auto px-4 sm:px-6 lg:px-8 text-center"
+        className="shell text-center"
       >
         <h2 className="text-3xl md:text-4xl font-black text-base-content mb-4">
           Ready to start your reading journey?

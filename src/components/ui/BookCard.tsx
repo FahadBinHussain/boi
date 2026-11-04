@@ -16,8 +16,23 @@ interface BookCardProps {
 
 const BookCard = ({ book, compact = false }: BookCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const [hasHover, setHasHover] = useState(true);
   const cardRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
+
+  // Touch devices have no hover, so the cover overlay can never be opened by
+  // pointer. Keep the actions visible there instead of hiding them forever.
+  useEffect(() => {
+    const mq = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const update = () => setHasHover(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+
+  // The overlay is open on hover or while something inside the card has focus.
+  const isOverlayVisible = hasHover ? isHovered || isFocused : true;
 
   // Create 3D tilt effect on hover
   useEffect(() => {
@@ -81,12 +96,16 @@ const BookCard = ({ book, compact = false }: BookCardProps) => {
   return (
     <motion.div
       ref={cardRef}
-      className={`group card bg-base-100 text-base-content border border-base-200 shadow-sm hover:shadow-xl rounded-2xl overflow-hidden transition-all duration-300 h-full flex flex-col ${
+      className={`group card bg-base-100 text-base-content border border-base-200 shadow-sm hover:shadow-xl rounded-2xl overflow-hidden transition-all duration-300 h-full flex flex-col min-w-0 ${
         compact ? 'max-w-[220px] mx-auto' : ''
       }`}
       whileHover={{ y: -5 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onFocus={() => setIsFocused(true)}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) setIsFocused(false);
+      }}
       style={{ 
         transformStyle: 'preserve-3d',
         transformOrigin: 'center center',
@@ -113,63 +132,74 @@ const BookCard = ({ book, compact = false }: BookCardProps) => {
           className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
         />
         
-        {/* Overlay on hover */}
-        <motion.div 
-          className="absolute inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        {/* Overlay actions. Opened by hover, by keyboard focus, and always on
+            touch devices, so the actions are never unreachable. */}
+        <motion.div
+          className={`absolute inset-0 backdrop-blur-xs flex items-center justify-center transition-opacity duration-300 ${
+            hasHover ? 'bg-black/50' : 'bg-gradient-to-t from-black/60 via-black/20 to-transparent'
+          }`}
           initial={{ opacity: 0 }}
-          animate={{ opacity: isHovered ? 1 : 0 }}
+          animate={{ opacity: isOverlayVisible ? 1 : 0 }}
         >
-          <div className="flex flex-col gap-2.5 transform">
-            <Link href={`/books/${book.id}`}>
-              <motion.button
+          <div className="flex flex-col gap-3 transform">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              initial={{ y: 20, opacity: 0 }}
+              animate={{
+                y: isOverlayVisible ? 0 : 20,
+                opacity: isOverlayVisible ? 1 : 0,
+                transition: { delay: 0.1, duration: 0.3 }
+              }}
+            >
+              <Link
+                href={`/books/${book.id}`}
                 className={`btn btn-sm bg-base-100 text-base-content hover:bg-base-200 border-none rounded-full shadow-lg ${
                   compact ? 'btn-xs text-xs' : ''
                 }`}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ 
-                  y: isHovered ? 0 : 20, 
-                  opacity: isHovered ? 1 : 0,
-                  transition: { delay: 0.1, duration: 0.3 }
-                }}
               >
                 <MotionIcon animation="bounce">
                   <FiInfo size={compact ? 13 : 15} />
                 </MotionIcon>
                 <span>Details</span>
-              </motion.button>
-            </Link>
-            <a href={book.downloadLink}>
-              <motion.button
+              </Link>
+            </motion.div>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              initial={{ y: 20, opacity: 0 }}
+              animate={{
+                y: isOverlayVisible ? 0 : 20,
+                opacity: isOverlayVisible ? 1 : 0,
+                transition: { delay: 0.2, duration: 0.3 }
+              }}
+            >
+              <a
+                href={book.downloadLink}
                 className={`btn btn-sm btn-primary rounded-full shadow-lg ${
                   compact ? 'btn-xs text-xs' : ''
                 }`}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ 
-                  y: isHovered ? 0 : 20, 
-                  opacity: isHovered ? 1 : 0,
-                  transition: { delay: 0.2, duration: 0.3 }
-                }}
               >
                 <MotionIcon animation="bounce">
                   <FiDownload size={compact ? 13 : 15} />
                 </MotionIcon>
                 <span>Download</span>
-              </motion.button>
-            </a>
+              </a>
+            </motion.div>
           </div>
         </motion.div>
       </div>
 
       {/* Book Info */}
       <div className={`p-4 flex flex-col flex-grow relative ${compact ? 'p-3' : ''}`} style={{ transform: 'translateZ(10px)' }}>
-        <h3 className={`font-bold text-base-content mb-1 line-clamp-1 group-hover:text-primary transition-colors ${
+        <h3 className={`font-bold text-base-content mb-1 line-clamp-2 group-hover:text-primary transition-colors ${
           compact ? 'text-sm' : 'text-base'
         }`}>
-          {book.title}
+          {/* The title is the link to the full record, so a clamped title is
+              never the only route to the rest of the value. */}
+          <Link href={`/books/${book.id}`} className="hover:underline">
+            {book.title}
+          </Link>
         </h3>
         <p className={`text-sm text-base-content/70 mb-2 line-clamp-1 ${compact ? 'text-xs' : ''}`}>
           {book.author}

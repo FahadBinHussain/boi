@@ -5,7 +5,7 @@ import MotionIcon from '@/components/ui/MotionIcon';
 export default function AboutPage() {
   return (
     <div className="bg-base-100 text-base-content min-h-screen py-12 transition-colors">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="shell">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-2xl text-primary mb-4 shadow-sm">

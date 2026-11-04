@@ -110,7 +110,7 @@ const BookGrid = ({ books, selectedGenres, isLoading = false, error = null, comp
       animate="show"
     >
       {filteredBooks.map((book) => (
-        <motion.div key={book.id} variants={item}>
+        <motion.div key={book.id} variants={item} className="min-w-0">
           <BookCard book={book} compact={compact} />
         </motion.div>
       ))}

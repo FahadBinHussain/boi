@@ -131,7 +131,7 @@ export default function Home() {
 
         <motion.div 
           style={{ opacity: heroOpacity, scale: heroScale }}
-          className="relative mx-auto grid max-w-[1480px] grid-cols-1 gap-16 px-6 pb-24 pt-20 lg:grid-cols-[1.1fr_0.9fr] lg:px-12 lg:pb-32 lg:pt-28"
+          className="shell relative grid gap-16 pb-24 pt-20 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:pb-32 lg:pt-28"
         >
           <motion.div
             initial="hidden"
@@ -146,7 +146,7 @@ export default function Home() {
               </span>
             </motion.div>
             
-            <motion.h1 variants={fadeInUp} className="max-w-[14ch] text-5xl font-extrabold tracking-tight lg:text-7xl xl:text-8xl">
+            <motion.h1 variants={fadeInUp} className="max-w-[20ch] text-5xl font-extrabold tracking-tight lg:text-7xl">
               <span className="text-base-content">Discover better books</span>
               <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent">with less noise.</span>
@@ -175,7 +175,7 @@ export default function Home() {
             transition={{ duration: 1, delay: 0.4 }}
             className="relative"
           >
-            <div className="grid grid-cols-2 gap-4 lg:gap-5">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-5">
               <motion.div 
                 whileHover={{ y: -4, scale: 1.02 }}
                 onMouseEnter={() => statRefs.current[0]?.startAnimation()}
@@ -186,7 +186,7 @@ export default function Home() {
                 <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-5">
                   <BookOpenIcon ref={(el) => { statRefs.current[0] = el; }} className="text-xl text-primary" />
                 </div>
-                <p className="font-mono text-4xl font-bold text-base-content">12k+</p>
+                <p className="font-mono text-3xl sm:text-4xl font-bold text-base-content">12k+</p>
                 <p className="mt-2 text-sm text-base-content/60">Titles indexed</p>
               </motion.div>
               
@@ -195,12 +195,12 @@ export default function Home() {
                 onMouseEnter={() => statRefs.current[1]?.startAnimation()}
                 onMouseLeave={() => statRefs.current[1]?.stopAnimation()}
                 transition={{ duration: 0.4 }}
-                className="translate-y-8 card bg-base-200/70 border border-base-content/10 p-6 backdrop-blur-xl shadow-xl rounded-3xl"
+                className="card bg-base-200/70 border border-base-content/10 p-6 backdrop-blur-xl shadow-xl rounded-3xl"
               >
                 <div className="h-12 w-12 rounded-2xl bg-secondary/10 flex items-center justify-center mb-5">
                   <TrendingUpIcon ref={(el) => { statRefs.current[1] = el; }} className="text-xl text-secondary" />
                 </div>
-                <p className="font-mono text-4xl font-bold text-base-content">94%</p>
+                <p className="font-mono text-3xl sm:text-4xl font-bold text-base-content">94%</p>
                 <p className="mt-2 text-sm text-base-content/60">Return readers</p>
               </motion.div>
               
@@ -214,7 +214,7 @@ export default function Home() {
                 <div className="h-12 w-12 rounded-2xl bg-accent/10 flex items-center justify-center mb-5">
                   <ClockIcon ref={(el) => { statRefs.current[2] = el; }} className="text-xl text-accent" />
                 </div>
-                <p className="font-mono text-4xl font-bold text-base-content">&lt;300ms</p>
+                <p className="font-mono text-3xl sm:text-4xl font-bold text-base-content">&lt;300ms</p>
                 <p className="mt-2 text-sm text-base-content/60">Search response</p>
               </motion.div>
               
@@ -223,12 +223,12 @@ export default function Home() {
                 onMouseEnter={() => statRefs.current[3]?.startAnimation()}
                 onMouseLeave={() => statRefs.current[3]?.stopAnimation()}
                 transition={{ duration: 0.4 }}
-                className="translate-y-8 card bg-base-200/70 border border-base-content/10 p-6 backdrop-blur-xl shadow-xl rounded-3xl"
+                className="card bg-base-200/70 border border-base-content/10 p-6 backdrop-blur-xl shadow-xl rounded-3xl"
               >
                 <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-5">
                   <GridIcon ref={(el) => { statRefs.current[3] = el; }} className="text-xl text-primary" />
                 </div>
-                <p className="font-mono text-4xl font-bold text-base-content">38</p>
+                <p className="font-mono text-3xl sm:text-4xl font-bold text-base-content">38</p>
                 <p className="mt-2 text-sm text-base-content/60">Genre clusters</p>
               </motion.div>
             </div>
@@ -240,7 +240,7 @@ export default function Home() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 2, duration: 1 }}
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-base-content/40"
+          className="absolute bottom-6 inset-x-0 mx-auto w-fit flex flex-col items-center gap-1 text-base-content/40"
         >
           <span className="text-[10px] tracking-[0.25em] font-semibold uppercase">Scroll</span>
           <motion.div 
@@ -255,7 +255,7 @@ export default function Home() {
       </section>
 
       {/* Featured section */}
-      <section className="relative mx-auto max-w-[1480px] px-6 pb-28 lg:px-12">
+      <section className="shell relative pb-28">
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -282,11 +282,11 @@ export default function Home() {
             ))}
           </div>
         ) : error ? (
-          <div className="alert alert-error rounded-3xl shadow-lg">
+          <div className="alert alert-error max-w-2xl rounded-3xl shadow-lg">
             <span>{error}</span>
           </div>
         ) : featured.length === 0 ? (
-          <div className="card bg-base-200 border border-base-content/10 p-16 text-center text-base-content/60 rounded-3xl">
+          <div className="card bg-base-200 border border-base-content/10 p-8 sm:p-16 text-center text-base-content/60 rounded-3xl">
             No books are available yet. Add some books and refresh to populate this section.
           </div>
         ) : (
@@ -313,12 +313,12 @@ export default function Home() {
                       className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" 
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-base-300/80 via-transparent to-transparent" />
-                    <span className="badge badge-primary absolute left-4 top-4 text-xs font-semibold shadow-md">
+                    <span className="badge badge-primary absolute start-4 top-4 text-xs font-semibold shadow-md">
                       {tag}
                     </span>
                   </div>
                   <div className="card-body p-6">
-                    <h3 className="card-title text-lg font-bold line-clamp-1 text-base-content">{book.title}</h3>
+                    <h3 className="card-title text-lg font-bold line-clamp-2 text-base-content">{book.title}</h3>
                     <p className="text-sm text-base-content/70">{author}</p>
                     <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-base-content/60">
                       {book.summary || 'A carefully selected title from our latest index, ready for your next deep reading session.'}
@@ -337,13 +337,13 @@ export default function Home() {
       </section>
 
       {/* Genres section */}
-      <section className="relative mx-auto max-w-[1480px] px-6 pb-28 lg:px-12">
+      <section className="shell relative pb-28">
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="grid grid-cols-1 gap-8 border-t border-base-content/10 pt-12 lg:grid-cols-[1.1fr_0.9fr]"
+          className="grid grid-cols-1 gap-8 border-t border-base-content/10 pt-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]"
         >
           <div>
             <p className="mb-2 text-xs font-bold tracking-[0.25em] uppercase text-primary">Browse By Mood</p>
@@ -361,6 +361,7 @@ export default function Home() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.04 }}
                 whileHover={{ y: -2, scale: 1.02 }}
+                className="min-w-0"
               >
                 <Link 
                   href={`/genres?selected=${genre}`} 

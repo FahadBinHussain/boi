@@ -5,6 +5,24 @@ import Footer from "@/components/layout/Footer";
 import { Providers } from "./providers";
 import Script from "next/script";
 import { Toaster } from "react-hot-toast";
+import { Inter, Hind_Siliguri } from "next/font/google";
+
+// Latin UI face. Exposed as --font-inter, which tailwind.config.ts maps into
+// fontFamily.sans. Inter has no Bengali glyphs, so Bengali text falls through
+// to --font-bengali below.
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+// Bengali face for the catalog content (titles, authors, summaries).
+const bengali = Hind_Siliguri({
+  subsets: ["bengali", "latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-bengali",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "বই - Free Books Download",
@@ -55,7 +73,7 @@ export default function RootLayout({
         </Script>
       </head>
       <body
-        className="font-sans antialiased min-h-screen flex flex-col bg-base-100 text-base-content"
+        className={`${inter.variable} ${bengali.variable} font-sans antialiased min-h-dvh flex flex-col bg-base-100 text-base-content`}
         suppressHydrationWarning
       >
         <Providers>

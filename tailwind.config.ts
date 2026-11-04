@@ -14,8 +14,12 @@ export default {
         foreground: "var(--foreground)",
       },
       fontFamily: {
+        // Latin first, Bengali second: Inter carries the Latin UI, and Bengali
+        // glyphs (which Inter does not have) fall through to Hind Siliguri.
+        // Both vars are defined by next/font in src/app/layout.tsx.
         sans: [
           'var(--font-inter)',
+          'var(--font-bengali)',
           'ui-sans-serif',
           'system-ui',
           '-apple-system',

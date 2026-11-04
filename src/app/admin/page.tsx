@@ -148,7 +148,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="bg-base-100 min-h-screen text-base-content transition-colors">
-      <div className="mx-auto max-w-[1480px] px-6 py-10 lg:px-12">
+      <div className="shell py-10">
         {/* Header */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
