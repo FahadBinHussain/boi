@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { FiGrid, FiBookOpen, FiLoader, FiAlertCircle } from 'react-icons/fi';
 import MotionIcon from '@/components/ui/MotionIcon';
 import { motion } from 'framer-motion';
+import { useEntranceAnimation } from '@/hooks/useEntranceAnimation';
 import Image from 'next/image';
 
 interface Genre {
@@ -27,6 +28,7 @@ interface Book {
 }
 
 function GenresContent() {
+  const controls = useEntranceAnimation('hidden', 'show');
   const searchParams = useSearchParams();
   const router = useRouter();
   const [activeGenre, setActiveGenre] = useState<string | null>(null);
@@ -140,7 +142,7 @@ function GenresContent() {
             <MotionIcon animation="spin" trigger="always">
               <FiLoader className="h-8 w-8 text-primary" />
             </MotionIcon>
-            <span className="ml-3 text-base font-medium text-base-content/70">Loading genres...</span>
+            <span className="ms-3 text-base font-medium text-base-content/70">Loading genres…</span>
           </div>
         )}
 
@@ -181,7 +183,7 @@ function GenresContent() {
                         className={isActive ? 'text-primary-content' : 'text-primary'} 
                       />
                     </MotionIcon>
-                    <span className="font-medium text-sm line-clamp-1">{genre.name}</span>
+                    <span className="font-medium text-sm line-clamp-1"><bdi>{genre.name}</bdi></span>
                   </motion.button>
                 );
               })}
@@ -209,8 +211,8 @@ function GenresContent() {
                 <motion.div 
                   className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
                   variants={container}
-                  initial="hidden"
-                  animate="show"
+                  initial={false}
+                  animate={controls}
                 >
                   {getGenreBooks().map((book) => (
                     <motion.div key={book.id} variants={item}>
@@ -240,10 +242,10 @@ function GenresContent() {
                           {/* Book Info */}
                           <div className="card-body p-4 flex flex-col flex-grow">
                             <h3 className="card-title text-base font-bold text-base-content mb-1 line-clamp-1 group-hover:text-primary transition-colors">
-                              {book.title}
+                              <bdi>{book.title}</bdi>
                             </h3>
                             <p className="text-xs text-base-content/70 mb-auto line-clamp-1">
-                              {book.authors.map(author => author.name).join(', ')}
+                              <bdi>{book.authors.map(author => author.name).join(', ')}</bdi>
                             </p>
                             
                             <div className="mt-4 flex items-center gap-1.5 text-primary text-xs font-semibold">
@@ -296,7 +298,7 @@ export default function GenresPage() {
             <MotionIcon animation="spin" trigger="always">
               <FiLoader className="h-8 w-8 text-primary" />
             </MotionIcon>
-            <span className="ml-3 text-base text-base-content/70">Loading genres...</span>
+            <span className="ms-3 text-base text-base-content/70">Loading genres…</span>
           </div>
         </div>
       </div>

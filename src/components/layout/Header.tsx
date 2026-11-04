@@ -143,7 +143,7 @@ const Header = () => {
               >
                 <FiBook size={24} />
               </motion.div>
-              <span className="font-bold text-2xl text-base-content ms-2">বই</span>
+              <span lang="bn" className="font-bold text-2xl text-base-content ms-2">বই</span>
             </div>
           </Link>
 
@@ -240,7 +240,7 @@ const Header = () => {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Search for books..."
+                placeholder="Search for books…"
                 className="input input-bordered w-full pe-12 bg-base-100 text-base-content"
                 autoFocus
               />

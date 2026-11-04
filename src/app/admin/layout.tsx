@@ -55,7 +55,7 @@ export default function AdminLayout({
         <MotionIcon animation="spin" trigger="always">
           <FiLoader className="h-10 w-10 text-primary" />
         </MotionIcon>
-        <span className="ml-4 font-medium text-base-content/70">Loading dashboard...</span>
+        <span className="ms-4 font-medium text-base-content/70">Loading dashboard…</span>
       </div>
     );
   }

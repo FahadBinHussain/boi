@@ -6,6 +6,24 @@ import BookCard from './BookCard';
 import { FiLoader, FiInbox, FiAlertCircle } from 'react-icons/fi';
 import MotionIcon from './MotionIcon';
 import type { Book } from '@/lib/books';
+import { useEntranceAnimation } from '@/hooks/useEntranceAnimation';
+
+// Animation for container
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+// Animation for items
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0 }
+};
 
 interface BookGridProps {
   books: Book[];
@@ -36,22 +54,7 @@ const BookGrid = ({ books, selectedGenres, isLoading = false, error = null, comp
     }
   }, [books, selectedGenres]);
 
-  // Animation for container
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  // Animation for items
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
-  };
+  const controls = useEntranceAnimation('hidden', 'show');
 
   if (!mounted) return null;
 
@@ -61,7 +64,7 @@ const BookGrid = ({ books, selectedGenres, isLoading = false, error = null, comp
         <MotionIcon animation="spin" trigger="always" className="mb-4">
           <FiLoader className="w-10 h-10 text-primary" />
         </MotionIcon>
-        <p className="text-base-content/70 font-medium">Loading books...</p>
+        <p className="text-base-content/70 font-medium">Loading books…</p>
       </div>
     );
   }
@@ -106,8 +109,8 @@ const BookGrid = ({ books, selectedGenres, isLoading = false, error = null, comp
           : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
       }`}
       variants={container}
-      initial="hidden"
-      animate="show"
+      initial={false}
+      animate={controls}
     >
       {filteredBooks.map((book) => (
         <motion.div key={book.id} variants={item} className="min-w-0">

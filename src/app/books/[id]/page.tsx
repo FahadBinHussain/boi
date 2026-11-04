@@ -133,7 +133,7 @@ export default function BookDetailPage() {
           <MotionIcon animation="spin" trigger="always" className="inline-block mb-4">
             <FiLoader className="w-12 h-12 text-primary" />
           </MotionIcon>
-          <p className="text-base-content/70 font-medium">Loading book details...</p>
+          <p className="text-base-content/70 font-medium">Loading book details…</p>
         </div>
       </div>
     );
@@ -212,7 +212,7 @@ export default function BookDetailPage() {
             
             {/* Book Details */}
             <div className="md:w-2/3 p-6 md:p-10 card-body">
-              <h1 className="text-3xl font-extrabold text-base-content mb-2">{book.title}</h1>
+              <h1 className="text-3xl font-extrabold text-base-content mb-2"><bdi>{book.title}</bdi></h1>
               
               <div className="mb-4">
                 {authors.length > 0 ? (
@@ -224,7 +224,7 @@ export default function BookDetailPage() {
                           href={`/authors/${author.id}`}
                           className="text-primary font-medium hover:underline"
                         >
-                          {author.name}
+                          <bdi>{author.name}</bdi>
                         </Link>
                         {index < authors.length - 1 && <span className="text-base-content/60">,</span>}
                       </span>
@@ -354,7 +354,7 @@ export default function BookDetailPage() {
                         </div>
                         <span className="text-base-content font-medium">{(book.averageRating || 0).toFixed(1)} / 5</span>
                         {typeof book.ratings === 'number' && book.ratings > 0 && (
-                          <span className="text-base-content/60 ml-1 text-xs">({book.ratings} ratings)</span>
+                          <span className="text-base-content/60 ms-1 text-xs">({book.ratings} ratings)</span>
                         )}
                       </div>
                     </div>

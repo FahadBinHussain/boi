@@ -198,11 +198,11 @@ const BookCard = ({ book, compact = false }: BookCardProps) => {
           {/* The title is the link to the full record, so a clamped title is
               never the only route to the rest of the value. */}
           <Link href={`/books/${book.id}`} className="hover:underline">
-            {book.title}
+            <bdi>{book.title}</bdi>
           </Link>
         </h3>
         <p className={`text-sm text-base-content/70 mb-2 line-clamp-1 ${compact ? 'text-xs' : ''}`}>
-          {book.author}
+          <bdi>{book.author}</bdi>
         </p>
         
         {/* Genres */}
@@ -211,14 +211,14 @@ const BookCard = ({ book, compact = false }: BookCardProps) => {
             <span 
               key={genre} 
               className={`badge badge-sm badge-outline border-base-content/20 text-base-content/80 group-hover:badge-primary transition-colors ${
-                compact ? 'text-[10px] px-1.5 py-0' : ''
+                compact ? 'text-xs px-1.5 py-0' : ''
               }`}
             >
-              {genre}
+              <bdi>{genre}</bdi>
             </span>
           ))}
           {book.genres.length > (compact ? 1 : 2) && (
-            <span className={`badge badge-sm badge-ghost ${compact ? 'text-[10px] px-1 py-0' : ''}`}>
+            <span className={`badge badge-sm badge-ghost ${compact ? 'text-xs px-1 py-0' : ''}`}>
               +{book.genres.length - (compact ? 1 : 2)}
             </span>
           )}
@@ -228,7 +228,7 @@ const BookCard = ({ book, compact = false }: BookCardProps) => {
       {/* Footer Info */}
       <div 
         className={`px-4 py-2.5 bg-base-200/50 border-t border-base-200 text-xs text-base-content/60 flex items-center justify-between ${
-          compact ? 'px-3 py-1.5 text-[10px]' : ''
+          compact ? 'px-3 py-1.5 text-xs' : ''
         }`} 
         style={{ transform: 'translateZ(5px)' }}
       >

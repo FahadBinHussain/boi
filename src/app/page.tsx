@@ -7,6 +7,7 @@ import { FiArrowRight, FiChevronRight } from 'react-icons/fi';
 import MotionIcon from '@/components/ui/MotionIcon';
 import { BookOpenIcon, TrendingUpIcon, ClockIcon, GridIcon, type AnimatedIconHandle } from '@/components/ui/AnimatedLandingIcons';
 import { genres as allGenres } from '@/lib/books';
+import { useEntranceAnimation } from '@/hooks/useEntranceAnimation';
 
 type ApiBook = {
   id: string;
@@ -42,6 +43,11 @@ const fadeInUp = {
   }
 };
 
+const statHidden = { opacity: 0, y: 40 };
+const statVisible = { opacity: 1, y: 0, transition: { duration: 1, delay: 0.4 } };
+const scrollHidden = { opacity: 0 };
+const scrollVisible = { opacity: 1, transition: { delay: 2, duration: 1 } };
+
 export default function Home() {
   const [books, setBooks] = useState<ApiBook[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,6 +56,9 @@ export default function Home() {
   const { scrollYProgress } = useScroll();
   const heroOpacity = useTransform(scrollYProgress, [0, 0.25], [1, 0]);
   const heroScale = useTransform(scrollYProgress, [0, 0.25], [1, 0.98]);
+  const heroControls = useEntranceAnimation('hidden', 'show');
+  const statControls = useEntranceAnimation(statHidden, statVisible);
+  const scrollControls = useEntranceAnimation(scrollHidden, scrollVisible);
 
   useEffect(() => {
     const load = async () => {
@@ -134,8 +143,8 @@ export default function Home() {
           className="shell relative grid gap-16 pb-24 pt-20 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:pb-32 lg:pt-28"
         >
           <motion.div
-            initial="hidden"
-            animate="show"
+            initial={false}
+            animate={heroControls}
             variants={staggerContainer}
             className="flex flex-col justify-center"
           >
@@ -146,13 +155,13 @@ export default function Home() {
               </span>
             </motion.div>
             
-            <motion.h1 variants={fadeInUp} className="max-w-[20ch] text-5xl font-extrabold tracking-tight lg:text-7xl">
+            <motion.h1 variants={fadeInUp} className="max-w-[20ch] text-balance text-5xl/[1.25] font-extrabold tracking-tight lg:text-7xl/[1.1]">
               <span className="text-base-content">Discover better books</span>
               <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent">with less noise.</span>
             </motion.h1>
             
-            <motion.p variants={fadeInUp} className="mt-6 max-w-[52ch] text-base leading-relaxed text-base-content/70 lg:text-lg">
+            <motion.p variants={fadeInUp} className="mt-6 max-w-[52ch] text-pretty text-base leading-relaxed text-base-content/70 lg:text-lg">
               Built for focused readers. Cleaner discovery, faster browsing, and a modern library experience that helps you spend more time reading and less time searching.
             </motion.p>
 
@@ -170,9 +179,8 @@ export default function Home() {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.4 }}
+            initial={false}
+            animate={statControls}
             className="relative"
           >
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-5">
@@ -236,13 +244,12 @@ export default function Home() {
         </motion.div>
 
         {/* Scroll indicator */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 2, duration: 1 }}
+        <motion.div
+          initial={false}
+          animate={scrollControls}
           className="absolute bottom-6 inset-x-0 mx-auto w-fit flex flex-col items-center gap-1 text-base-content/40"
         >
-          <span className="text-[10px] tracking-[0.25em] font-semibold uppercase">Scroll</span>
+          <span className="text-xs tracking-[0.25em] font-semibold uppercase">Scroll</span>
           <motion.div 
             animate={{ y: [0, 6, 0] }}
             transition={{ duration: 2, repeat: Infinity }}
@@ -265,7 +272,7 @@ export default function Home() {
         >
           <div>
             <p className="mb-2 text-xs font-bold tracking-[0.25em] uppercase text-primary">Curated Now</p>
-            <h2 className="text-3xl font-extrabold tracking-tight lg:text-4xl text-base-content">Featured reading picks</h2>
+            <h2 className="text-balance text-3xl/[1.2] font-extrabold tracking-tight lg:text-4xl/[1.15] text-base-content">Featured reading picks</h2>
           </div>
           <Link href="/books" className="btn btn-ghost btn-sm text-primary gap-1">
             <span>View all</span>
@@ -318,10 +325,10 @@ export default function Home() {
                     </span>
                   </div>
                   <div className="card-body p-6">
-                    <h3 className="card-title text-lg font-bold line-clamp-2 text-base-content">{book.title}</h3>
-                    <p className="text-sm text-base-content/70">{author}</p>
+                    <h3 className="card-title text-lg font-bold line-clamp-2 text-base-content"><bdi>{book.title}</bdi></h3>
+                    <p className="text-sm text-base-content/70"><bdi>{author}</bdi></p>
                     <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-base-content/60">
-                      {book.summary || 'A carefully selected title from our latest index, ready for your next deep reading session.'}
+                      <bdi>{book.summary || 'A carefully selected title from our latest index, ready for your next deep reading session.'}</bdi>
                     </p>
                     <div className="card-actions justify-end mt-4">
                       <Link href={`/books/${book.id}`} className="btn btn-primary btn-sm rounded-btn">
@@ -347,7 +354,7 @@ export default function Home() {
         >
           <div>
             <p className="mb-2 text-xs font-bold tracking-[0.25em] uppercase text-primary">Browse By Mood</p>
-            <h3 className="max-w-[16ch] text-3xl font-extrabold tracking-tight lg:text-4xl text-base-content">
+            <h3 className="max-w-[16ch] text-balance text-2xl/[1.25] font-extrabold tracking-tight lg:text-3xl/[1.2] text-base-content">
               Structured genres. <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Cleaner discovery.</span>
             </h3>
@@ -386,7 +393,7 @@ export default function Home() {
             <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
               <div>
                 <p className="mb-2 text-xs font-bold tracking-[0.25em] uppercase text-primary">Start Reading</p>
-                <h4 className="max-w-[16ch] text-3xl font-extrabold tracking-tight lg:text-4xl text-base-content">
+                <h4 className="max-w-[20ch] text-balance text-xl/[1.25] font-extrabold tracking-tight lg:text-2xl/[1.25] text-base-content">
                   Build your next reading stack in minutes.
                 </h4>
               </div>

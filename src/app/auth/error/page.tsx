@@ -55,7 +55,7 @@ export default function ErrorPage() {
             <FiLoader className="h-8 w-8 text-primary mx-auto mb-2" />
           </MotionIcon>
           <h2 className="text-xl font-bold text-base-content">
-            Loading...
+            Loading…
           </h2>
         </div>
       </div>

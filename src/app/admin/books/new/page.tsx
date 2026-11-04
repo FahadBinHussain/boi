@@ -835,7 +835,7 @@ export default function AddNewBook() {
                   {isScrapingMetadata ? (
                     <>
                       <span className="loading loading-spinner loading-xs"></span>
-                      Fetching...
+                      Fetching…
                     </>
                   ) : (
                     <>
@@ -872,7 +872,7 @@ export default function AddNewBook() {
                     <MotionIcon animation="float" trigger="hover" className="mr-2">
                       <FiBook className="h-4 w-4 text-primary" />
                     </MotionIcon>
-                    Book Name <span className="text-error ml-1">*</span>
+                    Book Name <span className="text-error ms-1">*</span>
                   </div>
                 </label>
                 <input
@@ -897,7 +897,7 @@ export default function AddNewBook() {
                     <MotionIcon animation="wiggle" trigger="hover" className="mr-2">
                       <FiUsers className="h-4 w-4 text-primary" />
                     </MotionIcon>
-                    Authors <span className="text-error ml-1">*</span>
+                    Authors <span className="text-error ms-1">*</span>
                   </div>
                 </label>
                 <div className="space-y-3">
@@ -985,7 +985,7 @@ export default function AddNewBook() {
                     <MotionIcon animation="pulse" trigger="hover" className="mr-2">
                       <FiImage className="h-4 w-4 text-primary" />
                     </MotionIcon>
-                    Thumbnail URL <span className="text-error ml-1">*</span>
+                    Thumbnail URL <span className="text-error ms-1">*</span>
                   </div>
                 </label>
                 <div className="flex flex-col md:flex-row md:items-start md:space-x-4">
@@ -1034,7 +1034,7 @@ export default function AddNewBook() {
                     <MotionIcon animation="float" trigger="hover" className="mr-2">
                       <FiFileText className="h-4 w-4 text-primary" />
                     </MotionIcon>
-                    Book File (PDF) <span className="text-error ml-1">*</span>
+                    Book File (PDF) <span className="text-error ms-1">*</span>
                   </div>
                 </label>
                 <div className="mt-1 bg-base-100 border-2 border-base-300 border-dashed rounded-xl p-6">
@@ -1073,7 +1073,7 @@ export default function AddNewBook() {
                             <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
                           </svg>
                         </MotionIcon>
-                        <div className="ml-3">
+                        <div className="ms-3">
                           <p className="text-sm font-semibold text-base-content">{bookPdfFile.name}</p>
                           <p className="text-xs text-base-content/60">{(bookPdfFile.size / 1024 / 1024).toFixed(2)} MB</p>
                         </div>
@@ -1098,7 +1098,7 @@ export default function AddNewBook() {
                 {singleBookUploadStatus === 'uploading' && singleBookUploadProgress !== null && (
                   <div className="mt-3">
                     <div className="flex mb-1 items-center justify-between text-xs font-semibold text-primary">
-                      <span>Uploading...</span>
+                      <span>Uploading…</span>
                       <span>{singleBookUploadProgress}%</span>
                     </div>
                     <progress className="progress progress-primary w-full" value={singleBookUploadProgress} max="100"></progress>
@@ -1353,7 +1353,7 @@ export default function AddNewBook() {
                 {isSubmitting ? (
                   <>
                     <span className="loading loading-spinner loading-sm"></span>
-                    Saving...
+                    Saving…
                   </>
                 ) : (
                   <>

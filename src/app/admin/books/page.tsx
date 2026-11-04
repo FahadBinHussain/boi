@@ -222,7 +222,7 @@ export default function BooksManagement() {
               <input
                 type="text"
                 className="input input-bordered input-sm w-full pl-9 bg-base-100 text-base-content"
-                placeholder="Search books..."
+                placeholder="Search books…"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -269,7 +269,7 @@ export default function BooksManagement() {
           <MotionIcon animation="spin" trigger="always">
             <FiLoader className="h-8 w-8 text-primary" />
           </MotionIcon>
-          <span className="ml-3 text-base text-base-content/70 font-medium">Loading books...</span>
+          <span className="ms-3 text-base text-base-content/70 font-medium">Loading books…</span>
         </div>
       )}
       

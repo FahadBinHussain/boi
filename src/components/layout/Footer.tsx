@@ -12,10 +12,10 @@ const Footer = () => {
           {/* About */}
           <div>
             <h3 className="text-sm font-semibold text-base-content tracking-wider uppercase mb-4">
-              About বই
+              About <span lang="bn">বই</span>
             </h3>
             <p className="text-base-content/70 text-sm leading-relaxed">
-              বই is a digital library offering free access to books across various genres.
+              <span lang="bn">বই</span> is a digital library offering free access to books across various genres.
               Our mission is to promote reading and make knowledge accessible to everyone.
             </p>
           </div>
@@ -151,7 +151,7 @@ const Footer = () => {
 
         <div className="border-t border-base-300 mt-8 pt-8 flex flex-col items-center">
           <p className="text-sm text-base-content/60 mb-2">
-            &copy; {currentYear} বই. All rights reserved.
+            &copy; {currentYear} <span lang="bn">বই</span>. All rights reserved.
           </p>
           <p className="flex items-center text-xs text-base-content/50">
             Made with <MotionIcon animation="pulse" trigger="always"><FiHeart className="mx-1 text-error" /></MotionIcon> for book lovers worldwide

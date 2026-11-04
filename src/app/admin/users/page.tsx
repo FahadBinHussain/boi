@@ -161,7 +161,7 @@ export default function UsersManagement() {
                 <FiUserCheck className="h-6 w-6" />
               </MotionIcon>
             </div>
-            <div className="ml-4">
+            <div className="ms-4">
               <p className="text-xs font-semibold text-base-content/60 uppercase tracking-wider">Active Users</p>
               <p className="text-2xl font-black text-base-content">{totalActiveUsers}</p>
             </div>
@@ -175,7 +175,7 @@ export default function UsersManagement() {
                 <FiUserX className="h-6 w-6" />
               </MotionIcon>
             </div>
-            <div className="ml-4">
+            <div className="ms-4">
               <p className="text-xs font-semibold text-base-content/60 uppercase tracking-wider">Inactive Users</p>
               <p className="text-2xl font-black text-base-content">{totalInactiveUsers}</p>
             </div>
@@ -189,7 +189,7 @@ export default function UsersManagement() {
                 <FiEye className="h-6 w-6" />
               </MotionIcon>
             </div>
-            <div className="ml-4">
+            <div className="ms-4">
               <p className="text-xs font-semibold text-base-content/60 uppercase tracking-wider">Admin Users</p>
               <p className="text-2xl font-black text-base-content">{totalAdminUsers}</p>
             </div>
@@ -209,7 +209,7 @@ export default function UsersManagement() {
             <input
               type="text"
               className="input input-bordered w-full pl-10 bg-base-100 text-base-content"
-              placeholder="Search users..."
+              placeholder="Search users…"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -267,7 +267,7 @@ export default function UsersManagement() {
                 >
                   <div className="group inline-flex items-center">
                     Name
-                    <span className="ml-2 text-base-content/50 group-hover:text-base-content">
+                    <span className="ms-2 text-base-content/50 group-hover:text-base-content">
                       {sort.field === "name" && (
                         sort.direction === "desc" ? "↓" : "↑"
                       )}
@@ -281,7 +281,7 @@ export default function UsersManagement() {
                 >
                   <div className="group inline-flex items-center">
                     Email
-                    <span className="ml-2 text-base-content/50 group-hover:text-base-content">
+                    <span className="ms-2 text-base-content/50 group-hover:text-base-content">
                       {sort.field === "email" && (
                         sort.direction === "desc" ? "↓" : "↑"
                       )}
@@ -295,7 +295,7 @@ export default function UsersManagement() {
                 >
                   <div className="group inline-flex items-center">
                     Role
-                    <span className="ml-2 text-base-content/50 group-hover:text-base-content">
+                    <span className="ms-2 text-base-content/50 group-hover:text-base-content">
                       {sort.field === "role" && (
                         sort.direction === "desc" ? "↓" : "↑"
                       )}
@@ -309,7 +309,7 @@ export default function UsersManagement() {
                 >
                   <div className="group inline-flex items-center">
                     Status
-                    <span className="ml-2 text-base-content/50 group-hover:text-base-content">
+                    <span className="ms-2 text-base-content/50 group-hover:text-base-content">
                       {sort.field === "status" && (
                         sort.direction === "desc" ? "↓" : "↑"
                       )}
@@ -323,7 +323,7 @@ export default function UsersManagement() {
                 >
                   <div className="group inline-flex items-center">
                     Last Login
-                    <span className="ml-2 text-base-content/50 group-hover:text-base-content">
+                    <span className="ms-2 text-base-content/50 group-hover:text-base-content">
                       {sort.field === "lastLogin" && (
                         sort.direction === "desc" ? "↓" : "↑"
                       )}
@@ -337,7 +337,7 @@ export default function UsersManagement() {
                 >
                   <div className="group inline-flex items-center">
                     Joined
-                    <span className="ml-2 text-base-content/50 group-hover:text-base-content">
+                    <span className="ms-2 text-base-content/50 group-hover:text-base-content">
                       {sort.field === "joined" && (
                         sort.direction === "desc" ? "↓" : "↑"
                       )}

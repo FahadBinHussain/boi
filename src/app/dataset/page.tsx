@@ -73,7 +73,7 @@ function SortHeader({
       aria-label={`Sort by ${label} ${nextDirection === 'asc' ? 'ascending' : 'descending'}`}
     >
       <span>{label}</span>
-      <span className={`text-[11px] ${isActive ? 'text-primary font-extrabold' : 'opacity-40'}`}>{indicator}</span>
+      <span className={`text-xs ${isActive ? 'text-primary font-extrabold' : 'opacity-40'}`}>{indicator}</span>
     </Link>
   );
 }
@@ -82,7 +82,7 @@ function CandidateRefMarks({ sources }: { sources: DatasetCandidateBook['sources
   if (!sources.length) return null;
 
   return (
-    <sup className="ml-1 inline-flex translate-y-[-0.15em] flex-wrap gap-1 align-super text-[10px] font-semibold leading-none">
+    <sup className="ms-1 inline-flex translate-y-[-0.15em] flex-wrap gap-1 align-super text-xs font-semibold leading-none">
       {sources.map((source, index) =>
         source.url ? (
           <a
@@ -119,7 +119,7 @@ function RefMarks({
   if (!uniqueRefs.length) return null;
 
   return (
-    <sup className="ml-1 inline-flex translate-y-[-0.15em] flex-wrap gap-1 align-super text-[10px] font-semibold leading-none">
+    <sup className="ms-1 inline-flex translate-y-[-0.15em] flex-wrap gap-1 align-super text-xs font-semibold leading-none">
       {uniqueRefs.map((ref) => {
         const reference = referencesById.get(ref);
         const label = `[${referenceNumbers.get(ref)}]`;
@@ -241,7 +241,7 @@ export default async function DatasetPage({
               <p className="mt-1 text-sm text-base-content/60">
                 {totalRows.toLocaleString()} {viewLabel} / showing {visibleRangeStart.toLocaleString()}-{visibleRangeEnd.toLocaleString()}
               </p>
-              <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-medium uppercase tracking-[0.12em] text-base-content/50">
+              <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium uppercase tracking-[0.12em] text-base-content/50">
                 <span className="inline-flex items-center gap-1.5 text-success">
                   <span className="inline-block h-1.5 w-1.5 rounded-full bg-success" aria-hidden="true" />
                   live database

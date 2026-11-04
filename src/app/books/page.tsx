@@ -63,7 +63,7 @@ export default function BooksPage() {
           <div className="relative">
             <input
               type="text"
-              placeholder="Search books by title, author or description..."
+              placeholder="Search books by title, author or description…"
               className="input input-bordered w-full pe-12 bg-base-100 text-base-content"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -83,7 +83,7 @@ export default function BooksPage() {
               <MotionIcon animation="spin" trigger="always">
                 <FiLoader className="h-8 w-8 text-primary" />
               </MotionIcon>
-              <span className="ms-3 text-base font-medium text-base-content/70">Loading books...</span>
+              <span className="ms-3 text-base font-medium text-base-content/70">Loading books…</span>
             </div>
           ) : error ? (
             <div className="alert alert-error max-w-xl shadow-lg">

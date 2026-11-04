@@ -92,7 +92,7 @@ function SignInContent() {
               </MotionIcon>
             )}
             <span>
-              {isLoading ? "Signing in..." : "Sign in with Google"}
+              {isLoading ? "Signing in…" : "Sign in with Google"}
             </span>
           </button>
         </div>
@@ -110,7 +110,7 @@ export default function SignInPage() {
             <FiLoader className="h-8 w-8 text-primary mx-auto mb-2" />
           </MotionIcon>
           <h2 className="text-xl font-bold text-base-content">
-            Loading...
+            Loading…
           </h2>
         </div>
       </div>

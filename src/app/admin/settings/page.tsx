@@ -119,7 +119,7 @@ export default function AdminSettings() {
         return (
           <div className="flex items-center text-blue-600 animate-pulse">
             <FiRefreshCw className="mr-1 h-4 w-4 animate-spin" />
-            <span>Syncing...</span>
+            <span>Syncing…</span>
           </div>
         );
       case 'success':
@@ -185,7 +185,7 @@ export default function AdminSettings() {
       {isLoading ? (
         <div className="card bg-base-200 border border-base-300 p-6 text-center text-base-content/70">
           <span className="loading loading-spinner text-primary mx-auto mb-2"></span>
-          Loading settings...
+          Loading settings…
         </div>
       ) : (
         <div className="space-y-8">
@@ -248,7 +248,7 @@ export default function AdminSettings() {
               {(isSaving || syncStatus === 'syncing') ? (
                 <>
                   <span className="loading loading-spinner loading-xs"></span>
-                  Syncing...
+                  Syncing…
                 </>
               ) : (
                 <>
