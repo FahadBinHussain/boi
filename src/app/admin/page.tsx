@@ -158,7 +158,7 @@ export default function AdminDashboard() {
         >
           <div>
             <p className="mb-1 text-xs font-bold tracking-[0.25em] uppercase text-primary">Control Center</p>
-            <h1 className="text-3xl font-extrabold tracking-tight text-base-content lg:text-4xl">Dashboard Overview</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight text-base-content lg:text-4xl">Dashboard overview</h1>
           </div>
           <Link 
             href="/admin/books/new" 
@@ -167,7 +167,7 @@ export default function AdminDashboard() {
             <MotionIcon animation="bounce" trigger="hover">
               <FiPlusCircle size={18} />
             </MotionIcon>
-            <span>Add Book</span>
+            <span>Add new book</span>
           </Link>
         </motion.div>
 
@@ -229,7 +229,7 @@ export default function AdminDashboard() {
         >
           {/* Downloads Chart */}
           <div className="dashboard-card card bg-base-200 border border-base-300 p-6 md:p-8 rounded-3xl shadow-md">
-            <h2 className="mb-6 text-lg font-bold text-base-content">Downloads Overview</h2>
+            <h2 className="mb-6 text-lg font-bold text-base-content">Downloads overview</h2>
             <div className="h-64" ref={chartRef}>
               <div className="flex h-full items-end gap-3 px-2">
                 {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => (
@@ -250,7 +250,7 @@ export default function AdminDashboard() {
 
           {/* User Activity */}
           <div className="dashboard-card card bg-base-200 border border-base-300 p-6 md:p-8 rounded-3xl shadow-md">
-            <h2 className="mb-6 text-lg font-bold text-base-content">User Activity</h2>
+            <h2 className="mb-6 text-lg font-bold text-base-content">User activity</h2>
             <div className="flex h-64 items-center justify-center">
               <div className="relative h-48 w-48">
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -258,7 +258,7 @@ export default function AdminDashboard() {
                     <div className="font-mono text-4xl font-extrabold text-base-content">
                       {activePercentage > 0 ? `${activePercentage}%` : '-'}
                     </div>
-                    <div className="mt-1 text-xs font-semibold text-base-content/75 uppercase">Active Users</div>
+                    <div className="mt-1 text-xs font-semibold text-base-content/75 uppercase">Active users</div>
                   </div>
                 </div>
                 <svg className="h-full w-full" viewBox="0 0 100 100">
@@ -294,7 +294,7 @@ export default function AdminDashboard() {
             className="dashboard-table card bg-base-200 border border-base-300 rounded-3xl shadow-md overflow-hidden"
           >
             <div className="border-b border-base-300 px-6 py-5">
-              <h2 className="text-base font-bold text-base-content">Recent Books</h2>
+              <h2 className="text-base font-bold text-base-content">Recent books</h2>
             </div>
             <div className="overflow-x-auto">
               {recentBooks.length > 0 ? (
@@ -330,7 +330,7 @@ export default function AdminDashboard() {
                     <FiBook className="mx-auto h-12 w-12 text-base-content/20" />
                   </MotionIcon>
                   <h3 className="mt-3 text-sm font-bold text-base-content">No books yet</h3>
-                  <p className="mt-1 text-xs text-base-content/75">Get started by adding your first book.</p>
+                  <p className="mt-1 text-xs text-base-content/75">Get started by adding the first book to the catalog.</p>
                   <div className="mt-6">
                     <Link
                       href="/admin/books/new"
@@ -363,7 +363,7 @@ export default function AdminDashboard() {
             className="dashboard-table card bg-base-200 border border-base-300 rounded-3xl shadow-md overflow-hidden"
           >
             <div className="border-b border-base-300 px-6 py-5">
-              <h2 className="text-base font-bold text-base-content">Recent Users</h2>
+              <h2 className="text-base font-bold text-base-content">Recent users</h2>
             </div>
             <div className="overflow-x-auto">
               <table className="table table-zebra table-sm">
@@ -388,7 +388,7 @@ export default function AdminDashboard() {
                   ) : (
                     <tr>
                       <td colSpan={4} className="text-center py-12 text-base-content/75 text-xs">
-                        No recent users recorded yet.
+                        No users have joined yet.
                       </td>
                     </tr>
                   )}
@@ -417,7 +417,7 @@ export default function AdminDashboard() {
             <FiAlertCircle className="h-6 w-6 shrink-0" />
           </MotionIcon>
           <div>
-            <h3 className="font-bold text-sm">System Notice</h3>
+            <h3 className="font-bold text-sm">System notice</h3>
             <p className="mt-1 text-xs">
               Scheduled maintenance planned for June 15, 2026, from 2:00 AM to 4:00 AM UTC. 
               The system may experience brief downtime during this period.

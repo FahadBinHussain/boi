@@ -153,7 +153,7 @@ export default function AddNewBook() {
   useEffect(() => {
     // Only show important notifications (error states)
     if (syncStatus === 'error') {
-      toast.error(lastSyncMessage || 'Failed to synchronize settings');
+      toast.error(lastSyncMessage || 'Unable to synchronize settings. Try again.');
     }
   }, [syncStatus, lastSyncMessage]);
 
@@ -172,20 +172,20 @@ export default function AddNewBook() {
     
     // Basic info validation
     if (!bookName.trim()) {
-      errors.bookName = "Book name is required";
+      errors.bookName = "Enter a book name";
     }
     
     if (authors.length === 0 || authors.some(author => !author.name.trim())) {
-      errors.authors = "Please add at least one author with a name";
+      errors.authors = "Add at least one author with a name";
     }
     
     // Media validation
     if (!thumbnailUrl.trim()) {
-      errors.thumbnailUrl = "Thumbnail URL is required";
+      errors.thumbnailUrl = "Enter a thumbnail URL";
     }
     
     if (!bookPdfFile && !singleBookPdfUrl) {
-      errors.bookPdf = "Please select a PDF file for the book";
+      errors.bookPdf = "Select a PDF file for the book";
     }
     
     // Details validation - publication date is now optional
@@ -196,16 +196,16 @@ export default function AddNewBook() {
       const fullDatePattern = /^\d{4}-\d{2}-\d{2}$/;
       
       if (!yearOnlyPattern.test(publicationDate) && !fullDatePattern.test(publicationDate)) {
-        errors.publicationDate = "Please enter a valid year (YYYY) or date (YYYY-MM-DD)";
+        errors.publicationDate = "Enter a valid year (YYYY) or date (YYYY-MM-DD)";
       } else if (fullDatePattern.test(publicationDate)) {
         // If full date format, validate that it's a reasonable date
         try {
           const date = new Date(publicationDate);
           if (isNaN(date.getTime())) {
-            errors.publicationDate = "Please enter a valid date";
+            errors.publicationDate = "Enter a valid date";
           }
         } catch (error) {
-          errors.publicationDate = "Please enter a valid date";
+          errors.publicationDate = "Enter a valid date";
         }
       }
     }
@@ -221,7 +221,7 @@ export default function AddNewBook() {
     // Validate all fields before submission
     if (!validateForm()) {
       // Show error notification
-      toast.error('Please fill in all required fields');
+      toast.error('Fill in the highlighted fields');
       return;
     }
     
@@ -280,11 +280,11 @@ export default function AddNewBook() {
         throw new Error(errorData.error || `Failed to save: ${response.statusText}`);
       }
       
-      toast.success('Book added successfully!');
+      toast.success('Book added');
       router.push('/admin/books');
     } catch (error) {
       console.error("Error submitting form:", error);
-      toast.error('Failed to save book. Please try again.');
+      toast.error('Unable to save the book. Try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -336,7 +336,7 @@ export default function AddNewBook() {
   // Function to fetch metadata from the appropriate scraper
   const fetchMetadata = async (url: string): Promise<void> => {
     if (!url.trim()) {
-      setScrapingError("Please enter a URL");
+      setScrapingError("Enter a URL");
       return;
     }
     
@@ -444,14 +444,14 @@ export default function AddNewBook() {
       
       // Only use the notification system for success messages
       if ('title' in data) {
-        toast.success(`Book "${data.title}" data imported successfully!`);
+        toast.success(`Details for "${data.title}" imported`);
       } else {
-        toast.success('Book data imported successfully!');
+        toast.success('Book details imported');
       }
     } catch (error) {
       console.error('Error fetching metadata:', error);
       setScrapingError(error instanceof Error ? error.message : 'Failed to fetch metadata');
-      toast.error('Failed to fetch metadata. See error for details.');
+      toast.error('Unable to fetch metadata. Check the URL and try again.');
     } finally {
       setIsScrapingMetadata(false);
     }
@@ -672,7 +672,7 @@ export default function AddNewBook() {
       if (!settings?.filesVcApiKey) errorMessage += 'API Key missing';
       if (!settings?.filesVcApiKey && !settings?.filesVcAccountId) errorMessage += ' and ';
       if (!settings?.filesVcAccountId) errorMessage += 'Account ID missing';
-      errorMessage += '. Please update your settings.';
+      errorMessage += '. Update your settings and try again.';
       
       handleSingleBookUploadError(errorMessage);
       return;
@@ -819,7 +819,7 @@ export default function AddNewBook() {
                     className={`input input-bordered w-full rounded-r-none bg-base-100 text-base-content pl-10 focus:input-primary text-sm ${
                       scrapingError ? "input-error" : ""
                     }`}
-                    placeholder="Paste a Fandom or Goodreads URL to auto-fill book details"
+                    placeholder="https://www.goodreads.com/book/show/..."
                     value={metadataUrl}
                     onChange={handleMetadataUrlChange}
                   />
@@ -881,7 +881,7 @@ export default function AddNewBook() {
                   className={`input input-bordered w-full bg-base-100 text-base-content ${
                     formErrors.bookName ? "input-error" : ""
                   }`}
-                  placeholder="Enter book name"
+                  placeholder="e.g. Rabindranath Tagore"
                   value={bookName}
                   onChange={(e) => setBookName(e.target.value)}
                 />
@@ -962,7 +962,7 @@ export default function AddNewBook() {
                   className={`textarea textarea-bordered w-full bg-base-100 text-base-content leading-relaxed ${
                     formErrors.summary ? "textarea-error" : ""
                   }`}
-                  placeholder="Enter a brief summary of the book's content"
+                  placeholder="A short description of what the book covers"
                   value={summary}
                   onChange={(e) => setSummary(e.target.value)}
                 />
@@ -1182,7 +1182,7 @@ export default function AddNewBook() {
                   type="text"
                   id="publisher"
                   className="input input-bordered w-full bg-base-100 text-base-content"
-                  placeholder="Publisher name"
+                  placeholder="e.g. Penguin"
                   value={publisher}
                   onChange={(e) => setPublisher(e.target.value)}
                 />
@@ -1196,7 +1196,7 @@ export default function AddNewBook() {
                   type="text"
                   id="language"
                   className="input input-bordered w-full bg-base-100 text-base-content"
-                  placeholder="Language"
+                  placeholder="e.g. Bengali"
                   value={language}
                   onChange={(e) => setLanguage(e.target.value)}
                 />
@@ -1244,7 +1244,7 @@ export default function AddNewBook() {
                     type="number"
                     id="numberOfPages"
                     className="input input-bordered w-full bg-base-100 text-base-content pr-10"
-                    placeholder="Number of pages"
+                    placeholder="e.g. 320"
                     value={numberOfPages || ""}
                     onChange={(e) => setNumberOfPages(parseInt(e.target.value) || undefined)}
                   />
@@ -1266,7 +1266,7 @@ export default function AddNewBook() {
                     type="number"
                     id="ratings"
                     className="input input-bordered w-full bg-base-100 text-base-content pr-10"
-                    placeholder="Number of ratings"
+                    placeholder="e.g. 1200"
                     value={ratings || ""}
                     onChange={(e) => setRatings(parseInt(e.target.value) || undefined)}
                   />

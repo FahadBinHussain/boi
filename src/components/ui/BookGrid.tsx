@@ -77,8 +77,8 @@ const BookGrid = ({ books, selectedGenres, isLoading = false, error = null, comp
             <FiAlertCircle className="w-6 h-6" />
           </MotionIcon>
           <div>
-            <h3 className="font-bold">Error</h3>
-            <div className="text-xs">{error}</div>
+            <h3 className="font-bold">{error}</h3>
+            <div className="text-xs">Check your connection and try again.</div>
           </div>
         </div>
       </div>
@@ -94,8 +94,14 @@ const BookGrid = ({ books, selectedGenres, isLoading = false, error = null, comp
               <FiInbox className="w-10 h-10 text-base-content/75" />
             </MotionIcon>
           </div>
-          <h3 className="font-bold text-base-content text-lg mb-1">No books found</h3>
-          <p className="text-sm text-base-content/75">Try adjusting your search or filters.</p>
+          <h3 className="font-bold text-base-content text-lg mb-1">
+            {selectedGenres.length > 0 ? 'No books in these genres' : 'No books match your search'}
+          </h3>
+          <p className="text-sm text-base-content/75">
+            {selectedGenres.length > 0
+              ? 'Clear the filters to see the whole catalog.'
+              : 'Try a different title or author.'}
+          </p>
         </div>
       </div>
     );

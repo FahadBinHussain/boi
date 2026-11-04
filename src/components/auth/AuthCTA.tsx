@@ -71,7 +71,7 @@ const AuthCTA = () => {
             href="/books" 
             className="btn btn-primary btn-lg rounded-full px-10 shadow-lg"
           >
-            My Library
+            Browse books
           </Link>
         </div>
       </section>
@@ -100,7 +100,7 @@ const AuthCTA = () => {
             href="/books" 
             className="btn btn-primary btn-lg rounded-full px-8 shadow-lg"
           >
-            Start Browsing
+            Start browsing
           </Link>
           
           <button

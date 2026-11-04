@@ -161,7 +161,7 @@ const BookCard = ({ book, compact = false }: BookCardProps) => {
                 <MotionIcon animation="bounce">
                   <FiInfo size={compact ? 13 : 15} />
                 </MotionIcon>
-                <span>Details</span>
+                <span>View details</span>
               </Link>
             </motion.div>
             <motion.div

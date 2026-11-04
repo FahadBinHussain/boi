@@ -168,7 +168,7 @@ export async function POST(req: NextRequest) {
     else if (pdfFile) {
       return NextResponse.json({
         error: 'File upload is no longer supported',
-        details: 'Please provide a direct PDF URL in pdfUrl.'
+        details: 'Enter a direct PDF URL for pdfUrl.'
       }, { status: 400 });
     }
     
@@ -284,7 +284,7 @@ export async function POST(req: NextRequest) {
       
       return NextResponse.json({
         success: true,
-        message: 'Book created successfully',
+        message: 'Book created',
         book: {
           id: book.id,
           title: book.title,

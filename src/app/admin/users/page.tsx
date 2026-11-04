@@ -146,7 +146,7 @@ export default function UsersManagement() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-base-content">Users Management</h1>
+        <h1 className="text-2xl font-bold text-base-content">Users management</h1>
         <p className="mt-2 text-sm text-base-content/75">
           Manage your users, view activity, and control user access.
         </p>
@@ -394,7 +394,7 @@ export default function UsersManagement() {
                         <button
                           onClick={() => sendEmail(user.email)}
                           className="btn btn-ghost btn-circle btn-xs text-primary"
-                          title="Send Email"
+                          title="Send email"
                         >
                           <MotionIcon animation="bounce" trigger="hover">
                             <FiMail className="h-4 w-4" />
@@ -426,7 +426,7 @@ export default function UsersManagement() {
               ) : (
                 <tr>
                   <td colSpan={8} className="px-6 py-12 text-center text-sm text-base-content/75">
-                    No users found matching your criteria.
+                    No users match the current filters. Clear the filters to see every user.
                   </td>
                 </tr>
               )}

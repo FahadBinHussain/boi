@@ -77,6 +77,19 @@ When a record is not a normal book, preserve the material type in metadata, espe
 - **`btn-disabled` already dims itself to `--tw-text-opacity: 0.2`.** Do not stack `opacity-40` on top of it; that is 8% effective and the label disappears. WCAG 1.4.3 exempts inactive controls, so DaisyUI's own disabled treatment is the intended look.
 - **Measuring contrast in a real browser has two traps.** (1) Chrome serializes achromatic DaisyUI colors as `oklab(L 0 0)`, so an `oklch`-only parser silently drops the page background and reports false passes — parse `oklab()` too. (2) CSS transitions are paused in a backgrounded tab, so reading `getComputedStyle` right after flipping `data-theme` returns the OLD theme's colors; disable transitions before switching. Composite the whole ancestor chain (outermost opaque layer inward) instead of compositing a translucent layer over white.
 
+## Frontend Writing Conventions
+
+- **One name per thing.** The detail action is `View details` everywhere (book card overlay, featured card, genre/author/series cards). The catalog entry point is `Browse books`. The admin add action is `Add new book`. Do not introduce a synonym for an action that already has a label.
+- **Sentence case for headings, buttons and links.** `Add new book` sits next to `Browse books`; `Browse books` sits next to `Explore genres`. Never mix `Save Changes` with `Discard changes`.
+- **An error names what failed and then the fix, in that order.** The alert heading carries the failure (`Unable to load books`) and the line under it carries the fix (`Check your connection and try again.`). No `Oops`, no `Something went wrong`, and never an error with no recovery step.
+- **Cut `successfully`.** `Book added`, `Settings saved`, `3 books deleted` — the toast already sits in the success slot.
+- **Cut `Please` from a routine instruction.** `Enter a book name`, `Fill in the highlighted fields`, `Select a PDF file for the book`.
+- **Counts go through `Intl`.** `pluralBooks()` in `src/app/admin/books/page.tsx` picks the plural form. Never `book(s)`.
+- **Destructive confirmations name the action and the object.** `Delete "Title"? This cannot be undone.` — never `Are you sure…`. Dialog buttons are verb plus object, never `Yes`/`No`/`OK`.
+- **Empty states orient and point forward.** The title names the empty thing (`No books match your search`) and the line under it names the way out (`Try a different title or author.`). Admin empty states keep the add action next to them.
+- **Icon-only controls name the action.** The admin row buttons are `Edit book` and `Delete book`, not `Edit`/`Delete`.
+- **Placeholders show an example, not an instruction.** `e.g. Penguin`, `e.g. 320`. When a field carries a real requirement (like leaving an API key unchanged), the requirement belongs in helper text.
+
 ## Dataset Restore (dataset/main is gitignored)
 
 `dataset/main/` and `dataset/archive/` are gitignored, so a fresh clone, a CI clone, or a wiped machine has neither. Never rebuild them by hand — restore the backup archive.

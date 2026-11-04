@@ -38,7 +38,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ 
       success: true,
-      message: 'Book deleted successfully',
+      message: 'Book deleted',
       deletedBook
     });
   } catch (error) {

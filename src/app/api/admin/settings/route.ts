@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
         dbError instanceof Error ? dbError.message : String(dbError)
       );
       return NextResponse.json({ 
-        error: 'Database connection failed - please check your database configuration' 
+        error: 'Database connection failed. Check your database configuration.' 
       }, { status: 500 });
     }
     
@@ -138,7 +138,7 @@ export async function PUT(request: NextRequest) {
         dbError instanceof Error ? dbError.message : String(dbError)
       );
       return NextResponse.json({ 
-        error: 'Database connection failed - please check your database configuration' 
+        error: 'Database connection failed. Check your database configuration.' 
       }, { status: 500 });
     }
     
@@ -276,7 +276,7 @@ export async function PUT(request: NextRequest) {
       
       return NextResponse.json({ 
         success: true,
-        message: 'Settings updated successfully in database' 
+        message: 'Settings updated' 
       }, { status: 200 });
     } catch (error) {
       // Handle specific Prisma errors with proper type checking

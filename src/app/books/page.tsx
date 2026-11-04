@@ -29,7 +29,7 @@ export default function BooksPage() {
         setBooks(data);
       } catch (err) {
         console.error('Error fetching books:', err);
-        setError('Failed to load books. Please try again later.');
+        setError('Unable to load books');
       } finally {
         setIsLoading(false);
       }
@@ -52,7 +52,7 @@ export default function BooksPage() {
     <div className="bg-base-100 text-base-content min-h-dvh py-12 transition-colors">
       <div className="shell">
         <div className="mb-10">
-          <h1 className="text-3xl font-extrabold text-base-content mb-3">Browse Books</h1>
+          <h1 className="text-3xl font-extrabold text-base-content mb-3">Browse books</h1>
           <p className="text-base text-base-content/75">
             Discover and download free books from our extensive collection
           </p>
@@ -91,8 +91,8 @@ export default function BooksPage() {
                 <FiAlertCircle className="h-6 w-6" />
               </MotionIcon>
               <div>
-                <h3 className="font-bold">Error</h3>
-                <div className="text-sm">{error}</div>
+                <h3 className="font-bold">{error}</h3>
+                <div className="text-sm">Check your connection and try again.</div>
               </div>
             </div>
           ) : (

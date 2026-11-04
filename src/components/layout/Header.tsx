@@ -202,7 +202,7 @@ const Header = () => {
                   ? 'btn-active text-primary' 
                   : 'text-base-content/75 hover:text-primary'
               }`}
-              aria-label="Search"
+              aria-label="Search books"
             >
               <MotionIcon animation="spin">
                 <FiSearch size={18} />

@@ -65,7 +65,7 @@ function GenresContent() {
         setBooks(booksData);
       } catch (err) {
         console.error('Error fetching data:', err);
-        setError('Failed to load data. Please try again later.');
+        setError('Unable to load genres');
       } finally {
         setIsLoading(false);
       }
@@ -153,8 +153,8 @@ function GenresContent() {
               <FiAlertCircle className="h-6 w-6" />
             </MotionIcon>
             <div>
-              <h3 className="font-bold">Error</h3>
-              <div className="text-sm">{error}</div>
+              <h3 className="font-bold">{error}</h3>
+              <div className="text-sm">Check your connection and try again.</div>
             </div>
           </div>
         )}
@@ -252,7 +252,7 @@ function GenresContent() {
                               <MotionIcon animation="float" trigger="hover">
                                 <FiBookOpen size={14} />
                               </MotionIcon>
-                              <span>View Details</span>
+                              <span>View details</span>
                             </div>
                           </div>
                         </div>
@@ -263,7 +263,7 @@ function GenresContent() {
 
                 {getGenreBooks().length === 0 && (
                   <div className="card bg-base-200 border border-base-content/10 p-12 text-center rounded-2xl">
-                    <p className="text-base-content/75">No books found in this genre.</p>
+                    <p className="text-base-content/75">This genre has no books in the catalog. Try another genre.</p>
                   </div>
                 )}
               </div>

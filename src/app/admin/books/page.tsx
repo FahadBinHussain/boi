@@ -20,6 +20,10 @@ interface Book {
   createdAt: string;
 }
 
+// Book counts are written through Intl so the plural form is never guessed.
+const pluralBooks = (count: number) =>
+  `${count} ${new Intl.PluralRules("en").select(count) === "one" ? "book" : "books"}`;
+
 export default function BooksManagement() {
   const [books, setBooks] = useState<Book[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -58,7 +62,7 @@ export default function BooksManagement() {
           setBooks(data);
         } catch (err) {
           console.error('Error fetching books:', err);
-          setError('Failed to load books. Please try again later.');
+          setError('Unable to load books');
         } finally {
           setIsLoading(false);
         }
@@ -155,7 +159,7 @@ export default function BooksManagement() {
   const deleteSelected = async () => {
     if (selectedBooks.length === 0) return;
 
-    const confirmDelete = window.confirm(`Are you sure you want to delete ${selectedBooks.length} book(s)?`);
+    const confirmDelete = window.confirm(`Delete ${pluralBooks(selectedBooks.length)}? This cannot be undone.`);
     if (!confirmDelete) return;
 
     setIsLoading(true);
@@ -173,17 +177,17 @@ export default function BooksManagement() {
       const result = await response.json().catch(() => null);
       
       if (!response.ok) {
-        throw new Error(result?.error || result?.details || 'Failed to delete books');
+        throw new Error(result?.error || result?.details || 'Unable to delete books. Try again.');
       }
       
       // Update local state
       setBooks(prevBooks => prevBooks.filter(book => !selectedBooks.includes(book.id)));
       setSelectedBooks([]);
       
-      toast.success(`${result.count} book(s) deleted successfully.`);
+      toast.success(`${pluralBooks(result.count)} deleted.`);
     } catch (error) {
       console.error('Error deleting books:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to delete books');
+      toast.error(error instanceof Error ? error.message : 'Unable to delete books. Try again.');
     } finally {
       setIsLoading(false);
     }
@@ -193,7 +197,7 @@ export default function BooksManagement() {
     <div className="p-6 lg:p-8 bg-base-100 min-h-screen text-base-content transition-colors">
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-base-content">Books Management</h1>
+          <h1 className="text-2xl font-extrabold text-base-content">Books management</h1>
           <p className="text-xs text-base-content/75 mt-1">Manage and organize all books in the catalog</p>
         </div>
         <div>
@@ -204,7 +208,7 @@ export default function BooksManagement() {
             <MotionIcon animation="bounce" trigger="hover">
               <FiPlusCircle className="h-4 w-4" />
             </MotionIcon>
-            <span>Add New Book</span>
+            <span>Add new book</span>
           </Link>
         </div>
       </div>
@@ -280,8 +284,8 @@ export default function BooksManagement() {
             <FiTrash2 className="h-5 w-5" />
           </MotionIcon>
           <div>
-            <h3 className="font-bold">Error</h3>
-            <div className="text-xs">{error}</div>
+            <h3 className="font-bold">{error}</h3>
+            <div className="text-xs">Check your connection and try again.</div>
           </div>
         </div>
       )}
@@ -402,7 +406,7 @@ export default function BooksManagement() {
                           <Link
                             href={`/admin/books/${book.id}`}
                             className="btn btn-ghost btn-circle btn-xs text-primary"
-                            title="Edit"
+                            title="Edit book" aria-label="Edit book"
                           >
                             <MotionIcon animation="float" trigger="hover">
                               <FiEdit2 className="h-3.5 w-3.5" />
@@ -410,7 +414,7 @@ export default function BooksManagement() {
                           </Link>
                           <button
                             onClick={async () => {
-                              if (window.confirm(`Are you sure you want to delete "${book.title}"?`)) {
+                              if (window.confirm(`Delete "${book.title}"? This cannot be undone.`)) {
                                 try {
                                   const response = await fetch(`/api/admin/books/${book.id}/delete`, {
                                     method: 'DELETE',
@@ -425,15 +429,15 @@ export default function BooksManagement() {
                                   }
                                   
                                   setBooks(prevBooks => prevBooks.filter(b => b.id !== book.id));
-                                  toast.success(`"${book.title}" deleted successfully.`);
+                                  toast.success(`"${book.title}" deleted.`);
                                 } catch (error) {
                                   console.error('Error deleting book:', error);
-                                  toast.error(error instanceof Error ? error.message : 'Failed to delete book. Please try again.');
+                                  toast.error(error instanceof Error ? error.message : 'Unable to delete the book. Try again.');
                                 }
                               }
                             }}
                             className="btn btn-ghost btn-circle btn-xs text-error"
-                            title="Delete"
+                            title="Delete book" aria-label="Delete book"
                           >
                             <MotionIcon animation="wiggle" trigger="hover">
                               <FiTrash2 className="h-3.5 w-3.5" />
@@ -503,7 +507,7 @@ export default function BooksManagement() {
               <FiBook className="mx-auto h-12 w-12 text-base-content/30" />
             </MotionIcon>
             <h3 className="mt-3 text-base font-bold text-base-content">No books yet</h3>
-            <p className="mt-1 text-xs text-base-content/75">Get started by adding your first book to your collection.</p>
+            <p className="mt-1 text-xs text-base-content/75">Get started by adding the first book to the catalog.</p>
             <div className="mt-6">
               <Link
                 href="/admin/books/new"

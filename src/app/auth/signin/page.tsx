@@ -20,9 +20,9 @@ function SignInContent() {
   useEffect(() => {
     if (errorParam) {
       if (errorParam === "Callback") {
-        setError("Authentication failed. Please make sure your Google account is properly set up and try again.");
+        setError("Unable to sign in. Check your Google account setup and try again.");
       } else {
-        setError(`Authentication error: ${errorParam}. Please try again.`);
+        setError("Unable to sign in. Try again.");
       }
     }
   }, [errorParam]);
@@ -33,7 +33,7 @@ function SignInContent() {
       await signIn("google", { callbackUrl });
     } catch (error) {
       console.error("Sign-in error:", error);
-      setError("Failed to start authentication. Please try again.");
+      setError("Unable to start sign-in. Try again.");
       setIsLoading(false);
     }
   };
@@ -43,7 +43,7 @@ function SignInContent() {
       <div className="w-full max-w-md card bg-base-200 border border-base-content/10 shadow-2xl p-8 rounded-3xl space-y-6">
         <div className="text-center">
           <h2 className="text-3xl font-extrabold text-base-content">
-            Admin Console Login
+            Admin console login
           </h2>
           <p className="mt-2 text-sm text-base-content/75">
             Sign in to access the admin dashboard

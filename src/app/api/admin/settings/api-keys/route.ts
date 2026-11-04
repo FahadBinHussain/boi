@@ -97,7 +97,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json(
-      { message: `${serviceName} API key saved successfully.` },
+      { message: `${serviceName} API key saved.` },
       { status: 200 },
     );
   } catch (error) {

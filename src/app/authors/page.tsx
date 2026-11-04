@@ -61,7 +61,7 @@ function AuthorsContent() {
         setBooks(booksData);
       } catch (err) {
         console.error('Error fetching data:', err);
-        setError('Failed to load data. Please try again later.');
+        setError('Unable to load authors');
       } finally {
         setIsLoading(false);
       }
@@ -158,8 +158,8 @@ function AuthorsContent() {
               <FiAlertCircle className="h-6 w-6" />
             </MotionIcon>
             <div>
-              <h3 className="font-bold">Error</h3>
-              <div className="text-sm">{error}</div>
+              <h3 className="font-bold">{error}</h3>
+              <div className="text-sm">Check your connection and try again.</div>
             </div>
           </div>
         )}
@@ -269,7 +269,7 @@ function AuthorsContent() {
                               <MotionIcon animation="float" trigger="hover">
                                 <FiBookOpen size={14} />
                               </MotionIcon>
-                              <span>View Details</span>
+                              <span>View details</span>
                             </div>
                           </div>
                         </div>
@@ -280,7 +280,7 @@ function AuthorsContent() {
 
                 {getAuthorBooks().length === 0 && (
                   <div className="card bg-base-200 border border-base-content/10 p-12 text-center rounded-2xl">
-                    <p className="text-base-content/75">No books found by this author.</p>
+                    <p className="text-base-content/75">This author has no books in the catalog. Try another author.</p>
                   </div>
                 )}
               </div>

@@ -22,12 +22,12 @@ function ErrorContent() {
         </div>
         <div>
           <h2 className="text-2xl font-extrabold text-base-content">
-            Authentication Error
+            Sign-in failed
           </h2>
           <p className="mt-2 text-sm text-base-content/75">
             {error === "AccessDenied"
-              ? "You do not have permission to access this resource."
-              : "There was an error signing you in. Please try again."}
+              ? "Your account does not have admin access. Ask an administrator for access."
+              : "Unable to sign in. Try again."}
           </p>
         </div>
         <div className="pt-2">

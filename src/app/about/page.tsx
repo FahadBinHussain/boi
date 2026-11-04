@@ -22,7 +22,7 @@ export default function AboutPage() {
         {/* Main Content */}
         <div className="card bg-base-200/60 border border-base-content/10 rounded-3xl shadow-xl overflow-hidden mb-12">
           <div className="card-body p-8 md:p-12">
-            <h2 className="text-2xl font-bold text-base-content mb-4">Our Mission</h2>
+            <h2 className="text-2xl font-bold text-base-content mb-4">Our mission</h2>
             <p className="text-base-content/80 mb-6 leading-relaxed">
               বই was created with a simple mission: to promote reading and make knowledge accessible to everyone around the world. We believe that books are one of humanity's greatest treasures, and access to them should not be limited by financial constraints.
             </p>
@@ -69,7 +69,7 @@ export default function AboutPage() {
               <li>Offered for free by their authors or publishers</li>
             </ul>
             <p className="text-base-content/80 mb-8 leading-relaxed">
-              If you believe that any content on our site infringes upon your copyright, please contact us immediately through our{' '}
+              If you believe that any content on our site infringes upon your copyright, contact us immediately through our{' '}
               <Link href="/dmca" className="text-primary hover:underline font-medium">DMCA page</Link>, and we will promptly address your concerns.
             </p>
             

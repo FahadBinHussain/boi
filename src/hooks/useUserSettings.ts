@@ -107,11 +107,11 @@ export const useUserSettings = (): UseUserSettingsReturn => {
           console.log('useUserSettings: Using data from API');
           setSettings(data);
           setSyncStatus('success');
-          setLastSyncMessage('Settings loaded successfully');
+          setLastSyncMessage('Settings loaded');
         }
       } catch (err) {
         console.error('useUserSettings: Error loading settings:', err);
-        setError(err instanceof Error ? err : new Error('Unknown error loading settings'));
+        setError(err instanceof Error ? err : new Error('Unable to load settings'));
         setSyncStatus('error');
         
         // Create more specific error message
@@ -123,7 +123,7 @@ export const useUserSettings = (): UseUserSettingsReturn => {
             errorMessage = err.message;
           }
         }
-        setLastSyncMessage(`Failed to load settings from database: ${errorMessage}`);
+        setLastSyncMessage(`Unable to load settings: ${errorMessage}`);
         console.log('useUserSettings: Error message set to:', errorMessage);
         
         // Fallback to defaults on error
@@ -212,7 +212,7 @@ export const useUserSettings = (): UseUserSettingsReturn => {
       setPendingChanges(null);
       
       setSyncStatus('success');
-      setLastSyncMessage(responseData.message || 'Settings saved successfully to database');
+      setLastSyncMessage(responseData.message || 'Settings saved');
     } catch (err) {
       console.error('Error updating user settings:', err);
       setError(err instanceof Error ? err : new Error('Failed to update settings'));
@@ -225,7 +225,7 @@ export const useUserSettings = (): UseUserSettingsReturn => {
         
         // Check for common errors and provide more helpful messages
         if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
-          displayMessage = 'Network error: Please check your internet connection';
+          displayMessage = 'Network error. Check your connection and try again.';
         } else if (err.message.includes('database')) {
           displayMessage = 'Database error: Your settings could not be saved to the database';
         }

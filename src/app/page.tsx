@@ -275,7 +275,7 @@ export default function Home() {
             <h2 className="text-balance text-3xl/[1.2] font-extrabold tracking-tight lg:text-4xl/[1.15] text-base-content">Featured reading picks</h2>
           </div>
           <Link href="/books" className="btn btn-ghost btn-sm text-primary gap-1">
-            <span>View all</span>
+            <span>View all books</span>
             <MotionIcon animation="float" trigger="hover">
               <FiArrowRight />
             </MotionIcon>
@@ -293,8 +293,11 @@ export default function Home() {
             <span>{error}</span>
           </div>
         ) : featured.length === 0 ? (
-          <div className="card bg-base-200 border border-base-content/10 p-8 sm:p-16 text-center text-base-content/75 rounded-3xl">
-            No books are available yet. Add some books and refresh to populate this section.
+          <div className="card bg-base-200 border border-base-content/10 p-8 sm:p-16 text-center rounded-3xl">
+            <h3 className="text-lg font-bold text-base-content">No books are available right now</h3>
+            <p className="mt-2 text-sm text-base-content/75">
+              New titles appear here as the archive is processed.
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -332,7 +335,7 @@ export default function Home() {
                     </p>
                     <div className="card-actions justify-end mt-4">
                       <Link href={`/books/${book.id}`} className="btn btn-primary btn-sm rounded-btn">
-                        Read Details
+                        View details
                       </Link>
                     </div>
                   </div>
@@ -353,7 +356,7 @@ export default function Home() {
           className="grid grid-cols-1 gap-8 border-t border-base-content/10 pt-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]"
         >
           <div>
-            <p className="mb-2 text-xs font-bold tracking-[0.25em] uppercase text-primary">Browse By Mood</p>
+            <p className="mb-2 text-xs font-bold tracking-[0.25em] uppercase text-primary">Browse by genre</p>
             <h3 className="max-w-[16ch] text-balance text-2xl/[1.25] font-extrabold tracking-tight lg:text-3xl/[1.2] text-base-content">
               Structured genres. <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Cleaner discovery.</span>
@@ -398,7 +401,7 @@ export default function Home() {
                 </h4>
               </div>
               <Link href="/auth/signin" className="btn btn-primary rounded-full px-8 gap-2 font-medium shadow-xl hover:shadow-2xl">
-                <span>Continue</span>
+                <span>Sign in</span>
                 <MotionIcon animation="float" trigger="hover">
                   <FiArrowRight />
                 </MotionIcon>

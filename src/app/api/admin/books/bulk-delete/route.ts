@@ -37,11 +37,11 @@ async function handleBulkDelete(req: Request) {
       )
     );
 
-    console.log(`${deletedBooks.length} books deleted successfully`);
+    console.log(`${deletedBooks.length} books deleted`);
 
     return NextResponse.json({ 
       success: true,
-      message: `${deletedBooks.length} books deleted successfully`,
+      message: `${deletedBooks.length} books deleted`,
       count: deletedBooks.length
     });
   } catch (error) {

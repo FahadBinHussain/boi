@@ -54,7 +54,7 @@ export default function AdminSettings() {
     if (syncStatus === 'success' && !notificationShownRef.current) {
       notificationShownRef.current = true;
       console.log('Settings page: Showing success notification with message:', lastSyncMessage);
-      toast.success(lastSyncMessage || 'Settings synchronized successfully');
+      toast.success(lastSyncMessage || 'Settings synchronized');
       setTimeout(() => {
         notificationShownRef.current = false;
         console.log('Settings page: Reset notification flag after timeout');
@@ -62,7 +62,7 @@ export default function AdminSettings() {
     } else if (syncStatus === 'error') {
       notificationShownRef.current = true;
       console.log('Settings page: Showing error notification with message:', lastSyncMessage);
-      toast.error(lastSyncMessage || 'Failed to synchronize settings');
+      toast.error(lastSyncMessage || 'Unable to synchronize settings. Try again.');
       setTimeout(() => {
         notificationShownRef.current = false;
         console.log('Settings page: Reset notification flag after timeout');
@@ -157,7 +157,7 @@ export default function AdminSettings() {
           <MotionIcon animation="spin" trigger="hover" className="mr-3">
             <FiSettings className="h-6 w-6 text-primary" />
           </MotionIcon>
-          <h1 className="text-2xl font-bold text-base-content">Admin Settings</h1>
+          <h1 className="text-2xl font-bold text-base-content">Admin settings</h1>
         </div>
         {getSyncStatusIndicator()}
       </div>
