@@ -73,11 +73,24 @@ const Header = () => {
 
     // One tween over every target, so nothing can be left behind at opacity 0.
     // clearProps hands the elements back to their natural CSS state.
-    gsap.fromTo(
+    const tween = gsap.fromTo(
       targets,
       { opacity: 0, y: -20 },
       { opacity: 1, y: 0, duration: 0.45, stagger: 0.05, ease: 'power2.out', clearProps: 'opacity,transform' }
     );
+
+    // GSAP advances on requestAnimationFrame, which a browser throttles to
+    // nothing in a background tab. Without this the search and menu buttons
+    // would sit at opacity 0 until the tab is focused. setTimeout still fires
+    // when hidden, so drop the entrance state outright if the tween never ran.
+    const safety = window.setTimeout(() => {
+      if (tween.progress() < 1) {
+        tween.kill();
+        gsap.set(targets, { clearProps: 'opacity,transform' });
+      }
+    }, 1500);
+
+    return () => window.clearTimeout(safety);
   }, []);
   
   // Handle search animation
