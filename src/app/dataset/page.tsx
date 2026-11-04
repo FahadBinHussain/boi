@@ -231,18 +231,18 @@ export default async function DatasetPage({
         <div className="px-4 py-6 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <div className="min-w-0">
-              <div className="mb-2 inline-flex items-center gap-2 badge badge-outline border-base-content/20 bg-base-100 px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-base-content/70">
+              <div className="mb-2 inline-flex items-center gap-2 badge badge-outline border-base-content/20 bg-base-100 px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-base-content/75">
                 <MotionIcon animation="pulse" trigger="hover">
                   <FiDatabase aria-hidden="true" />
                 </MotionIcon>
                 Books Dataset
               </div>
               <h1 className="text-2xl font-extrabold tracking-tight text-base-content sm:text-3xl">Source-backed Bangla books</h1>
-              <p className="mt-1 text-sm text-base-content/60">
+              <p className="mt-1 text-sm text-base-content/75">
                 {totalRows.toLocaleString()} {viewLabel} / showing {visibleRangeStart.toLocaleString()}-{visibleRangeEnd.toLocaleString()}
               </p>
-              <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium uppercase tracking-[0.12em] text-base-content/50">
-                <span className="inline-flex items-center gap-1.5 text-success">
+              <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium uppercase tracking-[0.12em] text-base-content/75">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-success/10 px-2 py-0.5 text-base-content">
                   <span className="inline-block h-1.5 w-1.5 rounded-full bg-success" aria-hidden="true" />
                   live database
                 </span>
@@ -299,7 +299,7 @@ export default async function DatasetPage({
               <div className="join">
                 <Link
                   href={`/dataset?${pageQuery}&page=${Math.max(1, safeCurrentPage - 1)}`}
-                  className={`btn btn-outline btn-xs join-item ${safeCurrentPage === 1 ? 'btn-disabled opacity-40' : ''}`}
+                  className={`btn btn-outline btn-xs join-item ${safeCurrentPage === 1 ? 'btn-disabled' : ''}`}
                 >
                   <MotionIcon animation="bounce" trigger="hover">
                     <FiChevronLeft aria-hidden="true" />
@@ -308,7 +308,7 @@ export default async function DatasetPage({
                 </Link>
                 <Link
                   href={`/dataset?${pageQuery}&page=${Math.min(totalWorkPages, safeCurrentPage + 1)}`}
-                  className={`btn btn-outline btn-xs join-item ${safeCurrentPage === totalWorkPages ? 'btn-disabled opacity-40' : ''}`}
+                  className={`btn btn-outline btn-xs join-item ${safeCurrentPage === totalWorkPages ? 'btn-disabled' : ''}`}
                 >
                   Next
                   <MotionIcon animation="bounce" trigger="hover">
@@ -326,7 +326,7 @@ export default async function DatasetPage({
           <div className="dataset-table-scroll max-h-[calc(100dvh-260px)] overflow-auto">
           <table className="table table-zebra table-sm table-pin-rows">
             <thead>
-              <tr className="bg-base-200 text-base-content/70">
+              <tr className="bg-base-200 text-base-content/75">
                 <th className="w-12">#</th>
                 <th className="w-[42%]">
                   <SortHeader label="Title" column="title" activeSort={sort} direction={direction} view={view} />
@@ -414,19 +414,19 @@ export default async function DatasetPage({
         </div>
 
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 card bg-base-100 border border-base-content/10 px-4 py-3 text-sm rounded-xl">
-          <div className="text-base-content/60">
+          <div className="text-base-content/75">
             Page {safeCurrentPage.toLocaleString()} of {totalWorkPages.toLocaleString()}
           </div>
           <div className="join">
             <Link
               href={`/dataset?${pageQuery}&page=${Math.max(1, safeCurrentPage - 1)}`}
-              className={`btn btn-outline btn-xs join-item ${safeCurrentPage === 1 ? 'btn-disabled opacity-40' : ''}`}
+              className={`btn btn-outline btn-xs join-item ${safeCurrentPage === 1 ? 'btn-disabled' : ''}`}
             >
               Previous
             </Link>
             <Link
               href={`/dataset?${pageQuery}&page=${Math.min(totalWorkPages, safeCurrentPage + 1)}`}
-              className={`btn btn-outline btn-xs join-item ${safeCurrentPage === totalWorkPages ? 'btn-disabled opacity-40' : ''}`}
+              className={`btn btn-outline btn-xs join-item ${safeCurrentPage === totalWorkPages ? 'btn-disabled' : ''}`}
             >
               Next
             </Link>

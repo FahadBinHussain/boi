@@ -55,7 +55,7 @@ export default function AdminLayout({
         <MotionIcon animation="spin" trigger="always">
           <FiLoader className="h-10 w-10 text-primary" />
         </MotionIcon>
-        <span className="ms-4 font-medium text-base-content/70">Loading dashboard…</span>
+        <span className="ms-4 font-medium text-base-content/75">Loading dashboard…</span>
       </div>
     );
   }
@@ -122,7 +122,7 @@ export default function AdminLayout({
               </div>
               <div className="min-w-0">
                 <p className="font-bold text-sm truncate text-base-content">{user?.name || "User"}</p>
-                <p className="text-xs text-base-content/60 truncate">{user?.email || ""}</p>
+                <p className="text-xs text-base-content/75 truncate">{user?.email || ""}</p>
                 <span className="badge badge-primary badge-xs mt-1 font-semibold">{isAdmin ? "Admin" : "Contributor"}</span>
               </div>
             </div>
@@ -140,10 +140,10 @@ export default function AdminLayout({
                   className={`sidebar-item group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
                     isActive
                       ? "bg-primary text-primary-content shadow-md font-semibold"
-                      : "text-base-content/70 hover:bg-base-300 hover:text-base-content"
+                      : "text-base-content/75 hover:bg-base-300 hover:text-base-content"
                   }`}
                 >
-                  <span className={isActive ? "text-primary-content" : "text-base-content/60 group-hover:text-primary"}>
+                  <span className={isActive ? "text-primary-content" : "text-base-content/75 group-hover:text-primary"}>
                     {item.icon}
                   </span>
                   <span>{item.name}</span>

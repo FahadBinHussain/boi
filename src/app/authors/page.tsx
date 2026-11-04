@@ -136,7 +136,7 @@ function AuthorsContent() {
       <div className="shell">
         <div className="mb-10">
           <h1 className="text-3xl font-extrabold text-base-content mb-3">Authors</h1>
-          <p className="text-base text-base-content/70">
+          <p className="text-base text-base-content/75">
             Browse our collection of books by author
           </p>
         </div>
@@ -147,7 +147,7 @@ function AuthorsContent() {
             <MotionIcon animation="spin" trigger="always">
               <FiLoader className="h-8 w-8 text-primary" />
             </MotionIcon>
-            <span className="ms-3 text-base font-medium text-base-content/70">Loading authors…</span>
+            <span className="ms-3 text-base font-medium text-base-content/75">Loading authors…</span>
           </div>
         )}
 
@@ -202,7 +202,7 @@ function AuthorsContent() {
                     Books by <span className="text-primary">{getActiveAuthorName()}</span>
                   </h2>
                   <div className="flex items-center gap-3">
-                    <label htmlFor="sort" className="text-xs font-semibold text-base-content/70 uppercase">Sort by:</label>
+                    <label htmlFor="sort" className="text-xs font-semibold text-base-content/75 uppercase">Sort by:</label>
                     <select
                       id="sort"
                       value={sortOption}
@@ -261,7 +261,7 @@ function AuthorsContent() {
                             <h3 className="card-title text-base font-bold text-base-content mb-1 line-clamp-1 group-hover:text-primary transition-colors">
                               <bdi>{book.title}</bdi>
                             </h3>
-                            <p className="text-xs text-base-content/70 mb-auto line-clamp-1">
+                            <p className="text-xs text-base-content/75 mb-auto line-clamp-1">
                               <bdi>{book.authors.map(author => author.name).join(', ')}</bdi>
                             </p>
                             
@@ -280,7 +280,7 @@ function AuthorsContent() {
 
                 {getAuthorBooks().length === 0 && (
                   <div className="card bg-base-200 border border-base-content/10 p-12 text-center rounded-2xl">
-                    <p className="text-base-content/60">No books found by this author.</p>
+                    <p className="text-base-content/75">No books found by this author.</p>
                   </div>
                 )}
               </div>
@@ -290,7 +290,7 @@ function AuthorsContent() {
             {!activeAuthor && (
               <div className="card bg-base-200/50 border border-base-content/10 p-12 text-center rounded-2xl">
                 <h2 className="text-xl font-bold text-base-content mb-2">Select an author</h2>
-                <p className="text-base-content/60">Click on an author above to view their books.</p>
+                <p className="text-base-content/75">Click on an author above to view their books.</p>
               </div>
             )}
           </>
@@ -307,7 +307,7 @@ export default function AuthorsPage() {
         <div className="shell">
           <div className="mb-10">
             <h1 className="text-3xl font-extrabold text-base-content mb-3">Authors</h1>
-            <p className="text-base text-base-content/70">
+            <p className="text-base text-base-content/75">
               Browse our collection of books by author
             </p>
           </div>
@@ -315,7 +315,7 @@ export default function AuthorsPage() {
             <MotionIcon animation="spin" trigger="always">
               <FiLoader className="h-8 w-8 text-primary" />
             </MotionIcon>
-            <span className="ms-3 text-base text-base-content/70">Loading authors…</span>
+            <span className="ms-3 text-base text-base-content/75">Loading authors…</span>
           </div>
         </div>
       </div>

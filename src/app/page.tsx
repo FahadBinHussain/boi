@@ -158,10 +158,10 @@ export default function Home() {
             <motion.h1 variants={fadeInUp} className="max-w-[20ch] text-balance text-5xl/[1.25] font-extrabold tracking-tight lg:text-7xl/[1.1]">
               <span className="text-base-content">Discover better books</span>
               <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent">with less noise.</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">with less noise.</span>
             </motion.h1>
             
-            <motion.p variants={fadeInUp} className="mt-6 max-w-[52ch] text-pretty text-base leading-relaxed text-base-content/70 lg:text-lg">
+            <motion.p variants={fadeInUp} className="mt-6 max-w-[52ch] text-pretty text-base leading-relaxed text-base-content/75 lg:text-lg">
               Built for focused readers. Cleaner discovery, faster browsing, and a modern library experience that helps you spend more time reading and less time searching.
             </motion.p>
 
@@ -192,10 +192,10 @@ export default function Home() {
                 className="card bg-base-200/70 border border-base-content/10 p-6 backdrop-blur-xl shadow-xl rounded-3xl"
               >
                 <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-5">
-                  <BookOpenIcon ref={(el) => { statRefs.current[0] = el; }} className="text-xl text-primary" />
+                  <BookOpenIcon ref={(el) => { statRefs.current[0] = el; }} className="text-xl text-base-content" />
                 </div>
                 <p className="font-mono text-3xl sm:text-4xl font-bold text-base-content">12k+</p>
-                <p className="mt-2 text-sm text-base-content/60">Titles indexed</p>
+                <p className="mt-2 text-sm text-base-content/75">Titles indexed</p>
               </motion.div>
               
               <motion.div 
@@ -206,10 +206,10 @@ export default function Home() {
                 className="card bg-base-200/70 border border-base-content/10 p-6 backdrop-blur-xl shadow-xl rounded-3xl"
               >
                 <div className="h-12 w-12 rounded-2xl bg-secondary/10 flex items-center justify-center mb-5">
-                  <TrendingUpIcon ref={(el) => { statRefs.current[1] = el; }} className="text-xl text-secondary" />
+                  <TrendingUpIcon ref={(el) => { statRefs.current[1] = el; }} className="text-xl text-base-content" />
                 </div>
                 <p className="font-mono text-3xl sm:text-4xl font-bold text-base-content">94%</p>
-                <p className="mt-2 text-sm text-base-content/60">Return readers</p>
+                <p className="mt-2 text-sm text-base-content/75">Return readers</p>
               </motion.div>
               
               <motion.div 
@@ -220,10 +220,10 @@ export default function Home() {
                 className="card bg-base-200/70 border border-base-content/10 p-6 backdrop-blur-xl shadow-xl rounded-3xl"
               >
                 <div className="h-12 w-12 rounded-2xl bg-accent/10 flex items-center justify-center mb-5">
-                  <ClockIcon ref={(el) => { statRefs.current[2] = el; }} className="text-xl text-accent" />
+                  <ClockIcon ref={(el) => { statRefs.current[2] = el; }} className="text-xl text-base-content" />
                 </div>
                 <p className="font-mono text-3xl sm:text-4xl font-bold text-base-content">&lt;300ms</p>
-                <p className="mt-2 text-sm text-base-content/60">Search response</p>
+                <p className="mt-2 text-sm text-base-content/75">Search response</p>
               </motion.div>
               
               <motion.div 
@@ -234,10 +234,10 @@ export default function Home() {
                 className="card bg-base-200/70 border border-base-content/10 p-6 backdrop-blur-xl shadow-xl rounded-3xl"
               >
                 <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-5">
-                  <GridIcon ref={(el) => { statRefs.current[3] = el; }} className="text-xl text-primary" />
+                  <GridIcon ref={(el) => { statRefs.current[3] = el; }} className="text-xl text-base-content" />
                 </div>
                 <p className="font-mono text-3xl sm:text-4xl font-bold text-base-content">38</p>
-                <p className="mt-2 text-sm text-base-content/60">Genre clusters</p>
+                <p className="mt-2 text-sm text-base-content/75">Genre clusters</p>
               </motion.div>
             </div>
           </motion.div>
@@ -247,7 +247,7 @@ export default function Home() {
         <motion.div
           initial={false}
           animate={scrollControls}
-          className="absolute bottom-6 inset-x-0 mx-auto w-fit flex flex-col items-center gap-1 text-base-content/40"
+          className="absolute bottom-6 inset-x-0 mx-auto w-fit flex flex-col items-center gap-1 text-base-content/75"
         >
           <span className="text-xs tracking-[0.25em] font-semibold uppercase">Scroll</span>
           <motion.div 
@@ -293,7 +293,7 @@ export default function Home() {
             <span>{error}</span>
           </div>
         ) : featured.length === 0 ? (
-          <div className="card bg-base-200 border border-base-content/10 p-8 sm:p-16 text-center text-base-content/60 rounded-3xl">
+          <div className="card bg-base-200 border border-base-content/10 p-8 sm:p-16 text-center text-base-content/75 rounded-3xl">
             No books are available yet. Add some books and refresh to populate this section.
           </div>
         ) : (
@@ -326,8 +326,8 @@ export default function Home() {
                   </div>
                   <div className="card-body p-6">
                     <h3 className="card-title text-lg font-bold line-clamp-2 text-base-content"><bdi>{book.title}</bdi></h3>
-                    <p className="text-sm text-base-content/70"><bdi>{author}</bdi></p>
-                    <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-base-content/60">
+                    <p className="text-sm text-base-content/75"><bdi>{author}</bdi></p>
+                    <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-base-content/75">
                       <bdi>{book.summary || 'A carefully selected title from our latest index, ready for your next deep reading session.'}</bdi>
                     </p>
                     <div className="card-actions justify-end mt-4">

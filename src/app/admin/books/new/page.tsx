@@ -78,11 +78,11 @@ const BookThumbnail = ({
       {hasError && (
         <div className="flex flex-col items-center justify-center text-center p-2">
           <MotionIcon animation="wiggle" trigger="always">
-            <svg className="h-8 w-8 text-base-content/40 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <svg className="h-8 w-8 text-base-content/75 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
             </svg>
           </MotionIcon>
-          <span className="text-xs text-base-content/60">Image not available</span>
+          <span className="text-xs text-base-content/75">Image not available</span>
         </div>
       )}
       
@@ -792,7 +792,7 @@ export default function AddNewBook() {
       <div className="card bg-base-200 border border-base-300 shadow-xl overflow-hidden">
         <div className="border-b border-base-300 bg-base-300/40 p-4 sm:p-6">
           <h2 className="text-lg font-bold text-base-content">Book Information</h2>
-          <p className="mt-1 text-sm text-base-content/70">
+          <p className="mt-1 text-sm text-base-content/75">
             Enter all details of the book you want to add to the library. Required fields are marked with an asterisk (*).
           </p>
         </div>
@@ -801,7 +801,7 @@ export default function AddNewBook() {
           {/* Auto-fill from web section at the top for better UX */}
           <div className="form-group bg-base-100 p-4 rounded-xl border border-base-300">
             <h3 className="text-base font-bold text-base-content">Quick Fill from Web</h3>
-            <p className="mt-1 text-sm text-base-content/60">
+            <p className="mt-1 text-sm text-base-content/75">
               Save time by automatically populating book details from Fandom or Goodreads.
             </p>
 
@@ -810,7 +810,7 @@ export default function AddNewBook() {
                 <div className="relative flex flex-grow items-stretch focus-within:z-10">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                     <MotionIcon animation="wiggle" trigger="hover">
-                      <FiLink className="h-5 w-5 text-base-content/40" aria-hidden="true" />
+                      <FiLink className="h-5 w-5 text-base-content/75" aria-hidden="true" />
                     </MotionIcon>
                   </div>
                   <input
@@ -969,7 +969,7 @@ export default function AddNewBook() {
                 {formErrors.summary && (
                   <p className="mt-1 text-xs text-error">{formErrors.summary}</p>
                 )}
-                <p className="mt-1 text-xs text-base-content/60">Provide a concise summary or description of the book's content</p>
+                <p className="mt-1 text-xs text-base-content/75">Provide a concise summary or description of the book's content</p>
               </div>
             </div>
           </div>
@@ -1003,7 +1003,7 @@ export default function AddNewBook() {
                     {formErrors.thumbnailUrl && (
                       <p className="mt-1 text-xs text-error">{formErrors.thumbnailUrl}</p>
                     )}
-                    <p className="mt-1 text-xs text-base-content/60">Enter a URL for the book cover image</p>
+                    <p className="mt-1 text-xs text-base-content/75">Enter a URL for the book cover image</p>
                   </div>
                   
                   <div className="flex-shrink-0 flex justify-center">
@@ -1016,11 +1016,11 @@ export default function AddNewBook() {
                         }}
                       />
                     ) : (
-                      <div className="h-48 w-32 border-2 border-dashed border-base-300 rounded-xl flex flex-col items-center justify-center text-base-content/40 bg-base-100">
+                      <div className="h-48 w-32 border-2 border-dashed border-base-300 rounded-xl flex flex-col items-center justify-center text-base-content/75 bg-base-100">
                         <MotionIcon animation="pulse" trigger="always" className="mb-2">
                           <FiImage className="h-10 w-10" />
                         </MotionIcon>
-                        <span className="text-xs text-center px-2 text-base-content/50">Cover preview will appear here</span>
+                        <span className="text-xs text-center px-2 text-base-content/75">Cover preview will appear here</span>
                       </div>
                     )}
                   </div>
@@ -1041,11 +1041,11 @@ export default function AddNewBook() {
                   <div className="flex justify-center">
                     <div className="space-y-2 text-center">
                       <MotionIcon animation="bounce" trigger="hover">
-                        <svg className="mx-auto h-10 w-10 text-base-content/40" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                        <svg className="mx-auto h-10 w-10 text-base-content/75" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
                           <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H8m36-12h-4m4 0H20" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       </MotionIcon>
-                      <div className="flex text-sm text-base-content/70 justify-center">
+                      <div className="flex text-sm text-base-content/75 justify-center">
                         <label htmlFor="bookPdf" className="relative cursor-pointer rounded-md font-semibold text-primary hover:underline">
                           <span>Upload a PDF file</span>
                           <input
@@ -1060,7 +1060,7 @@ export default function AddNewBook() {
                         </label>
                         <p className="pl-1">or drag and drop</p>
                       </div>
-                      <p className="text-xs text-base-content/50">PDF up to 100MB</p>
+                      <p className="text-xs text-base-content/75">PDF up to 100MB</p>
                     </div>
                   </div>
                   
@@ -1075,13 +1075,13 @@ export default function AddNewBook() {
                         </MotionIcon>
                         <div className="ms-3">
                           <p className="text-sm font-semibold text-base-content">{bookPdfFile.name}</p>
-                          <p className="text-xs text-base-content/60">{(bookPdfFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                          <p className="text-xs text-base-content/75">{(bookPdfFile.size / 1024 / 1024).toFixed(2)} MB</p>
                         </div>
                       </div>
                       <button
                         type="button"
                         onClick={() => setBookPdfFile(null)}
-                        className="btn btn-ghost btn-circle btn-sm text-base-content/60 hover:text-error"
+                        className="btn btn-ghost btn-circle btn-sm text-base-content/75 hover:text-error"
                         disabled={singleBookUploadStatus === 'uploading'}
                       >
                         <MotionIcon animation="wiggle" trigger="hover">
@@ -1168,7 +1168,7 @@ export default function AddNewBook() {
                   value={publicationDate}
                   onChange={(e) => setPublicationDate(e.target.value)}
                 />
-                <p className="mt-1 text-xs text-base-content/60">Enter year (YYYY) or full date (YYYY-MM-DD). Auto-filled dates will be formatted automatically.</p>
+                <p className="mt-1 text-xs text-base-content/75">Enter year (YYYY) or full date (YYYY-MM-DD). Auto-filled dates will be formatted automatically.</p>
                 
                 {formErrors.publicationDate && (
                   <p className="mt-1 text-xs text-error">{formErrors.publicationDate}</p>
@@ -1186,7 +1186,7 @@ export default function AddNewBook() {
                   value={publisher}
                   onChange={(e) => setPublisher(e.target.value)}
                 />
-                <p className="mt-1 text-xs text-base-content/60">Enter the name of the publishing company (optional)</p>
+                <p className="mt-1 text-xs text-base-content/75">Enter the name of the publishing company (optional)</p>
               </div>
               
               {/* Language */}
@@ -1200,7 +1200,7 @@ export default function AddNewBook() {
                   value={language}
                   onChange={(e) => setLanguage(e.target.value)}
                 />
-                <p className="mt-1 text-xs text-base-content/60">Enter the language of the book (e.g. English, Spanish)</p>
+                <p className="mt-1 text-xs text-base-content/75">Enter the language of the book (e.g. English, Spanish)</p>
               </div>
             </div>
           </div>
@@ -1220,7 +1220,7 @@ export default function AddNewBook() {
                   value={series}
                   onChange={(e) => setSeries(e.target.value)}
                 />
-                <p className="mt-1 text-xs text-base-content/60">If this book is part of a series, enter the series name</p>
+                <p className="mt-1 text-xs text-base-content/75">If this book is part of a series, enter the series name</p>
               </div>
               
               <div className="sm:col-span-2">
@@ -1233,7 +1233,7 @@ export default function AddNewBook() {
                   value={seriesPosition}
                   onChange={(e) => setSeriesPosition(e.target.value)}
                 />
-                <p className="mt-1 text-xs text-base-content/60">Book's position in the series (e.g. "1" or "2.5")</p>
+                <p className="mt-1 text-xs text-base-content/75">Book's position in the series (e.g. "1" or "2.5")</p>
               </div>
             
               {/* Number of Pages */}
@@ -1248,7 +1248,7 @@ export default function AddNewBook() {
                     value={numberOfPages || ""}
                     onChange={(e) => setNumberOfPages(parseInt(e.target.value) || undefined)}
                   />
-                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-base-content/40">
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-base-content/75">
                     <MotionIcon animation="float" trigger="hover">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
@@ -1270,7 +1270,7 @@ export default function AddNewBook() {
                     value={ratings || ""}
                     onChange={(e) => setRatings(parseInt(e.target.value) || undefined)}
                   />
-                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-base-content/40">
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-base-content/75">
                     <MotionIcon animation="bounce" trigger="hover">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -1295,7 +1295,7 @@ export default function AddNewBook() {
                     value={averageRating || ""}
                     onChange={(e) => setAverageRating(parseFloat(e.target.value) || undefined)}
                   />
-                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-base-content/40">
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-base-content/75">
                     <MotionIcon animation="spin" trigger="hover">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -1303,7 +1303,7 @@ export default function AddNewBook() {
                     </MotionIcon>
                   </div>
                 </div>
-                <p className="mt-1 text-xs text-base-content/60">Average rating out of 5</p>
+                <p className="mt-1 text-xs text-base-content/75">Average rating out of 5</p>
               </div>
               
               {/* Genres - as a comma-separated input */}
@@ -1320,7 +1320,7 @@ export default function AddNewBook() {
                     setGenres(genresArray);
                   }}
                 />
-                <p className="mt-1 text-xs text-base-content/60">Separate genres with commas</p>
+                <p className="mt-1 text-xs text-base-content/75">Separate genres with commas</p>
               </div>
               
               {/* Characters - as a comma-separated input */}
@@ -1337,7 +1337,7 @@ export default function AddNewBook() {
                     setCharacters(charactersArray);
                   }}
                 />
-                <p className="mt-1 text-xs text-base-content/60">Separate character names with commas</p>
+                <p className="mt-1 text-xs text-base-content/75">Separate character names with commas</p>
               </div>
             </div>
           </div>

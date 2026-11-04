@@ -201,7 +201,7 @@ const BookCard = ({ book, compact = false }: BookCardProps) => {
             <bdi>{book.title}</bdi>
           </Link>
         </h3>
-        <p className={`text-sm text-base-content/70 mb-2 line-clamp-1 ${compact ? 'text-xs' : ''}`}>
+        <p className={`text-sm text-base-content/75 mb-2 line-clamp-1 ${compact ? 'text-xs' : ''}`}>
           <bdi>{book.author}</bdi>
         </p>
         
@@ -227,7 +227,7 @@ const BookCard = ({ book, compact = false }: BookCardProps) => {
 
       {/* Footer Info */}
       <div 
-        className={`px-4 py-2.5 bg-base-200/50 border-t border-base-200 text-xs text-base-content/60 flex items-center justify-between ${
+        className={`px-4 py-2.5 bg-base-200/50 border-t border-base-200 text-xs text-base-content/75 flex items-center justify-between ${
           compact ? 'px-3 py-1.5 text-xs' : ''
         }`} 
         style={{ transform: 'translateZ(5px)' }}

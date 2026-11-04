@@ -69,6 +69,14 @@ When a record is not a normal book, preserve the material type in metadata, espe
 - **Rendered text uses the real ellipsis character `…`,** never three dots.
 - Local dev needs a Postgres for the `/api/books` catalog path (`prisma db push`), and the seeded catalog can be filled from the live Turso `works`/`editions`/`authors` tables so layouts are verified against real Bengali titles. The vault `.env.local` only carries the Turso variables; `DATABASE_URL` and the NextAuth/Google vars are local-only additions.
 
+## Frontend Color Conventions
+
+- **Muted text alpha floor is `/75`.** Measured against the live DaisyUI `light` and `dark` themes: `text-base-content/70` clears 4.5:1 in light but drops to 4.18:1 in dark, because the dark `base-200` card surface sits close to the dark theme's `base-content`. `/75` is the lightest alpha that clears 4.5:1 on `base-100`/`base-200`/`base-300` in BOTH themes — use it for every secondary label.
+- **Put the hue on the background, not on the label.** A `bg-primary/10` chip with a `text-primary` glyph measures 2.89:1, and `text-accent` on `bg-accent/10` only 1.70:1. Keep the tinted chip background and set the glyph to `text-base-content` (11-12:1 in light, 6.1-6.4:1 in dark). Same rule for the `live database` status pill on `/dataset`.
+- **The headline gradient must not include the `accent` stop.** `oklch(var(--a))` on white is 1.83:1 and fails even the 3:1 large-text bar. The headline runs `from-primary to-secondary` — 7.68:1 / 3.39:1 in light, 4.73:1 / 5.63:1 in dark.
+- **`btn-disabled` already dims itself to `--tw-text-opacity: 0.2`.** Do not stack `opacity-40` on top of it; that is 8% effective and the label disappears. WCAG 1.4.3 exempts inactive controls, so DaisyUI's own disabled treatment is the intended look.
+- **Measuring contrast in a real browser has two traps.** (1) Chrome serializes achromatic DaisyUI colors as `oklab(L 0 0)`, so an `oklch`-only parser silently drops the page background and reports false passes — parse `oklab()` too. (2) CSS transitions are paused in a backgrounded tab, so reading `getComputedStyle` right after flipping `data-theme` returns the OLD theme's colors; disable transitions before switching. Composite the whole ancestor chain (outermost opaque layer inward) instead of compositing a translucent layer over white.
+
 ## Dataset Restore (dataset/main is gitignored)
 
 `dataset/main/` and `dataset/archive/` are gitignored, so a fresh clone, a CI clone, or a wiped machine has neither. Never rebuild them by hand — restore the backup archive.

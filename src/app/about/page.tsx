@@ -14,7 +14,7 @@ export default function AboutPage() {
             </MotionIcon>
           </div>
           <h1 className="text-4xl font-extrabold text-base-content mb-3">About বই</h1>
-          <p className="text-base text-base-content/70 max-w-2xl mx-auto">
+          <p className="text-base text-base-content/75 max-w-2xl mx-auto">
             A digital library offering free access to books across various genres and categories.
           </p>
         </div>
@@ -34,25 +34,25 @@ export default function AboutPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
               <div className="card bg-base-100 border border-base-content/10 p-6 rounded-2xl shadow-sm">
                 <h3 className="text-lg font-bold text-base-content mb-2">Wide Selection</h3>
-                <p className="text-base-content/70 text-sm">
+                <p className="text-base-content/75 text-sm">
                   Access thousands of books across various genres and categories, from classics to contemporary books.
                 </p>
               </div>
               <div className="card bg-base-100 border border-base-content/10 p-6 rounded-2xl shadow-sm">
                 <h3 className="text-lg font-bold text-base-content mb-2">Multiple Formats</h3>
-                <p className="text-base-content/70 text-sm">
+                <p className="text-base-content/75 text-sm">
                   Download books in various formats including PDF, EPUB, and MOBI, compatible with all your devices.
                 </p>
               </div>
               <div className="card bg-base-100 border border-base-content/10 p-6 rounded-2xl shadow-sm">
                 <h3 className="text-lg font-bold text-base-content mb-2">User-Friendly Interface</h3>
-                <p className="text-base-content/70 text-sm">
+                <p className="text-base-content/75 text-sm">
                   Our clean, modern interface makes it easy to search, browse, and download books with just a few clicks.
                 </p>
               </div>
               <div className="card bg-base-100 border border-base-content/10 p-6 rounded-2xl shadow-sm">
                 <h3 className="text-lg font-bold text-base-content mb-2">No Registration Required</h3>
-                <p className="text-base-content/70 text-sm">
+                <p className="text-base-content/75 text-sm">
                   Download books instantly without having to create an account or provide personal information.
                 </p>
               </div>
@@ -95,7 +95,7 @@ export default function AboutPage() {
             </MotionIcon>
           </div>
           <h2 className="text-2xl font-bold text-base-content mb-2">Get In Touch</h2>
-          <p className="text-base-content/70 mb-6 max-w-xl mx-auto text-sm">
+          <p className="text-base-content/75 mb-6 max-w-xl mx-auto text-sm">
             Have questions, suggestions, or feedback? We'd love to hear from you. Reach out to our team.
           </p>
           <div>
@@ -113,7 +113,7 @@ export default function AboutPage() {
 
         {/* Thank You Note */}
         <div className="text-center mt-12">
-          <p className="flex items-center justify-center text-base-content/50 text-xs">
+          <p className="flex items-center justify-center text-base-content/75 text-xs">
             Made with <MotionIcon animation="pulse" trigger="always"><FiHeart className="mx-1 text-error" /></MotionIcon> for book lovers worldwide
           </p>
         </div>

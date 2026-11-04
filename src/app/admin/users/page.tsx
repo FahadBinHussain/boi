@@ -147,7 +147,7 @@ export default function UsersManagement() {
     <div>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-base-content">Users Management</h1>
-        <p className="mt-2 text-sm text-base-content/70">
+        <p className="mt-2 text-sm text-base-content/75">
           Manage your users, view activity, and control user access.
         </p>
       </div>
@@ -162,7 +162,7 @@ export default function UsersManagement() {
               </MotionIcon>
             </div>
             <div className="ms-4">
-              <p className="text-xs font-semibold text-base-content/60 uppercase tracking-wider">Active Users</p>
+              <p className="text-xs font-semibold text-base-content/75 uppercase tracking-wider">Active Users</p>
               <p className="text-2xl font-black text-base-content">{totalActiveUsers}</p>
             </div>
           </div>
@@ -176,7 +176,7 @@ export default function UsersManagement() {
               </MotionIcon>
             </div>
             <div className="ms-4">
-              <p className="text-xs font-semibold text-base-content/60 uppercase tracking-wider">Inactive Users</p>
+              <p className="text-xs font-semibold text-base-content/75 uppercase tracking-wider">Inactive Users</p>
               <p className="text-2xl font-black text-base-content">{totalInactiveUsers}</p>
             </div>
           </div>
@@ -190,7 +190,7 @@ export default function UsersManagement() {
               </MotionIcon>
             </div>
             <div className="ms-4">
-              <p className="text-xs font-semibold text-base-content/60 uppercase tracking-wider">Admin Users</p>
+              <p className="text-xs font-semibold text-base-content/75 uppercase tracking-wider">Admin Users</p>
               <p className="text-2xl font-black text-base-content">{totalAdminUsers}</p>
             </div>
           </div>
@@ -203,7 +203,7 @@ export default function UsersManagement() {
           <div className="relative flex-1">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
               <MotionIcon animation="wiggle" trigger="hover">
-                <FiSearch className="h-5 w-5 text-base-content/40" />
+                <FiSearch className="h-5 w-5 text-base-content/75" />
               </MotionIcon>
             </div>
             <input
@@ -218,7 +218,7 @@ export default function UsersManagement() {
           <div className="flex items-center space-x-2">
             <div className="inline-flex items-center">
               <MotionIcon animation="wiggle" trigger="hover" className="mr-2">
-                <FiFilter className="h-5 w-5 text-base-content/40" />
+                <FiFilter className="h-5 w-5 text-base-content/75" />
               </MotionIcon>
               <select
                 className="select select-bordered bg-base-100 text-base-content"
@@ -267,7 +267,7 @@ export default function UsersManagement() {
                 >
                   <div className="group inline-flex items-center">
                     Name
-                    <span className="ms-2 text-base-content/50 group-hover:text-base-content">
+                    <span className="ms-2 text-base-content/75 group-hover:text-base-content">
                       {sort.field === "name" && (
                         sort.direction === "desc" ? "↓" : "↑"
                       )}
@@ -281,7 +281,7 @@ export default function UsersManagement() {
                 >
                   <div className="group inline-flex items-center">
                     Email
-                    <span className="ms-2 text-base-content/50 group-hover:text-base-content">
+                    <span className="ms-2 text-base-content/75 group-hover:text-base-content">
                       {sort.field === "email" && (
                         sort.direction === "desc" ? "↓" : "↑"
                       )}
@@ -295,7 +295,7 @@ export default function UsersManagement() {
                 >
                   <div className="group inline-flex items-center">
                     Role
-                    <span className="ms-2 text-base-content/50 group-hover:text-base-content">
+                    <span className="ms-2 text-base-content/75 group-hover:text-base-content">
                       {sort.field === "role" && (
                         sort.direction === "desc" ? "↓" : "↑"
                       )}
@@ -309,7 +309,7 @@ export default function UsersManagement() {
                 >
                   <div className="group inline-flex items-center">
                     Status
-                    <span className="ms-2 text-base-content/50 group-hover:text-base-content">
+                    <span className="ms-2 text-base-content/75 group-hover:text-base-content">
                       {sort.field === "status" && (
                         sort.direction === "desc" ? "↓" : "↑"
                       )}
@@ -323,7 +323,7 @@ export default function UsersManagement() {
                 >
                   <div className="group inline-flex items-center">
                     Last Login
-                    <span className="ms-2 text-base-content/50 group-hover:text-base-content">
+                    <span className="ms-2 text-base-content/75 group-hover:text-base-content">
                       {sort.field === "lastLogin" && (
                         sort.direction === "desc" ? "↓" : "↑"
                       )}
@@ -337,7 +337,7 @@ export default function UsersManagement() {
                 >
                   <div className="group inline-flex items-center">
                     Joined
-                    <span className="ms-2 text-base-content/50 group-hover:text-base-content">
+                    <span className="ms-2 text-base-content/75 group-hover:text-base-content">
                       {sort.field === "joined" && (
                         sort.direction === "desc" ? "↓" : "↑"
                       )}
@@ -364,7 +364,7 @@ export default function UsersManagement() {
                     <td className="whitespace-nowrap px-3 py-4 text-sm">
                       <div className="font-bold text-base-content">{user.name}</div>
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-base-content/70">{user.email}</td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-base-content/75">{user.email}</td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm">
                       <span className={`badge badge-sm font-semibold ${
                         user.role === "admin" 
@@ -383,10 +383,10 @@ export default function UsersManagement() {
                         {user.status}
                       </span>
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-base-content/60">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-base-content/75">
                       {new Date(user.lastLogin).toLocaleDateString()}
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-base-content/60">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-base-content/75">
                       {new Date(user.joined).toLocaleDateString()}
                     </td>
                     <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
@@ -425,7 +425,7 @@ export default function UsersManagement() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={8} className="px-6 py-12 text-center text-sm text-base-content/60">
+                  <td colSpan={8} className="px-6 py-12 text-center text-sm text-base-content/75">
                     No users found matching your criteria.
                   </td>
                 </tr>
@@ -439,7 +439,7 @@ export default function UsersManagement() {
           <div className="flex items-center justify-between border-t border-base-300 bg-base-200/50 px-4 py-3 sm:px-6">
             <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
               <div>
-                <p className="text-sm text-base-content/70">
+                <p className="text-sm text-base-content/75">
                   Showing <span className="font-semibold text-base-content">{indexOfFirstUser + 1}</span> to{" "}
                   <span className="font-semibold text-base-content">
                     {indexOfLastUser > filteredUsers.length ? filteredUsers.length : indexOfLastUser}

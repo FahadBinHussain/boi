@@ -53,7 +53,7 @@ export default function BooksPage() {
       <div className="shell">
         <div className="mb-10">
           <h1 className="text-3xl font-extrabold text-base-content mb-3">Browse Books</h1>
-          <p className="text-base text-base-content/70">
+          <p className="text-base text-base-content/75">
             Discover and download free books from our extensive collection
           </p>
         </div>
@@ -68,7 +68,7 @@ export default function BooksPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <div className="absolute end-4 top-1/2 -translate-y-1/2 text-base-content/50">
+            <div className="absolute end-4 top-1/2 -translate-y-1/2 text-base-content/75">
               <MotionIcon animation="spin">
                 <FiSearch size={18} />
               </MotionIcon>
@@ -83,7 +83,7 @@ export default function BooksPage() {
               <MotionIcon animation="spin" trigger="always">
                 <FiLoader className="h-8 w-8 text-primary" />
               </MotionIcon>
-              <span className="ms-3 text-base font-medium text-base-content/70">Loading books…</span>
+              <span className="ms-3 text-base font-medium text-base-content/75">Loading books…</span>
             </div>
           ) : error ? (
             <div className="alert alert-error max-w-xl shadow-lg">

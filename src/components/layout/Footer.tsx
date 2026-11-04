@@ -14,7 +14,7 @@ const Footer = () => {
             <h3 className="text-sm font-semibold text-base-content tracking-wider uppercase mb-4">
               About <span lang="bn">বই</span>
             </h3>
-            <p className="text-base-content/70 text-sm leading-relaxed">
+            <p className="text-base-content/75 text-sm leading-relaxed">
               <span lang="bn">বই</span> is a digital library offering free access to books across various genres.
               Our mission is to promote reading and make knowledge accessible to everyone.
             </p>
@@ -29,7 +29,7 @@ const Footer = () => {
               <li>
                 <Link 
                   href="/" 
-                  className="text-base-content/70 hover:text-primary text-sm transition-colors"
+                  className="text-base-content/75 hover:text-primary text-sm transition-colors"
                 >
                   Home
                 </Link>
@@ -37,7 +37,7 @@ const Footer = () => {
               <li>
                 <Link 
                   href="/books" 
-                  className="text-base-content/70 hover:text-primary text-sm transition-colors"
+                  className="text-base-content/75 hover:text-primary text-sm transition-colors"
                 >
                   Browse Books
                 </Link>
@@ -45,7 +45,7 @@ const Footer = () => {
               <li>
                 <Link 
                   href="/genres" 
-                  className="text-base-content/70 hover:text-primary text-sm transition-colors"
+                  className="text-base-content/75 hover:text-primary text-sm transition-colors"
                 >
                   Genres
                 </Link>
@@ -53,7 +53,7 @@ const Footer = () => {
               <li>
                 <Link 
                   href="/authors" 
-                  className="text-base-content/70 hover:text-primary text-sm transition-colors"
+                  className="text-base-content/75 hover:text-primary text-sm transition-colors"
                 >
                   Authors
                 </Link>
@@ -61,7 +61,7 @@ const Footer = () => {
               <li>
                 <Link 
                   href="/dataset" 
-                  className="text-base-content/70 hover:text-primary text-sm transition-colors"
+                  className="text-base-content/75 hover:text-primary text-sm transition-colors"
                 >
                   Dataset
                 </Link>
@@ -69,7 +69,7 @@ const Footer = () => {
               <li>
                 <Link 
                   href="/about" 
-                  className="text-base-content/70 hover:text-primary text-sm transition-colors"
+                  className="text-base-content/75 hover:text-primary text-sm transition-colors"
                 >
                   About Us
                 </Link>
@@ -86,7 +86,7 @@ const Footer = () => {
               <li>
                 <Link 
                   href="/privacy" 
-                  className="text-base-content/70 hover:text-primary text-sm transition-colors"
+                  className="text-base-content/75 hover:text-primary text-sm transition-colors"
                 >
                   Privacy Policy
                 </Link>
@@ -94,7 +94,7 @@ const Footer = () => {
               <li>
                 <Link 
                   href="/terms" 
-                  className="text-base-content/70 hover:text-primary text-sm transition-colors"
+                  className="text-base-content/75 hover:text-primary text-sm transition-colors"
                 >
                   Terms of Service
                 </Link>
@@ -102,7 +102,7 @@ const Footer = () => {
               <li>
                 <Link 
                   href="/copyright" 
-                  className="text-base-content/70 hover:text-primary text-sm transition-colors"
+                  className="text-base-content/75 hover:text-primary text-sm transition-colors"
                 >
                   Copyright Notice
                 </Link>
@@ -110,7 +110,7 @@ const Footer = () => {
               <li>
                 <Link 
                   href="/dmca" 
-                  className="text-base-content/70 hover:text-primary text-sm transition-colors"
+                  className="text-base-content/75 hover:text-primary text-sm transition-colors"
                 >
                   DMCA Policy
                 </Link>
@@ -124,23 +124,23 @@ const Footer = () => {
               Connect With Us
             </h3>
             <div className="flex gap-3 mb-4">
-              <a href="#" className="btn btn-ghost btn-circle btn-sm text-base-content/70 hover:text-primary">
+              <a href="#" className="btn btn-ghost btn-circle btn-sm text-base-content/75 hover:text-primary">
                 <MotionIcon animation="bounce">
                   <FiGithub size={18} />
                 </MotionIcon>
               </a>
-              <a href="#" className="btn btn-ghost btn-circle btn-sm text-base-content/70 hover:text-primary">
+              <a href="#" className="btn btn-ghost btn-circle btn-sm text-base-content/75 hover:text-primary">
                 <MotionIcon animation="wiggle">
                   <FiTwitter size={18} />
                 </MotionIcon>
               </a>
-              <a href="mailto:contact@boi.com" className="btn btn-ghost btn-circle btn-sm text-base-content/70 hover:text-primary">
+              <a href="mailto:contact@boi.com" className="btn btn-ghost btn-circle btn-sm text-base-content/75 hover:text-primary">
                 <MotionIcon animation="float">
                   <FiMail size={18} />
                 </MotionIcon>
               </a>
             </div>
-            <p className="text-sm text-base-content/70">
+            <p className="text-sm text-base-content/75">
               Questions or suggestions? 
               <a href="mailto:contact@boi.com" className="text-primary hover:underline ms-1">
                 Reach out to us
@@ -150,10 +150,10 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-base-300 mt-8 pt-8 flex flex-col items-center">
-          <p className="text-sm text-base-content/60 mb-2">
+          <p className="text-sm text-base-content/75 mb-2">
             &copy; {currentYear} <span lang="bn">বই</span>. All rights reserved.
           </p>
-          <p className="flex items-center text-xs text-base-content/50">
+          <p className="flex items-center text-xs text-base-content/75">
             Made with <MotionIcon animation="pulse" trigger="always"><FiHeart className="mx-1 text-error" /></MotionIcon> for book lovers worldwide
           </p>
         </div>

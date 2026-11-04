@@ -166,7 +166,7 @@ export default function AdminSettings() {
       <div className="mb-4">
         <button 
           onClick={() => setShowDebug(!showDebug)}
-          className="text-xs text-base-content/60 underline hover:text-base-content"
+          className="text-xs text-base-content/75 underline hover:text-base-content"
         >
           {showDebug ? "Hide Debug Info" : "Show Debug Info"}
         </button>
@@ -183,7 +183,7 @@ export default function AdminSettings() {
       </div>
       
       {isLoading ? (
-        <div className="card bg-base-200 border border-base-300 p-6 text-center text-base-content/70">
+        <div className="card bg-base-200 border border-base-300 p-6 text-center text-base-content/75">
           <span className="loading loading-spinner text-primary mx-auto mb-2"></span>
           Loading settings…
         </div>
@@ -211,7 +211,7 @@ export default function AdminSettings() {
                   value={filesVcApiKey}
                   onChange={handleApiKeyChange}
                 />
-                <p className="mt-1 text-xs text-base-content/60">
+                <p className="mt-1 text-xs text-base-content/75">
                   {!isApiKeyModified && settings?.filesVcApiKey 
                     ? "API key is saved. Leave blank to keep the existing key." 
                     : "Your API key will be stored in the database."}
@@ -230,7 +230,7 @@ export default function AdminSettings() {
                   value={filesVcAccountId}
                   onChange={handleAccountIdChange}
                 />
-                <p className="mt-1 text-xs text-base-content/60">
+                <p className="mt-1 text-xs text-base-content/75">
                   Required to associate uploads with your Files.vc account. Find this in your Files.vc dashboard.
                 </p>
               </div>

@@ -133,7 +133,7 @@ export default function BookDetailPage() {
           <MotionIcon animation="spin" trigger="always" className="inline-block mb-4">
             <FiLoader className="w-12 h-12 text-primary" />
           </MotionIcon>
-          <p className="text-base-content/70 font-medium">Loading book details…</p>
+          <p className="text-base-content/75 font-medium">Loading book details…</p>
         </div>
       </div>
     );
@@ -144,7 +144,7 @@ export default function BookDetailPage() {
       <div className="min-h-screen flex items-center justify-center bg-base-100 text-base-content px-4">
         <div className="text-center card bg-base-200 border border-base-content/10 p-8 max-w-md shadow-xl rounded-3xl">
           <h2 className="text-2xl font-bold text-base-content mb-2">{error || 'Book not found'}</h2>
-          <p className="text-base-content/70 mb-6">The book you're looking for doesn't seem to exist.</p>
+          <p className="text-base-content/75 mb-6">The book you're looking for doesn't seem to exist.</p>
           <Link 
             href="/books" 
             className="btn btn-primary gap-2"
@@ -217,7 +217,7 @@ export default function BookDetailPage() {
               <div className="mb-4">
                 {authors.length > 0 ? (
                   <div className="flex flex-wrap items-center gap-1.5">
-                    <span className="text-base-content/70">By</span>
+                    <span className="text-base-content/75">By</span>
                     {authors.map((author, index) => (
                       <span key={author.id}>
                         <Link 
@@ -226,12 +226,12 @@ export default function BookDetailPage() {
                         >
                           <bdi>{author.name}</bdi>
                         </Link>
-                        {index < authors.length - 1 && <span className="text-base-content/60">,</span>}
+                        {index < authors.length - 1 && <span className="text-base-content/75">,</span>}
                       </span>
                     ))}
                   </div>
                 ) : book.author ? (
-                  <div className="text-base-content/70">By {book.author}</div>
+                  <div className="text-base-content/75">By {book.author}</div>
                 ) : null}
               </div>
               
@@ -250,7 +250,7 @@ export default function BookDetailPage() {
                       <FiBook className="text-primary mt-1" />
                     </MotionIcon>
                     <div>
-                      <h3 className="text-xs font-semibold text-base-content/60 uppercase">Series</h3>
+                      <h3 className="text-xs font-semibold text-base-content/75 uppercase">Series</h3>
                       <p className="text-base-content font-medium">
                         <Link 
                           href={`/series/${book.seriesId || ''}`}
@@ -270,7 +270,7 @@ export default function BookDetailPage() {
                       <FiHash className="text-primary mt-1" />
                     </MotionIcon>
                     <div>
-                      <h3 className="text-xs font-semibold text-base-content/60 uppercase">Position in Series</h3>
+                      <h3 className="text-xs font-semibold text-base-content/75 uppercase">Position in Series</h3>
                       <p className="text-base-content font-medium">{book.seriesPosition}</p>
                     </div>
                   </div>
@@ -283,7 +283,7 @@ export default function BookDetailPage() {
                       <FiCalendar className="text-primary mt-1" />
                     </MotionIcon>
                     <div>
-                      <h3 className="text-xs font-semibold text-base-content/60 uppercase">Publication Date</h3>
+                      <h3 className="text-xs font-semibold text-base-content/75 uppercase">Publication Date</h3>
                       <p className="text-base-content font-medium">{book.publicationDate}</p>
                     </div>
                   </div>
@@ -296,7 +296,7 @@ export default function BookDetailPage() {
                       <FiFileText className="text-primary mt-1" />
                     </MotionIcon>
                     <div>
-                      <h3 className="text-xs font-semibold text-base-content/60 uppercase">Publisher</h3>
+                      <h3 className="text-xs font-semibold text-base-content/75 uppercase">Publisher</h3>
                       <p className="text-base-content font-medium">{book.publisher}</p>
                     </div>
                   </div>
@@ -309,7 +309,7 @@ export default function BookDetailPage() {
                       <FiGlobe className="text-primary mt-1" />
                     </MotionIcon>
                     <div>
-                      <h3 className="text-xs font-semibold text-base-content/60 uppercase">Language</h3>
+                      <h3 className="text-xs font-semibold text-base-content/75 uppercase">Language</h3>
                       <p className="text-base-content font-medium">{book.language}</p>
                     </div>
                   </div>
@@ -322,7 +322,7 @@ export default function BookDetailPage() {
                       <FiLayers className="text-primary mt-1" />
                     </MotionIcon>
                     <div>
-                      <h3 className="text-xs font-semibold text-base-content/60 uppercase">Pages</h3>
+                      <h3 className="text-xs font-semibold text-base-content/75 uppercase">Pages</h3>
                       <p className="text-base-content font-medium">{book.numberOfPages}</p>
                     </div>
                   </div>
@@ -335,7 +335,7 @@ export default function BookDetailPage() {
                       <FiStar className="text-warning mt-1" />
                     </MotionIcon>
                     <div>
-                      <h3 className="text-xs font-semibold text-base-content/60 uppercase">Rating</h3>
+                      <h3 className="text-xs font-semibold text-base-content/75 uppercase">Rating</h3>
                       <div className="flex items-center">
                         <div className="flex text-warning mr-2">
                           {[...Array(5)].map((_, i) => (
@@ -354,7 +354,7 @@ export default function BookDetailPage() {
                         </div>
                         <span className="text-base-content font-medium">{(book.averageRating || 0).toFixed(1)} / 5</span>
                         {typeof book.ratings === 'number' && book.ratings > 0 && (
-                          <span className="text-base-content/60 ms-1 text-xs">({book.ratings} ratings)</span>
+                          <span className="text-base-content/75 ms-1 text-xs">({book.ratings} ratings)</span>
                         )}
                       </div>
                     </div>
@@ -368,7 +368,7 @@ export default function BookDetailPage() {
                       <FiFileText className="text-primary mt-1" />
                     </MotionIcon>
                     <div>
-                      <h3 className="text-xs font-semibold text-base-content/60 uppercase">Format</h3>
+                      <h3 className="text-xs font-semibold text-base-content/75 uppercase">Format</h3>
                       <p className="text-base-content font-medium">{book.format}</p>
                     </div>
                   </div>
@@ -380,7 +380,7 @@ export default function BookDetailPage() {
                       <FiFileText className="text-primary mt-1" />
                     </MotionIcon>
                     <div>
-                      <h3 className="text-xs font-semibold text-base-content/60 uppercase">File Size</h3>
+                      <h3 className="text-xs font-semibold text-base-content/75 uppercase">File Size</h3>
                       <p className="text-base-content font-medium">{book.fileSize}</p>
                     </div>
                   </div>

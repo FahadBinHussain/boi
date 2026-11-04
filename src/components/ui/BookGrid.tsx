@@ -64,7 +64,7 @@ const BookGrid = ({ books, selectedGenres, isLoading = false, error = null, comp
         <MotionIcon animation="spin" trigger="always" className="mb-4">
           <FiLoader className="w-10 h-10 text-primary" />
         </MotionIcon>
-        <p className="text-base-content/70 font-medium">Loading books…</p>
+        <p className="text-base-content/75 font-medium">Loading books…</p>
       </div>
     );
   }
@@ -91,11 +91,11 @@ const BookGrid = ({ books, selectedGenres, isLoading = false, error = null, comp
         <div className="card bg-base-200 border border-base-content/10 p-8 max-w-md text-center rounded-2xl shadow-sm">
           <div className="flex justify-center mb-3">
             <MotionIcon animation="float" trigger="always">
-              <FiInbox className="w-10 h-10 text-base-content/40" />
+              <FiInbox className="w-10 h-10 text-base-content/75" />
             </MotionIcon>
           </div>
           <h3 className="font-bold text-base-content text-lg mb-1">No books found</h3>
-          <p className="text-sm text-base-content/60">Try adjusting your search or filters.</p>
+          <p className="text-sm text-base-content/75">Try adjusting your search or filters.</p>
         </div>
       </div>
     );

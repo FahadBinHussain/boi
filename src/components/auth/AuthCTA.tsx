@@ -64,7 +64,7 @@ const AuthCTA = () => {
           <h2 className="text-3xl md:text-4xl font-black text-base-content mb-4">
             Welcome back, {session.user?.name?.split(' ')[0] || 'Reader'}!
           </h2>
-          <p className="text-base-content/70 text-lg mb-8 max-w-2xl mx-auto">
+          <p className="text-base-content/75 text-lg mb-8 max-w-2xl mx-auto">
             Continue your reading journey with personalized recommendations.
           </p>
           <Link 
@@ -91,7 +91,7 @@ const AuthCTA = () => {
         <h2 className="text-3xl md:text-4xl font-black text-base-content mb-4">
           Ready to start your reading journey?
         </h2>
-        <p className="text-base-content/70 text-lg mb-8 max-w-2xl mx-auto">
+        <p className="text-base-content/75 text-lg mb-8 max-w-2xl mx-auto">
           Join thousands of readers who discover new books every day on বই.
         </p>
         

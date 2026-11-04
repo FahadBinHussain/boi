@@ -66,7 +66,7 @@ function StatCard({ title, value, icon, colorClass = "text-primary bg-primary/10
     >
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-xs font-bold uppercase tracking-wider text-base-content/60">{title}</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-base-content/75">{title}</p>
           <p className="mt-3 font-mono text-4xl font-extrabold text-base-content">{value}</p>
         </div>
         <div className={`rounded-2xl p-3.5 ${colorClass}`}>
@@ -183,40 +183,40 @@ export default function AdminDashboard() {
             value={stats.totalBooks} 
             icon={
               <MotionIcon animation="float" trigger="always">
-                <FiBook className="h-6 w-6 text-primary" />
+                <FiBook className="h-6 w-6 text-base-content" />
               </MotionIcon>
             } 
-            colorClass="bg-primary/10 text-primary"
+            colorClass="bg-primary/10 text-base-content"
           />
           <StatCard 
             title="Total Users" 
             value={stats.totalUsers} 
             icon={
               <MotionIcon animation="bounce" trigger="always">
-                <FiUsers className="h-6 w-6 text-secondary" />
+                <FiUsers className="h-6 w-6 text-base-content" />
               </MotionIcon>
             } 
-            colorClass="bg-secondary/10 text-secondary"
+            colorClass="bg-secondary/10 text-base-content"
           />
           <StatCard 
             title="Downloads Today" 
             value="-" 
             icon={
               <MotionIcon animation="bounce" trigger="always">
-                <FiDownload className="h-6 w-6 text-accent" />
+                <FiDownload className="h-6 w-6 text-base-content" />
               </MotionIcon>
             } 
-            colorClass="bg-accent/10 text-accent"
+            colorClass="bg-accent/10 text-base-content"
           />
           <StatCard 
             title="Growth Rate" 
             value="-" 
             icon={
               <MotionIcon animation="pulse" trigger="always">
-                <FiTrendingUp className="h-6 w-6 text-warning" />
+                <FiTrendingUp className="h-6 w-6 text-base-content" />
               </MotionIcon>
             } 
-            colorClass="bg-warning/10 text-warning"
+            colorClass="bg-warning/10 text-base-content"
           />
         </motion.div>
 
@@ -241,7 +241,7 @@ export default function AdminDashboard() {
                         opacity: 0.85
                       }}
                     />
-                    <div className="mt-3 text-xs font-semibold text-base-content/50 uppercase">{day}</div>
+                    <div className="mt-3 text-xs font-semibold text-base-content/75 uppercase">{day}</div>
                   </div>
                 ))}
               </div>
@@ -258,7 +258,7 @@ export default function AdminDashboard() {
                     <div className="font-mono text-4xl font-extrabold text-base-content">
                       {activePercentage > 0 ? `${activePercentage}%` : '-'}
                     </div>
-                    <div className="mt-1 text-xs font-semibold text-base-content/60 uppercase">Active Users</div>
+                    <div className="mt-1 text-xs font-semibold text-base-content/75 uppercase">Active Users</div>
                   </div>
                 </div>
                 <svg className="h-full w-full" viewBox="0 0 100 100">
@@ -300,7 +300,7 @@ export default function AdminDashboard() {
               {recentBooks.length > 0 ? (
                 <table className="table table-zebra table-sm">
                   <thead>
-                    <tr className="text-xs uppercase text-base-content/60">
+                    <tr className="text-xs uppercase text-base-content/75">
                       <th>Title</th>
                       <th>Author</th>
                       <th>Downloads</th>
@@ -311,7 +311,7 @@ export default function AdminDashboard() {
                     {recentBooks.map((book) => (
                       <tr key={book.id}>
                         <td className="font-medium">{book.title}</td>
-                        <td className="text-base-content/70">{book.author}</td>
+                        <td className="text-base-content/75">{book.author}</td>
                         <td>{book.downloads}</td>
                         <td>
                           <span className={`badge badge-sm font-semibold ${
@@ -330,7 +330,7 @@ export default function AdminDashboard() {
                     <FiBook className="mx-auto h-12 w-12 text-base-content/20" />
                   </MotionIcon>
                   <h3 className="mt-3 text-sm font-bold text-base-content">No books yet</h3>
-                  <p className="mt-1 text-xs text-base-content/60">Get started by adding your first book.</p>
+                  <p className="mt-1 text-xs text-base-content/75">Get started by adding your first book.</p>
                   <div className="mt-6">
                     <Link
                       href="/admin/books/new"
@@ -368,7 +368,7 @@ export default function AdminDashboard() {
             <div className="overflow-x-auto">
               <table className="table table-zebra table-sm">
                 <thead>
-                  <tr className="text-xs uppercase text-base-content/60">
+                  <tr className="text-xs uppercase text-base-content/75">
                     <th>Name</th>
                     <th>Email</th>
                     <th>Joined</th>
@@ -380,14 +380,14 @@ export default function AdminDashboard() {
                     recentUsers.map((user) => (
                       <tr key={user.id}>
                         <td className="font-medium">{user.name}</td>
-                        <td className="text-base-content/70">{user.email}</td>
+                        <td className="text-base-content/75">{user.email}</td>
                         <td>{new Date(user.joined).toLocaleDateString()}</td>
                         <td>{user.downloads}</td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={4} className="text-center py-12 text-base-content/50 text-xs">
+                      <td colSpan={4} className="text-center py-12 text-base-content/75 text-xs">
                         No recent users recorded yet.
                       </td>
                     </tr>

@@ -194,7 +194,7 @@ export default function BooksManagement() {
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-extrabold text-base-content">Books Management</h1>
-          <p className="text-xs text-base-content/60 mt-1">Manage and organize all books in the catalog</p>
+          <p className="text-xs text-base-content/75 mt-1">Manage and organize all books in the catalog</p>
         </div>
         <div>
           <Link
@@ -216,7 +216,7 @@ export default function BooksManagement() {
             <div className="relative flex-1">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                 <MotionIcon animation="wiggle" trigger="hover">
-                  <FiSearch className="h-4 w-4 text-base-content/40" />
+                  <FiSearch className="h-4 w-4 text-base-content/75" />
                 </MotionIcon>
               </div>
               <input
@@ -231,7 +231,7 @@ export default function BooksManagement() {
             <div className="flex items-center space-x-2">
               <div className="inline-flex items-center gap-1.5">
                 <MotionIcon animation="wiggle" trigger="hover">
-                  <FiFilter className="h-4 w-4 text-base-content/40" />
+                  <FiFilter className="h-4 w-4 text-base-content/75" />
                 </MotionIcon>
                 <select
                   className="select select-bordered select-sm bg-base-100 text-base-content"
@@ -248,7 +248,7 @@ export default function BooksManagement() {
           
           {selectedBooks.length > 0 && (
             <div className="flex items-center space-x-2">
-              <span className="text-xs text-base-content/70">{selectedBooks.length} selected</span>
+              <span className="text-xs text-base-content/75">{selectedBooks.length} selected</span>
               <button
                 onClick={deleteSelected}
                 className="btn btn-error btn-sm gap-1.5"
@@ -269,7 +269,7 @@ export default function BooksManagement() {
           <MotionIcon animation="spin" trigger="always">
             <FiLoader className="h-8 w-8 text-primary" />
           </MotionIcon>
-          <span className="ms-3 text-base text-base-content/70 font-medium">Loading books…</span>
+          <span className="ms-3 text-base text-base-content/75 font-medium">Loading books…</span>
         </div>
       )}
       
@@ -293,7 +293,7 @@ export default function BooksManagement() {
             <div className="overflow-x-auto">
               <table className="table table-zebra table-sm">
                 <thead>
-                  <tr className="text-xs uppercase text-base-content/60">
+                  <tr className="text-xs uppercase text-base-content/75">
                     <th scope="col" className="w-10">
                       <input
                         type="checkbox"
@@ -381,7 +381,7 @@ export default function BooksManagement() {
                       <td className="font-semibold text-base-content">
                         {book.title}
                       </td>
-                      <td className="text-base-content/70">{book.author}</td>
+                      <td className="text-base-content/75">{book.author}</td>
                       <td>
                         <span className="badge badge-outline border-base-content/20 badge-sm text-xs">
                           {book.category}
@@ -450,7 +450,7 @@ export default function BooksManagement() {
             {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex flex-col sm:flex-row items-center justify-between border-t border-base-300 bg-base-200/50 px-4 py-3 gap-3">
-                <p className="text-xs text-base-content/70">
+                <p className="text-xs text-base-content/75">
                   Showing <span className="font-bold">{indexOfFirstBook + 1}</span> to{" "}
                   <span className="font-bold">
                     {indexOfLastBook > filteredBooks.length
@@ -503,7 +503,7 @@ export default function BooksManagement() {
               <FiBook className="mx-auto h-12 w-12 text-base-content/30" />
             </MotionIcon>
             <h3 className="mt-3 text-base font-bold text-base-content">No books yet</h3>
-            <p className="mt-1 text-xs text-base-content/60">Get started by adding your first book to your collection.</p>
+            <p className="mt-1 text-xs text-base-content/75">Get started by adding your first book to your collection.</p>
             <div className="mt-6">
               <Link
                 href="/admin/books/new"

@@ -169,7 +169,7 @@ const Header = () => {
                   <MotionIcon animation={item.animation} trigger={isActive ? 'always' : 'hover'}>
                     <Icon 
                       size={16} 
-                      className={isActive ? 'text-primary' : 'text-base-content/60 group-hover:text-primary transition-colors'} 
+                      className={isActive ? 'text-primary' : 'text-base-content/75 group-hover:text-primary transition-colors'} 
                     />
                   </MotionIcon>
                   <span>{item.label}</span>
@@ -200,7 +200,7 @@ const Header = () => {
               className={`btn btn-ghost btn-circle btn-sm transition-all duration-300 ${
                 isSearchOpen 
                   ? 'btn-active text-primary' 
-                  : 'text-base-content/70 hover:text-primary'
+                  : 'text-base-content/75 hover:text-primary'
               }`}
               aria-label="Search"
             >
@@ -220,7 +220,7 @@ const Header = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="md:hidden btn btn-ghost btn-circle btn-sm text-base-content/70 hover:text-primary"
+              className="md:hidden btn btn-ghost btn-circle btn-sm text-base-content/75 hover:text-primary"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label="Toggle menu"
             >
@@ -271,12 +271,12 @@ const Header = () => {
                       className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl font-medium transition-colors ${
                         isActive
                           ? 'bg-primary/10 text-primary font-bold border-s-4 border-primary'
-                          : 'text-base-content/70 hover:bg-base-300 hover:text-base-content'
+                          : 'text-base-content/75 hover:bg-base-300 hover:text-base-content'
                       }`}
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <MotionIcon animation={item.animation} trigger={isActive ? 'always' : 'hover'}>
-                        <Icon size={18} className={isActive ? 'text-primary' : 'text-base-content/60'} />
+                        <Icon size={18} className={isActive ? 'text-primary' : 'text-base-content/75'} />
                       </MotionIcon>
                       <span>{item.label}</span>
                       {isActive && (

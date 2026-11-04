@@ -45,7 +45,7 @@ function SignInContent() {
           <h2 className="text-3xl font-extrabold text-base-content">
             Admin Console Login
           </h2>
-          <p className="mt-2 text-sm text-base-content/70">
+          <p className="mt-2 text-sm text-base-content/75">
             Sign in to access the admin dashboard
           </p>
           {error && (
