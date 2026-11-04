@@ -7,6 +7,12 @@ export default {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   darkMode: "class",
+  future: {
+    // Compiles every `hover:` variant under
+    // `@media (hover: hover) and (pointer: fine)`. Without it a tapped
+    // button keeps its hover styling on touch and reads as a stuck state.
+    hoverOnlyWhenSupported: true,
+  },
   theme: {
     extend: {
       colors: {

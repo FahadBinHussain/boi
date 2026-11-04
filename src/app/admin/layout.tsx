@@ -129,7 +129,7 @@ export default function AdminLayout({
           </div>
 
           {/* Sidebar navigation */}
-          <nav className="flex-1 px-4 py-5 space-y-1.5 overflow-y-auto">
+          <nav className="flex-1 px-4 py-5 space-y-1.5 overflow-y-auto overscroll-contain">
             {navItems.map((item) => {
               const isActive = pathname === item.href || (item.href !== "/admin" && pathname?.startsWith(item.href));
               
@@ -137,7 +137,7 @@ export default function AdminLayout({
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`sidebar-item group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
+                  className={`sidebar-item group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
                     isActive
                       ? "bg-primary text-primary-content shadow-md font-semibold"
                       : "text-base-content/75 hover:bg-base-300 hover:text-base-content"
@@ -168,7 +168,7 @@ export default function AdminLayout({
       </aside>
 
       {/* Main content */}
-      <div className="main-content flex-1 overflow-auto bg-base-100">
+      <div className="main-content flex-1 overflow-auto overscroll-contain bg-base-100">
         {children}
       </div>
     </div>

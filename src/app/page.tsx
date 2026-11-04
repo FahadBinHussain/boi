@@ -166,7 +166,7 @@ export default function Home() {
             </motion.p>
 
             <motion.div variants={fadeInUp} className="mt-10 flex flex-wrap items-center gap-4">
-              <Link href="/books" className="btn btn-primary rounded-full px-8 gap-2 font-medium shadow-lg hover:shadow-xl transition-all">
+              <Link href="/books" className="btn btn-primary rounded-full px-8 gap-2 font-medium shadow-lg hover:shadow-xl transition-[box-shadow]">
                 <span>Browse collection</span>
                 <MotionIcon animation="float" trigger="hover">
                   <FiArrowRight />
@@ -314,13 +314,13 @@ export default function Home() {
                   viewport={{ once: true, amount: 0.25 }}
                   transition={{ duration: 0.7, delay: index * 0.08 }}
                   whileHover={{ y: -6, scale: 1.01 }}
-                  className="card bg-base-200 border border-base-content/10 shadow-lg hover:shadow-2xl overflow-hidden rounded-3xl group transition-all"
+                  className="card bg-base-200 border border-base-content/10 shadow-lg hover:shadow-2xl overflow-hidden rounded-3xl group transition-[box-shadow]"
                 >
                   <div className="relative h-[220px] overflow-hidden bg-base-300">
                     <img 
                       src={cover} 
                       alt={book.title} 
-                      className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" 
+                      className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 outline outline-[1px] outline-black/10 dark:outline-white/10 -outline-offset-[1px]" 
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-base-300/80 via-transparent to-transparent" />
                     <span className="badge badge-primary absolute start-4 top-4 text-xs font-semibold shadow-md">

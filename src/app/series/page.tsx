@@ -170,7 +170,7 @@ function SeriesContent() {
                   <motion.button
                     key={series.id}
                     onClick={() => handleSeriesClick(series.id)}
-                    className={`p-5 rounded-2xl text-center transition-all flex flex-col items-center justify-center gap-2 border ${
+                    className={`p-5 rounded-2xl text-center transition-colors flex flex-col items-center justify-center gap-2 border ${
                       isActive
                         ? 'btn-primary shadow-lg border-primary'
                         : 'bg-base-200/60 border-base-content/10 text-base-content hover:bg-base-300 hover:border-base-content/20'
@@ -218,7 +218,7 @@ function SeriesContent() {
                   {getSeriesBooks().map((book) => (
                     <motion.div key={book.id} variants={item}>
                       <Link href={`/books/${book.id}`}>
-                        <div className="card bg-base-100 border border-base-200 shadow-sm hover:shadow-xl overflow-hidden rounded-2xl transition-all h-full flex flex-col group">
+                        <div className="card bg-base-100 border border-base-200 shadow-sm hover:shadow-xl overflow-hidden rounded-2xl transition-[box-shadow] h-full flex flex-col group">
                           {/* Cover Image */}
                           <div className="relative w-full pt-[140%] bg-base-200">
                             <div className="absolute inset-0">

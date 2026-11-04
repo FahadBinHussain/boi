@@ -68,6 +68,7 @@ When a record is not a normal book, preserve the material type in metadata, espe
 - **Bengali catalogue strings need `<bdi>`.** The document is `lang="en"` and the catalogue is Bengali, so dynamic titles, authors and genre names go inside `<bdi>` and the static `বই` wordmark carries `lang="bn"`.
 - **Rendered text uses the real ellipsis character `…`,** never three dots.
 - Local dev needs a Postgres for the `/api/books` catalog path (`prisma db push`), and the seeded catalog can be filled from the live Turso `works`/`editions`/`authors` tables so layouts are verified against real Bengali titles. The vault `.env.local` only carries the Turso variables; `DATABASE_URL` and the NextAuth/Google vars are local-only additions.
+- **On Windows, run that local Postgres as a Windows service.** Started from a shell (`pg_ctl start`), its client backends die intermittently with `0xC0000142` (STATUS_DLL_INIT_FAILED) and the log shows `could not reserve shared memory region ... error code 487`; simple queries work, then the next backend dies and takes the server with it. Register it instead — `pg_ctl register -N boipg -D <datadir> -o "-p 5434" -S auto` then `Start-Service boipg` — and the service environment keeps it stable. Never `taskkill` the postmaster: that leaves the Windows shared-memory block behind and every later start on that port fails with `pre-existing shared memory block is still in use`; stop it with `pg_ctl stop -m fast`. The Prisma table is `"Book"` (capital B, no `@@map`), so ad-hoc SQL must quote it.
 
 ## Frontend Color Conventions
 
@@ -89,6 +90,17 @@ When a record is not a normal book, preserve the material type in metadata, espe
 - **Empty states orient and point forward.** The title names the empty thing (`No books match your search`) and the line under it names the way out (`Try a different title or author.`). Admin empty states keep the add action next to them.
 - **Icon-only controls name the action.** The admin row buttons are `Edit book` and `Delete book`, not `Edit`/`Delete`.
 - **Placeholders show an example, not an instruction.** `e.g. Penguin`, `e.g. 320`. When a field carries a real requirement (like leaving an API key unchanged), the requirement belongs in helper text.
+
+## Frontend Motion Conventions
+
+- **One `MotionConfig` gates every animation.** `src/app/providers.tsx` wraps the app in `<MotionConfig reducedMotion="user">`, so every transform animation (MotionIcon, `whileHover`, `whileTap`, the scroll entrances) falls back to an opacity cross-fade when the reader asked for less motion. Never add a transform animation outside that provider.
+- **A press is a transition, not a keyframe.** DaisyUI's `button-pop` keyframe plays on every button at mount and cannot be reversed mid-press, so `src/app/globals.css` replaces it: the button settles to `0.96` over `150ms ease-out` and comes back if the press is released early. `whileTap` scales are `0.96` too — `0.95` is below the floor.
+- **Name the properties a transition changes.** `transition-all` is gone. Use `transition-colors` for colour changes and `transition-[box-shadow]` for elevation. An element animated by Framer Motion must not also carry a CSS `transform` transition — the two fight each other.
+- **Hover only on hover-capable pointers.** `tailwind.config.ts` sets `future.hoverOnlyWhenSupported`, so every `hover:` variant compiles under `@media (hover: hover) and (pointer: fine)` and a tapped button does not keep its hover styling.
+- **The theme switch must not animate.** `applyTheme()` in `src/contexts/ThemeContext.tsx` disables transitions, flips `data-theme`, flushes the style and restores transitions on the next frame; otherwise every colour transition on the page fires at once and the swap smears.
+- **Content images get a 1px outline inset by 1px** — `outline outline-[1px] outline-black/10 dark:outline-white/10 -outline-offset-[1px]`. Pure black in light and pure white in dark, never a tinted neutral, so the edge does not read as a colour fringe.
+- **Scrollable overlays contain their scroll.** The theme menu, the admin sidebar and the dataset table carry `overscroll-contain`, so scrolling past the end never scrolls the page behind.
+- Dead CSS is removed, not kept: `.gpu-accelerated`, `.reveal-text`, `.parallax-*`, `.stagger-container`, `.feature-box`, `.hero-gradient` and `.page-transition-overlay` were all unused and are gone.
 
 ## Dataset Restore (dataset/main is gitignored)
 

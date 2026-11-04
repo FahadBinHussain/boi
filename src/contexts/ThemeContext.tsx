@@ -59,6 +59,29 @@ export function isDarkTheme(theme: string): boolean {
   return DARK_THEMES.has(theme);
 }
 
+// Switching themes must not animate. Every color transition on the page would
+// otherwise fire at once and smear the swap. Transitions are switched off for
+// the swap, the new colors are flushed, and transitions come back after the
+// next frame.
+function applyTheme(root: HTMLElement, theme: string) {
+  const style = document.createElement("style");
+  style.textContent = "*,*::before,*::after{transition:none !important}";
+  document.head.appendChild(style);
+
+  root.setAttribute("data-theme", theme);
+  root.classList.remove("light", "dark");
+  root.classList.add(isDarkTheme(theme) ? "dark" : "light");
+
+  // Force a style flush so the new colors are the ones that get painted.
+  void root.offsetHeight;
+
+  const restore = () => style.remove();
+  requestAnimationFrame(() => requestAnimationFrame(restore));
+  // Background tabs throttle requestAnimationFrame, so a timer puts the
+  // transitions back even if the frame never arrives.
+  setTimeout(restore, 200);
+}
+
 interface ThemeContextType {
   theme: Theme;
   resolvedTheme: DaisyTheme;
@@ -103,9 +126,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setResolvedTheme(computed);
 
     const root = window.document.documentElement;
-    root.setAttribute("data-theme", computed);
-    root.classList.remove("light", "dark");
-    root.classList.add(isDarkTheme(computed) ? "dark" : "light");
+    applyTheme(root, computed);
   }, [theme, mounted]);
 
   // Listen for system preference changes when in 'system' mode
@@ -118,9 +139,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       const computed: DaisyTheme = mediaQuery.matches ? "dark" : "light";
       setResolvedTheme(computed);
       const root = window.document.documentElement;
-      root.setAttribute("data-theme", computed);
-      root.classList.remove("light", "dark");
-      root.classList.add(computed === "dark" ? "dark" : "light");
+      applyTheme(root, computed);
     };
 
     mediaQuery.addEventListener("change", handleChange);

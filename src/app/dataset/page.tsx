@@ -323,7 +323,7 @@ export default async function DatasetPage({
 
       <section className="px-4 py-6 sm:px-6 lg:px-8">
         <div className="card bg-base-100 border border-base-content/10 shadow-sm rounded-2xl overflow-hidden">
-          <div className="dataset-table-scroll max-h-[calc(100dvh-260px)] overflow-auto">
+          <div className="dataset-table-scroll max-h-[calc(100dvh-260px)] overflow-auto overscroll-contain">
           <table className="table table-zebra table-sm table-pin-rows">
             <thead>
               <tr className="bg-base-200 text-base-content/75">

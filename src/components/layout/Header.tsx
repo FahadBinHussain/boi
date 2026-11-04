@@ -125,7 +125,7 @@ const Header = () => {
   return (
     <header 
       ref={headerRef}
-      className={`sticky top-0 z-50 w-full transition-all duration-300 text-base-content ${
+      className={`sticky top-0 z-50 w-full transition-[background-color,border-color,box-shadow,backdrop-filter,padding] duration-300 text-base-content ${
         isScrolled 
           ? 'bg-base-100/95 backdrop-blur-lg shadow-md border-b border-base-200 py-2' 
           : 'bg-base-100/80 backdrop-blur-md border-b border-base-200 py-3'
@@ -196,8 +196,8 @@ const Header = () => {
             <motion.button 
               onClick={() => setIsSearchOpen(!isSearchOpen)}
               whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`btn btn-ghost btn-circle btn-sm transition-all duration-300 ${
+              whileTap={{ scale: 0.96 }}
+              className={`btn btn-ghost btn-circle btn-sm transition-colors duration-300 ${
                 isSearchOpen 
                   ? 'btn-active text-primary' 
                   : 'text-base-content/75 hover:text-primary'
@@ -219,7 +219,7 @@ const Header = () => {
             
             <motion.button
               whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileTap={{ scale: 0.96 }}
               className="md:hidden btn btn-ghost btn-circle btn-sm text-base-content/75 hover:text-primary"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label="Toggle menu"

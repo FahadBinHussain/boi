@@ -69,9 +69,9 @@ const GenreButton = ({ genre, isSelected, onToggle }: GenreButtonProps) => {
   return (
     <motion.button
       whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
+      whileTap={{ scale: 0.96 }}
       onClick={onToggle}
-      className={`btn btn-sm rounded-full transition-all ${
+      className={`btn btn-sm rounded-full transition-colors ${
         isSelected
           ? 'btn-primary shadow-sm'
           : 'btn-ghost border border-base-300 bg-base-200/50 hover:bg-base-200 text-base-content'

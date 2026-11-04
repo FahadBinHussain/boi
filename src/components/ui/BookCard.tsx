@@ -96,7 +96,7 @@ const BookCard = ({ book, compact = false }: BookCardProps) => {
   return (
     <motion.div
       ref={cardRef}
-      className={`group card bg-base-100 text-base-content border border-base-200 shadow-sm hover:shadow-xl rounded-2xl overflow-hidden transition-all duration-300 h-full flex flex-col min-w-0 ${
+      className={`group card bg-base-100 text-base-content border border-base-200 shadow-sm hover:shadow-xl rounded-2xl overflow-hidden transition-[box-shadow] duration-300 h-full flex flex-col min-w-0 ${
         compact ? 'max-w-[220px] mx-auto' : ''
       }`}
       whileHover={{ y: -5 }}
@@ -123,7 +123,7 @@ const BookCard = ({ book, compact = false }: BookCardProps) => {
           alt={`${book.title} cover`}
           fill
           sizes={compact ? "(max-width: 640px) 33vw, 220px" : "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"}
-          className="transform group-hover:scale-105 transition-transform duration-500 object-cover"
+          className="transform group-hover:scale-105 transition-transform duration-500 object-cover outline outline-[1px] outline-black/10 dark:outline-white/10 -outline-offset-[1px]"
           priority={false}
         />
         
@@ -144,7 +144,7 @@ const BookCard = ({ book, compact = false }: BookCardProps) => {
           <div className="flex flex-col gap-3 transform">
             <motion.div
               whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileTap={{ scale: 0.96 }}
               initial={{ y: 20, opacity: 0 }}
               animate={{
                 y: isOverlayVisible ? 0 : 20,
@@ -166,7 +166,7 @@ const BookCard = ({ book, compact = false }: BookCardProps) => {
             </motion.div>
             <motion.div
               whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileTap={{ scale: 0.96 }}
               initial={{ y: 20, opacity: 0 }}
               animate={{
                 y: isOverlayVisible ? 0 : 20,
