@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { FiArrowRight, FiChevronRight } from 'react-icons/fi';
+import { FiArrowRight, FiChevronRight, FiAlertCircle } from 'react-icons/fi';
 import MotionIcon from '@/components/ui/MotionIcon';
 import { BookOpenIcon, TrendingUpIcon, ClockIcon, GridIcon, type AnimatedIconHandle } from '@/components/ui/AnimatedLandingIcons';
 import { genres as allGenres } from '@/lib/books';
@@ -69,8 +69,11 @@ export default function Home() {
         if (!response.ok) throw new Error('Unable to load books right now.');
         const data = await response.json();
         setBooks(Array.isArray(data) ? data : []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unable to load books right now.');
+      } catch {
+        // The browser's own message for a failed fetch ("Failed to fetch") says
+        // nothing to a reader and names no way forward. The alert below names
+        // the failure and the way forward instead.
+        setError('Unable to load books');
       } finally {
         setLoading(false);
       }
@@ -290,7 +293,13 @@ export default function Home() {
           </div>
         ) : error ? (
           <div className="alert alert-error max-w-2xl rounded-3xl shadow-lg">
-            <span>{error}</span>
+            <MotionIcon animation="wiggle" trigger="always">
+              <FiAlertCircle className="h-6 w-6" />
+            </MotionIcon>
+            <div>
+              <h3 className="font-bold">{error}</h3>
+              <div className="text-sm">Check your connection and try again.</div>
+            </div>
           </div>
         ) : featured.length === 0 ? (
           <div className="card bg-base-200 border border-base-content/10 p-8 sm:p-16 text-center rounded-3xl">

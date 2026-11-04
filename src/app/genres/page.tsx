@@ -183,7 +183,7 @@ function GenresContent() {
                         className={isActive ? 'text-primary-content' : 'text-primary'} 
                       />
                     </MotionIcon>
-                    <span className="font-medium text-sm line-clamp-1"><bdi>{genre.name}</bdi></span>
+                    <span className="font-medium text-sm line-clamp-1" title={genre.name}><bdi>{genre.name}</bdi></span>
                   </motion.button>
                 );
               })}

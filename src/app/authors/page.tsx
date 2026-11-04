@@ -188,7 +188,7 @@ function AuthorsContent() {
                         className={isActive ? 'text-primary-content' : 'text-primary'} 
                       />
                     </MotionIcon>
-                    <span className="font-medium text-sm line-clamp-1"><bdi>{author.name}</bdi></span>
+                    <span className="font-medium text-sm line-clamp-1" title={author.name}><bdi>{author.name}</bdi></span>
                   </motion.button>
                 );
               })}

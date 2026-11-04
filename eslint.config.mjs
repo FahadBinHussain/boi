@@ -9,6 +9,9 @@ const eslintConfig = [
       "**/src/generated/**",
       "**/node_modules/**",
       "**/.next/**",
+      // A stale build cache can sit next to `.next` when a production build
+      // is abandoned. It is not source and must never be linted.
+      "**/.next-*/**",
       "**/files.vc-Uploader/**",
       "**/src/lib/scrapers/**"
     ]

@@ -50,7 +50,7 @@ export default function SortableTableHeader({
       <button
         type="button"
         onClick={() => onSort(field)}
-        className={`inline-flex items-center gap-1 text-left ${buttonClassName}`}
+        className={`inline-flex items-center gap-1 py-1 text-left ${buttonClassName}`}
       >
         <span>{label}</span>
         <span aria-hidden="true" className={isActive ? "text-primary font-bold" : "text-base-content/75 group-hover:text-base-content"}>

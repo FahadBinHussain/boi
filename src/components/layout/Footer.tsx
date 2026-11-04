@@ -29,7 +29,7 @@ const Footer = () => {
               <li>
                 <Link 
                   href="/" 
-                  className="text-base-content/75 hover:text-primary text-sm transition-colors"
+                  className="text-base-content/75 hover:text-primary text-sm transition-colors inline-block py-1"
                 >
                   Home
                 </Link>
@@ -37,7 +37,7 @@ const Footer = () => {
               <li>
                 <Link 
                   href="/books" 
-                  className="text-base-content/75 hover:text-primary text-sm transition-colors"
+                  className="text-base-content/75 hover:text-primary text-sm transition-colors inline-block py-1"
                 >
                   Browse books
                 </Link>
@@ -45,7 +45,7 @@ const Footer = () => {
               <li>
                 <Link 
                   href="/genres" 
-                  className="text-base-content/75 hover:text-primary text-sm transition-colors"
+                  className="text-base-content/75 hover:text-primary text-sm transition-colors inline-block py-1"
                 >
                   Genres
                 </Link>
@@ -53,7 +53,7 @@ const Footer = () => {
               <li>
                 <Link 
                   href="/authors" 
-                  className="text-base-content/75 hover:text-primary text-sm transition-colors"
+                  className="text-base-content/75 hover:text-primary text-sm transition-colors inline-block py-1"
                 >
                   Authors
                 </Link>
@@ -61,7 +61,7 @@ const Footer = () => {
               <li>
                 <Link 
                   href="/dataset" 
-                  className="text-base-content/75 hover:text-primary text-sm transition-colors"
+                  className="text-base-content/75 hover:text-primary text-sm transition-colors inline-block py-1"
                 >
                   Dataset
                 </Link>
@@ -69,9 +69,9 @@ const Footer = () => {
               <li>
                 <Link 
                   href="/about" 
-                  className="text-base-content/75 hover:text-primary text-sm transition-colors"
+                  className="text-base-content/75 hover:text-primary text-sm transition-colors inline-block py-1"
                 >
-                  About us
+                  About <span lang="bn">বই</span>
                 </Link>
               </li>
             </ul>
@@ -86,7 +86,7 @@ const Footer = () => {
               <li>
                 <Link 
                   href="/privacy" 
-                  className="text-base-content/75 hover:text-primary text-sm transition-colors"
+                  className="text-base-content/75 hover:text-primary text-sm transition-colors inline-block py-1"
                 >
                   Privacy policy
                 </Link>
@@ -94,7 +94,7 @@ const Footer = () => {
               <li>
                 <Link 
                   href="/terms" 
-                  className="text-base-content/75 hover:text-primary text-sm transition-colors"
+                  className="text-base-content/75 hover:text-primary text-sm transition-colors inline-block py-1"
                 >
                   Terms of service
                 </Link>
@@ -102,7 +102,7 @@ const Footer = () => {
               <li>
                 <Link 
                   href="/copyright" 
-                  className="text-base-content/75 hover:text-primary text-sm transition-colors"
+                  className="text-base-content/75 hover:text-primary text-sm transition-colors inline-block py-1"
                 >
                   Copyright notice
                 </Link>
@@ -110,7 +110,7 @@ const Footer = () => {
               <li>
                 <Link 
                   href="/dmca" 
-                  className="text-base-content/75 hover:text-primary text-sm transition-colors"
+                  className="text-base-content/75 hover:text-primary text-sm transition-colors inline-block py-1"
                 >
                   DMCA policy
                 </Link>

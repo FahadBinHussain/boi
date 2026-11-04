@@ -69,6 +69,7 @@ When a record is not a normal book, preserve the material type in metadata, espe
 - **Rendered text uses the real ellipsis character `…`,** never three dots.
 - Local dev needs a Postgres for the `/api/books` catalog path (`prisma db push`), and the seeded catalog can be filled from the live Turso `works`/`editions`/`authors` tables so layouts are verified against real Bengali titles. The vault `.env.local` only carries the Turso variables; `DATABASE_URL` and the NextAuth/Google vars are local-only additions.
 - **On Windows, run that local Postgres as a Windows service.** Started from a shell (`pg_ctl start`), its client backends die intermittently with `0xC0000142` (STATUS_DLL_INIT_FAILED) and the log shows `could not reserve shared memory region ... error code 487`; simple queries work, then the next backend dies and takes the server with it. Register it instead — `pg_ctl register -N boipg -D <datadir> -o "-p 5434" -S auto` then `Start-Service boipg` — and the service environment keeps it stable. Never `taskkill` the postmaster: that leaves the Windows shared-memory block behind and every later start on that port fails with `pre-existing shared memory block is still in use`; stop it with `pg_ctl stop -m fast`. The Prisma table is `"Book"` (capital B, no `@@map`), so ad-hoc SQL must quote it.
+- **A production build poisons the next dev server.** `pnpm build` writes its own `routes-manifest.json`, `BUILD_ID` and `server/` into `.next`, and `pnpm dev` reuses that directory. The pages keep working, but every `src/app/api/**/route.ts` answers `404` with the app's 404 page — the dev router reads the production manifest. Clear `.next` (or start dev from a clean tree) whenever you switch between `pnpm build` and `pnpm dev`.
 
 ## Frontend Color Conventions
 
@@ -126,6 +127,14 @@ When a record is not a normal book, preserve the material type in metadata, espe
 - **Satori cannot read woff2 and cannot reach the network at request time,** so Hind Siliguri is bundled at `src/assets/fonts/HindSiliguri-Regular.ttf` (SIL Open Font License). The card is drawn while the page is being requested, not at build time.
 - **Satori does not shrink text to fit.** A long Bengali book title at 76px runs off the card, so `ogImage()` steps the size down with the length, clips the title and caps the title block. A book card also drops the summary when the summary only repeats the title.
 - **Keep the cards under 300KB.** The PNGs are 40-95KB; a bigger card means more text or a photo.
+
+## Frontend Interface Conventions
+
+- **A breakpoint is a measurement, not a guess.** The header rail used to appear from `md` (768px), but the six links, the wordmark and the action row need 865px while the shell offers 710px there — every page scrolled sideways at 768px. The rail starts at `lg` now, and the drawer carries 768-1023px. The dataset navigation has the same shape and became a row at `xl`. When a row appears, measure the row against the shell at that breakpoint before shipping it.
+- **Every standalone link needs a 24px target (WCAG 2.5.8).** The footer links, the dataset sort links and the admin sort buttons were 16-20px tall, so they were `py-1` short of the floor. A link inside a sentence is exempt.
+- **Every link in the footer must resolve.** Privacy policy, Terms of service, Copyright notice and DMCA policy all answered 404. They live in `src/app/{privacy,terms,copyright,dmca}` and share the `LegalPage` shell in `src/components/layout/LegalPage.tsx`, so their wording and spacing cannot drift apart.
+- **`src/app/not-found.tsx` is the site's 404.** Without it any unknown URL answered a bare framework page with no way back into the catalog.
+- **A truncated line needs a way to read the whole value.** The genre, author and series names are clamped to one line in the grid, so each one carries a `title`.
 
 ## Dataset Restore (dataset/main is gitignored)
 

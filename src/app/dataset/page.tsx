@@ -70,7 +70,7 @@ function SortHeader({
   return (
     <Link
       href={`/dataset?view=${view}&sort=${column}&dir=${nextDirection}`}
-      className="inline-flex w-full items-center justify-between gap-3 text-left transition hover:text-primary font-bold"
+      className="inline-flex w-full items-center justify-between gap-3 py-1 text-left transition hover:text-primary font-bold"
       aria-label={`Sort by ${label} ${nextDirection === 'asc' ? 'ascending' : 'descending'}`}
     >
       <span>{label}</span>
@@ -261,7 +261,7 @@ export default async function DatasetPage({
                 <span>updated {datasetUpdatedLabel(stats.updated_at)}</span>
               </p>
             </div>
-            <nav aria-label="Dataset navigation" className="flex flex-col gap-2 rounded-2xl border border-base-content/10 bg-base-100 p-2 shadow-sm md:flex-row md:items-center">
+            <nav aria-label="Dataset navigation" className="flex flex-col gap-2 rounded-2xl border border-base-content/10 bg-base-100 p-2 shadow-sm xl:flex-row xl:flex-wrap xl:items-center">
               <div className="join">
                 <Link
                   href={`/dataset?view=books&sort=${sort}&dir=${direction}`}
@@ -282,8 +282,8 @@ export default async function DatasetPage({
                   Candidates
                 </Link>
               </div>
-              <div className="hidden h-6 w-px bg-base-content/10 md:block" />
-              <div className="flex flex-wrap gap-1">
+              <div className="hidden h-6 w-px bg-base-content/10 xl:block" />
+              <div className="flex min-w-0 flex-wrap gap-1">
                 {exportFiles.map((file) => (
                   <Link
                     key={file.name}
@@ -297,7 +297,7 @@ export default async function DatasetPage({
                   </Link>
                 ))}
               </div>
-              <div className="hidden h-6 w-px bg-base-content/10 md:block" />
+              <div className="hidden h-6 w-px bg-base-content/10 xl:block" />
               <div className="join">
                 <Link
                   href={`/dataset?${pageQuery}&page=${Math.max(1, safeCurrentPage - 1)}`}

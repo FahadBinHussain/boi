@@ -153,10 +153,13 @@ const Header = () => {
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation
+              The rail only appears from `lg`. Between `md` and `lg` the six
+              links plus the wordmark and the action row do not fit the shell,
+              and the header used to push the whole page sideways at 768px. */}
           <div 
             ref={navItemsRef}
-            className="hidden md:flex items-center relative py-1"
+            className="hidden lg:flex items-center relative py-1"
           >
             {navItems.map((item) => {
               const isActive = isLinkActive(item.href);
@@ -164,9 +167,9 @@ const Header = () => {
 
               return (
                 <Link 
-                  key={item.href}
+                  key={item.href} 
                   href={item.href}
-                  className={`px-4 py-2 mx-1 rounded-xl text-sm font-semibold transition-colors duration-200 relative group flex items-center gap-1.5 ${
+                  className={`px-3 mx-0.5 xl:px-4 xl:mx-1 py-2 rounded-xl text-sm font-semibold transition-colors duration-200 relative group flex items-center gap-1.5 ${
                     isActive 
                       ? 'text-primary' 
                       : 'text-base-content/75 hover:text-base-content hover:bg-base-200/60'
@@ -227,7 +230,7 @@ const Header = () => {
               ref={menuButtonRef}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.96 }}
-              className="md:hidden btn btn-ghost btn-circle btn-sm text-base-content/75 hover:text-primary"
+              className="lg:hidden btn btn-ghost btn-circle btn-sm text-base-content/75 hover:text-primary"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label="Toggle menu"
               aria-expanded={isMenuOpen}
@@ -272,7 +275,7 @@ const Header = () => {
           <div
             id="mobile-menu"
             ref={mobileMenuRef}
-            className="md:hidden py-4 overflow-hidden"
+            className="lg:hidden py-4 overflow-hidden"
           >
             <div className="bg-base-200/95 backdrop-blur-md rounded-box shadow-xl border border-base-300 p-4">
               <div className="flex flex-col gap-1">
@@ -302,12 +305,12 @@ const Header = () => {
                 })}
                 
                 {/* Mobile Theme Toggle */}
-                <div className="sm:hidden border-t border-base-300 mt-2 pt-3 flex justify-center">
+                <div className="lg:hidden border-t border-base-300 mt-2 pt-3 flex justify-center">
                   <ThemeToggle />
                 </div>
                 
                 {/* Mobile Sign In Button */}
-                <div className="sm:hidden border-t border-base-300 mt-2 pt-3">
+                <div className="lg:hidden border-t border-base-300 mt-2 pt-3">
                   <div>
                     <LoginButton />
                   </div>
