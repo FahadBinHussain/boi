@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { FiArchive, FiBookOpen, FiChevronLeft, FiChevronRight, FiDatabase, FiDownloadCloud, FiAlertCircle } from 'react-icons/fi';
 import MotionIcon from '@/components/ui/MotionIcon';
+import SortableTableHeader from '@/components/ui/SortableTableHeader';
 import { pageMetadata } from '@/lib/seo';
 import {
   DatasetDatabaseError,
@@ -50,33 +51,11 @@ function isDatasetView(value: string | undefined): value is DatasetView {
   return Boolean(value && viewKeys.includes(value as DatasetView));
 }
 
-function SortHeader({
-  label,
-  column,
-  activeSort,
-  direction,
-  view,
-}: {
-  label: string;
-  column: SortKey;
-  activeSort: SortKey;
-  direction: SortDirection;
-  view: DatasetView;
-}) {
-  const isActive = activeSort === column;
-  const nextDirection: SortDirection = isActive && direction === 'asc' ? 'desc' : 'asc';
-  const indicator = isActive ? (direction === 'asc' ? '↑' : '↓') : '↕';
-
-  return (
-    <Link
-      href={`/dataset?view=${view}&sort=${column}&dir=${nextDirection}`}
-      className="inline-flex w-full items-center justify-between gap-3 py-1 text-left transition hover:text-primary font-bold"
-      aria-label={`Sort by ${label} ${nextDirection === 'asc' ? 'ascending' : 'descending'}`}
-    >
-      <span>{label}</span>
-      <span className={`text-xs ${isActive ? 'text-primary font-extrabold' : 'opacity-40'}`}>{indicator}</span>
-    </Link>
-  );
+// Sorting here is a URL, not a state change: the link carries the next
+// direction so the page can be linked to and reloaded. Clicking the sorted
+// column again flips the direction, every other column starts ascending.
+function nextDirection(column: SortKey, activeSort: SortKey, direction: SortDirection): SortDirection {
+  return activeSort === column && direction === 'asc' ? 'desc' : 'asc';
 }
 
 function CandidateRefMarks({ sources }: { sources: DatasetCandidateBook['sources'] }) {
@@ -329,19 +308,47 @@ export default async function DatasetPage({
           <table className="table table-zebra table-sm table-pin-rows">
             <thead>
               <tr className="bg-base-200 text-base-content/75">
-                <th className="w-12">#</th>
-                <th className="w-[42%]">
-                  <SortHeader label="Title" column="title" activeSort={sort} direction={direction} view={view} />
-                </th>
-                <th className="w-[34%]">
-                  <SortHeader label="Authors" column="author" activeSort={sort} direction={direction} view={view} />
-                </th>
-                <th className="w-28">
-                  <SortHeader label="Year" column="year" activeSort={sort} direction={direction} view={view} />
-                </th>
-                <th className="w-28">
-                  <SortHeader label="Editions" column="editions" activeSort={sort} direction={direction} view={view} />
-                </th>
+                <th scope="col" className="w-12">#</th>
+                <SortableTableHeader
+                  label="Title"
+                  field="title"
+                  activeField={sort}
+                  direction={direction}
+                  href={`/dataset?view=${view}&sort=title&dir=${nextDirection('title', sort, direction)}`}
+                  inactiveIndicator="↕"
+                  className="w-[42%]"
+                  buttonClassName="w-full justify-between gap-3 font-bold hover:text-primary"
+                />
+                <SortableTableHeader
+                  label="Authors"
+                  field="author"
+                  activeField={sort}
+                  direction={direction}
+                  href={`/dataset?view=${view}&sort=author&dir=${nextDirection('author', sort, direction)}`}
+                  inactiveIndicator="↕"
+                  className="w-[34%]"
+                  buttonClassName="w-full justify-between gap-3 font-bold hover:text-primary"
+                />
+                <SortableTableHeader
+                  label="Year"
+                  field="year"
+                  activeField={sort}
+                  direction={direction}
+                  href={`/dataset?view=${view}&sort=year&dir=${nextDirection('year', sort, direction)}`}
+                  inactiveIndicator="↕"
+                  className="w-28"
+                  buttonClassName="w-full justify-between gap-3 font-bold hover:text-primary"
+                />
+                <SortableTableHeader
+                  label="Editions"
+                  field="editions"
+                  activeField={sort}
+                  direction={direction}
+                  href={`/dataset?view=${view}&sort=editions&dir=${nextDirection('editions', sort, direction)}`}
+                  inactiveIndicator="↕"
+                  className="w-28"
+                  buttonClassName="w-full justify-between gap-3 font-bold hover:text-primary"
+                />
               </tr>
             </thead>
             <tbody>

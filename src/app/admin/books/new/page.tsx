@@ -883,7 +883,7 @@ export default function AddNewBook() {
                   className={`input input-bordered w-full bg-base-100 text-base-content ${
                     formErrors.bookName ? "input-error" : ""
                   }`}
-                  placeholder="e.g. Rabindranath Tagore"
+                  placeholder="e.g. Pather Panchali"
                   value={bookName}
                   onChange={(e) => setBookName(e.target.value)}
                 />
@@ -912,7 +912,7 @@ export default function AddNewBook() {
                         className={`input input-bordered flex-1 bg-base-100 text-base-content ${
                           formErrors.authors ? "input-error" : ""
                         }`}
-                        placeholder={`Author ${index + 1}`}
+                        placeholder={index === 0 ? 'e.g. Rabindranath Tagore' : `Author ${index + 1}`}
                         value={author.name}
                         onChange={(e) => updateAuthor(author.id!, e.target.value)}
                       />

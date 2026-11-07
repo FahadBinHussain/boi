@@ -31,9 +31,11 @@ interface BookGridProps {
   isLoading?: boolean;
   error?: string | null;
   compact?: boolean;
+  /** The reader's search text, so an empty result can say what emptied it. */
+  searchQuery?: string;
 }
 
-const BookGrid = ({ books, selectedGenres, isLoading = false, error = null, compact = false }: BookGridProps) => {
+const BookGrid = ({ books, selectedGenres, isLoading = false, error = null, compact = false, searchQuery = '' }: BookGridProps) => {
   const [filteredBooks, setFilteredBooks] = useState<Book[]>(books);
   const [mounted, setMounted] = useState(false);
 
@@ -86,6 +88,25 @@ const BookGrid = ({ books, selectedGenres, isLoading = false, error = null, comp
   }
 
   if (filteredBooks.length === 0) {
+    // Three different reasons for an empty grid. Telling a reader that the
+    // catalog is empty by saying "no books match your search" sends them off
+    // to type a different title into a catalog that has no titles at all.
+    const isSearching = searchQuery.trim().length > 0;
+    const emptyState = selectedGenres.length > 0
+      ? {
+          heading: 'No books in these genres',
+          body: 'Clear the filters to see the whole catalog.',
+        }
+      : isSearching
+      ? {
+          heading: 'No books match your search',
+          body: 'Try a different title or author.',
+        }
+      : {
+          heading: 'The catalog is empty',
+          body: 'No books have been added yet. New titles appear here as the archive grows.',
+        };
+
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <div className="card bg-base-200 border border-base-content/10 p-8 max-w-md text-center rounded-2xl shadow-sm">
@@ -94,14 +115,8 @@ const BookGrid = ({ books, selectedGenres, isLoading = false, error = null, comp
               <FiInbox className="w-10 h-10 text-base-content/75" />
             </MotionIcon>
           </div>
-          <h3 className="font-bold text-base-content text-lg mb-1">
-            {selectedGenres.length > 0 ? 'No books in these genres' : 'No books match your search'}
-          </h3>
-          <p className="text-sm text-base-content/75">
-            {selectedGenres.length > 0
-              ? 'Clear the filters to see the whole catalog.'
-              : 'Try a different title or author.'}
-          </p>
+          <h3 className="font-bold text-base-content text-lg mb-1">{emptyState.heading}</h3>
+          <p className="text-sm text-base-content/75">{emptyState.body}</p>
         </div>
       </div>
     );

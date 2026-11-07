@@ -301,10 +301,10 @@ export default function AdminDashboard() {
                 <table className="table table-zebra table-sm">
                   <thead>
                     <tr className="text-xs uppercase text-base-content/75">
-                      <th>Title</th>
-                      <th>Author</th>
-                      <th>Downloads</th>
-                      <th>Status</th>
+                      <th scope="col">Title</th>
+                      <th scope="col">Author</th>
+                      <th scope="col">Downloads</th>
+                      <th scope="col">Status</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -369,10 +369,10 @@ export default function AdminDashboard() {
               <table className="table table-zebra table-sm">
                 <thead>
                   <tr className="text-xs uppercase text-base-content/75">
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Joined</th>
-                    <th>Downloads</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Joined</th>
+                    <th scope="col">Downloads</th>
                   </tr>
                 </thead>
                 <tbody>

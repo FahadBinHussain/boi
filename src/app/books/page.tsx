@@ -97,9 +97,10 @@ export default function BooksPage() {
               </div>
             </div>
           ) : (
-            <BookGrid 
+            <BookGrid
               books={filteredBooks}
-              selectedGenres={[]} 
+              selectedGenres={[]}
+              searchQuery={searchQuery}
             />
           )}
         </div>
