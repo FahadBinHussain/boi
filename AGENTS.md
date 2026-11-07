@@ -135,6 +135,9 @@ When a record is not a normal book, preserve the material type in metadata, espe
 - **Every link in the footer must resolve.** Privacy policy, Terms of service, Copyright notice and DMCA policy all answered 404. They live in `src/app/{privacy,terms,copyright,dmca}` and share the `LegalPage` shell in `src/components/layout/LegalPage.tsx`, so their wording and spacing cannot drift apart.
 - **`src/app/not-found.tsx` is the site's 404.** Without it any unknown URL answered a bare framework page with no way back into the catalog.
 - **A truncated line needs a way to read the whole value.** The genre, author and series names are clamped to one line in the grid, so each one carries a `title`.
+- **`line-clamp` does not save a string with no break opportunity.** A Bengali or German title with no space rendered 534px wide inside a 186px heading, and the card's `overflow-hidden` cut it, so the reader saw a fragment with no ellipsis and no sign that anything was missing. The card title and author carry `break-words`, so the long token wraps and the clamp puts its ellipsis back.
+- **DaisyUI's `.badge` has a fixed height and `width: fit-content`.** A long genre name therefore ran 84px past the card edge and was clipped by it. A badge label that comes from data is clamped to one line inside the card (`max-w-full` on the badge, `truncate` on the label) and keeps the full name in `title`.
+- **A card needs a width of its own.** The book card had none outside the `compact` variant, so a wide container grew its cover to 1572×2358 — a poster, not a card. It is capped at `max-w-[460px]` and centred; the widest real grid column is 440px, so the catalog pages look the same.
 
 ## Dataset Restore (dataset/main is gitignored)
 

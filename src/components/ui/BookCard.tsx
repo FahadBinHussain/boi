@@ -97,7 +97,7 @@ const BookCard = ({ book, compact = false }: BookCardProps) => {
     <motion.div
       ref={cardRef}
       className={`group card bg-base-100 text-base-content border border-base-200 shadow-sm hover:shadow-xl rounded-2xl overflow-hidden transition-[box-shadow] duration-300 h-full flex flex-col min-w-0 ${
-        compact ? 'max-w-[220px] mx-auto' : ''
+        compact ? 'max-w-[220px] mx-auto' : 'max-w-[460px] mx-auto'
       }`}
       whileHover={{ y: -5 }}
       onMouseEnter={() => setIsHovered(true)}
@@ -192,29 +192,36 @@ const BookCard = ({ book, compact = false }: BookCardProps) => {
 
       {/* Book Info */}
       <div className={`p-4 flex flex-col flex-grow relative ${compact ? 'p-3' : ''}`} style={{ transform: 'translateZ(10px)' }}>
-        <h3 className={`font-bold text-base-content mb-1 line-clamp-2 group-hover:text-primary transition-colors ${
+        <h3 className={`font-bold text-base-content mb-1 line-clamp-2 break-words group-hover:text-primary transition-colors ${
           compact ? 'text-sm' : 'text-base'
         }`}>
           {/* The title is the link to the full record, so a clamped title is
-              never the only route to the rest of the value. */}
+              never the only route to the rest of the value. break-words keeps
+              a title with no break opportunity inside the card instead of
+              letting it run past the edge and get cut. */}
           <Link href={`/books/${book.id}`} className="hover:underline">
             <bdi>{book.title}</bdi>
           </Link>
         </h3>
-        <p className={`text-sm text-base-content/75 mb-2 line-clamp-1 ${compact ? 'text-xs' : ''}`}>
+        <p className={`text-sm text-base-content/75 mb-2 line-clamp-1 break-words ${compact ? 'text-xs' : ''}`}>
           <bdi>{book.author}</bdi>
         </p>
-        
+
         {/* Genres */}
         <div className="flex flex-wrap gap-1 mt-auto pt-2">
           {book.genres.slice(0, compact ? 1 : 2).map((genre) => (
-            <span 
-              key={genre} 
-              className={`badge badge-sm badge-outline border-base-content/20 text-base-content/80 group-hover:badge-primary transition-colors ${
+            <span
+              key={genre}
+              className={`badge badge-sm badge-outline max-w-full border-base-content/20 text-base-content/80 group-hover:badge-primary transition-colors ${
                 compact ? 'text-xs px-1.5 py-0' : ''
               }`}
             >
-              <bdi>{genre}</bdi>
+              {/* A genre name that is longer than the card is clamped to one
+                  line and keeps the full name on hover, so the badge never
+                  runs past the card edge. */}
+              <bdi className="truncate" title={genre}>
+                {genre}
+              </bdi>
             </span>
           ))}
           {book.genres.length > (compact ? 1 : 2) && (
