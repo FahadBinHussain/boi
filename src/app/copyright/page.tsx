@@ -1,5 +1,6 @@
 import LegalPage from "@/components/layout/LegalPage";
 import { pageMetadata } from "@/lib/seo";
+import { CONTACT_URL } from "@/lib/site";
 
 export const metadata = pageMetadata({
   title: "Copyright notice",
@@ -45,9 +46,15 @@ export default function CopyrightPage() {
           heading: "Removing an entry",
           body: (
             <p>
-              If you are a rights holder and you want an entry removed, email{" "}
-              <a href="mailto:contact@boi.com" className="text-primary hover:underline">
-                contact@boi.com
+              If you are a rights holder and you want an entry removed, open an
+              issue on the{" "}
+              <a
+                href={CONTACT_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline"
+              >
+                project&apos;s issue tracker
               </a>{" "}
               with the link to the entry. It is taken down.
             </p>

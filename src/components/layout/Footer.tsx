@@ -1,6 +1,7 @@
 import Link from 'next/link';
-import { FiHeart, FiGithub, FiTwitter, FiMail } from 'react-icons/fi';
+import { FiHeart, FiGithub, FiMessageCircle } from 'react-icons/fi';
 import MotionIcon from '../ui/MotionIcon';
+import { CONTACT_URL, REPO_URL } from '@/lib/site';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -125,7 +126,7 @@ const Footer = () => {
             </h3>
             <div className="flex gap-3 mb-4">
               <a
-                href="https://github.com/FahadBinHussain/boi"
+                href={REPO_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="বই on GitHub"
@@ -136,19 +137,26 @@ const Footer = () => {
                 </MotionIcon>
               </a>
               <a
-                href="mailto:contact@boi.com"
-                aria-label="Email বই"
+                href={CONTACT_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Report a problem on বই GitHub"
                 className="btn btn-ghost btn-circle btn-sm text-base-content/75 hover:text-primary"
               >
                 <MotionIcon animation="float">
-                  <FiMail size={18} />
+                  <FiMessageCircle size={18} />
                 </MotionIcon>
               </a>
             </div>
             <p className="text-sm text-base-content/75">
-              Questions or suggestions? 
-              <a href="mailto:contact@boi.com" className="text-primary hover:underline ms-1">
-                Reach out to us
+              Questions or suggestions?{' '}
+              <a
+                href={CONTACT_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline ms-1"
+              >
+                Open an issue
               </a>
             </p>
           </div>

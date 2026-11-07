@@ -1,7 +1,8 @@
 import Link from 'next/link';
-import { FiBook, FiMail, FiHeart, FiInfo } from 'react-icons/fi';
+import { FiBook, FiHeart, FiInfo, FiMessageCircle } from 'react-icons/fi';
 import MotionIcon from '@/components/ui/MotionIcon';
 import { pageMetadata } from '@/lib/seo';
+import { CONTACT_URL } from '@/lib/site';
 
 export const metadata = pageMetadata({
   title: "About",
@@ -98,22 +99,24 @@ export default function AboutPage() {
         <div className="card bg-base-200 border border-base-content/10 rounded-3xl p-8 md:p-12 text-center shadow-lg">
           <div className="inline-flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full text-primary mx-auto mb-4">
             <MotionIcon animation="float">
-              <FiMail size={20} />
+              <FiMessageCircle size={20} />
             </MotionIcon>
           </div>
           <h2 className="text-2xl font-bold text-base-content mb-2">Get In Touch</h2>
           <p className="text-base-content/75 mb-6 max-w-xl mx-auto text-sm">
-            Have questions, suggestions, or feedback? We'd love to hear from you. Reach out to our team.
+            Have questions, suggestions, or feedback? Open an issue on the project and we will pick it up.
           </p>
           <div>
-            <a 
-              href="mailto:contact@boi.com" 
+            <a
+              href={CONTACT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="btn btn-primary rounded-full px-8 gap-2 font-medium shadow-md"
             >
               <MotionIcon animation="bounce">
-                <FiMail size={16} />
+                <FiMessageCircle size={16} />
               </MotionIcon>
-              Contact Us
+              Open an issue
             </a>
           </div>
         </div>

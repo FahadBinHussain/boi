@@ -1,5 +1,6 @@
 import LegalPage from "@/components/layout/LegalPage";
 import { pageMetadata } from "@/lib/seo";
+import { CONTACT_URL } from "@/lib/site";
 
 export const metadata = pageMetadata({
   title: "Terms of service",
@@ -49,9 +50,14 @@ export default function TermsPage() {
           heading: "Questions",
           body: (
             <p>
-              Email{" "}
-              <a href="mailto:contact@boi.com" className="text-primary hover:underline">
-                contact@boi.com
+              Open an issue on the{" "}
+              <a
+                href={CONTACT_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline"
+              >
+                project&apos;s issue tracker
               </a>
               .
             </p>
