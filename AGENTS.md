@@ -102,6 +102,7 @@ When a record is not a normal book, preserve the material type in metadata, espe
 - **Content images get a 1px outline inset by 1px** — `outline outline-[1px] outline-black/10 dark:outline-white/10 -outline-offset-[1px]`. Pure black in light and pure white in dark, never a tinted neutral, so the edge does not read as a colour fringe.
 - **Scrollable overlays contain their scroll.** The theme menu, the admin sidebar and the dataset table carry `overscroll-contain`, so scrolling past the end never scrolls the page behind.
 - Dead CSS is removed, not kept: `.gpu-accelerated`, `.reveal-text`, `.parallax-*`, `.stagger-container`, `.feature-box`, `.hero-gradient` and `.page-transition-overlay` were all unused and are gone.
+- **The landing hero's build is written down in `docs/landing-hero.md`.** It names the paint order of the wash, the three blurred orbs, the masked grid, the gradient headline stencil and the noise film, with the measured values, the two motions, what would not survive being copied and what could not be read. Read it before changing the hero.
 
 ## Frontend Accessibility Conventions
 
